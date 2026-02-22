@@ -110,7 +110,7 @@ function OnboardingForm() {
 
   if (done) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-navy-50 to-purple-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
           <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="h-8 w-8 text-yellow-600" />
@@ -119,7 +119,7 @@ function OnboardingForm() {
           <p className="text-gray-600 mb-6">{t('pending_approval')}</p>
           <Button
             onClick={() => router.push('/')}
-            className="bg-indigo-600 hover:bg-indigo-700"
+            className="bg-navy-600 hover:bg-navy-700"
           >
             Back to Home
           </Button>
@@ -129,7 +129,7 @@ function OnboardingForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-navy-50 to-purple-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-lg">
         {/* Step 1: Role selection */}
         {step === 1 && (
@@ -142,13 +142,13 @@ function OnboardingForm() {
                 onClick={() => setRole('student')}
                 className={`p-6 rounded-xl border-2 text-left transition-all ${
                   role === 'student'
-                    ? 'border-indigo-600 bg-indigo-50'
-                    : 'border-gray-200 hover:border-indigo-300'
+                    ? 'border-navy-600 bg-navy-50'
+                    : 'border-gray-200 hover:border-navy-300'
                 }`}
               >
                 <BookOpen
                   className={`h-8 w-8 mb-3 ${
-                    role === 'student' ? 'text-indigo-600' : 'text-gray-400'
+                    role === 'student' ? 'text-navy-600' : 'text-gray-400'
                   }`}
                 />
                 <h3 className="font-bold text-gray-900 mb-1">{t('student_role')}</h3>
@@ -159,13 +159,13 @@ function OnboardingForm() {
                 onClick={() => setRole('instructor')}
                 className={`p-6 rounded-xl border-2 text-left transition-all ${
                   role === 'instructor'
-                    ? 'border-indigo-600 bg-indigo-50'
-                    : 'border-gray-200 hover:border-indigo-300'
+                    ? 'border-navy-600 bg-navy-50'
+                    : 'border-gray-200 hover:border-navy-300'
                 }`}
               >
                 <GraduationCap
                   className={`h-8 w-8 mb-3 ${
-                    role === 'instructor' ? 'text-indigo-600' : 'text-gray-400'
+                    role === 'instructor' ? 'text-navy-600' : 'text-gray-400'
                   }`}
                 />
                 <h3 className="font-bold text-gray-900 mb-1">{t('instructor_role')}</h3>
@@ -190,7 +190,7 @@ function OnboardingForm() {
             </div>
 
             <Button
-              className="w-full bg-indigo-600 hover:bg-indigo-700"
+              className="w-full bg-navy-600 hover:bg-navy-700"
               onClick={() => (role === 'instructor' ? setStep(2) : handleSubmit())}
               disabled={loading}
             >
@@ -202,7 +202,7 @@ function OnboardingForm() {
         {/* Step 2: Instructor profile details */}
         {step === 2 && role === 'instructor' && (
           <>
-            <button onClick={() => setStep(1)} className="text-indigo-600 text-sm mb-4 hover:underline">
+            <button onClick={() => setStep(1)} className="text-navy-600 text-sm mb-4 hover:underline">
               ← Back
             </button>
             <h1 className="text-2xl font-bold text-gray-900 mb-6">Instructor Profile</h1>
@@ -228,8 +228,8 @@ function OnboardingForm() {
                       onClick={() => toggleItem(yogaStyles, style, setYogaStyles)}
                       className={`px-3 py-1 rounded-full text-sm border transition-all ${
                         yogaStyles.includes(style)
-                          ? 'bg-indigo-600 text-white border-indigo-600'
-                          : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
+                          ? 'bg-navy-600 text-white border-navy-600'
+                          : 'bg-white text-gray-600 border-gray-300 hover:border-navy-400'
                       }`}
                     >
                       {style}
@@ -247,8 +247,8 @@ function OnboardingForm() {
                       onClick={() => toggleItem(languages, lang, setLanguages)}
                       className={`px-3 py-1 rounded-full text-sm border transition-all ${
                         languages.includes(lang)
-                          ? 'bg-indigo-600 text-white border-indigo-600'
-                          : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
+                          ? 'bg-navy-600 text-white border-navy-600'
+                          : 'bg-white text-gray-600 border-gray-300 hover:border-navy-400'
                       }`}
                     >
                       {lang}
@@ -272,7 +272,7 @@ function OnboardingForm() {
             </div>
 
             <Button
-              className="w-full bg-indigo-600 hover:bg-indigo-700 mt-6"
+              className="w-full bg-navy-600 hover:bg-navy-700 mt-6"
               onClick={handleSubmit}
               disabled={loading || yogaStyles.length === 0 || languages.length === 0}
             >

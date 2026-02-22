@@ -152,7 +152,7 @@ export default async function StudentDashboardPage() {
                     className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-gray-50 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
+                      <div className="w-10 h-10 rounded-full bg-navy-100 flex items-center justify-center text-navy-600 font-bold text-sm">
                         {booking.profiles?.full_name?.charAt(0) || '?'}
                       </div>
                       <div>
@@ -174,7 +174,7 @@ export default async function StudentDashboardPage() {
                         href={booking.google_meet_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-indigo-700"
+                        className="inline-flex items-center gap-1.5 bg-navy-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-navy-700"
                       >
                         <Video className="h-4 w-4" />
                         Join Meet
@@ -189,7 +189,7 @@ export default async function StudentDashboardPage() {
                 <p className="mb-4">{t('no_upcoming')}</p>
                 {canBook && (
                   <Link href="/instructors">
-                    <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
+                    <Button size="sm" className="bg-navy-600 hover:bg-navy-700">
                       {t('browse_instructors')}
                     </Button>
                   </Link>
@@ -205,7 +205,7 @@ export default async function StudentDashboardPage() {
               <div className="space-y-3">
                 <Link href="/instructors">
                   <Button
-                    className="w-full justify-start gap-2 bg-indigo-600 hover:bg-indigo-700"
+                    className="w-full justify-start gap-2 bg-navy-600 hover:bg-navy-700"
                     disabled={!canBook}
                   >
                     <Search className="h-4 w-4" />

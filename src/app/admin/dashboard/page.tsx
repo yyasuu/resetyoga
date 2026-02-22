@@ -61,8 +61,8 @@ export default async function AdminDashboardPage() {
         <div className="grid sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-xl p-5 border border-gray-200">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <Users className="h-5 w-5 text-indigo-600" />
+              <div className="w-10 h-10 bg-navy-100 rounded-lg flex items-center justify-center">
+                <Users className="h-5 w-5 text-navy-600" />
               </div>
               <span className="text-gray-500 text-sm">{t('total_students')}</span>
             </div>
@@ -115,7 +115,7 @@ export default async function AdminDashboardPage() {
                       {instructor.instructor_profiles?.yoga_styles?.slice(0, 4).map((s: string) => (
                         <span
                           key={s}
-                          className="text-xs bg-white text-indigo-600 px-2 py-0.5 rounded-full border border-indigo-100"
+                          className="text-xs bg-white text-navy-600 px-2 py-0.5 rounded-full border border-navy-100"
                         >
                           {s}
                         </span>

@@ -137,7 +137,7 @@ export function InstructorCalendar({ instructorId }: InstructorCalendarProps) {
           <span className="text-gray-600">Available (click to remove)</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 rounded bg-indigo-500" />
+          <div className="w-4 h-4 rounded bg-navy-500" />
           <span className="text-gray-600">Booked by student</span>
         </div>
         <div className="flex items-center gap-2">
@@ -187,7 +187,7 @@ export function InstructorCalendar({ instructorId }: InstructorCalendarProps) {
               <p className="font-bold text-gray-900 mt-2">
                 {format(pendingSlot.start, 'EEEE, MMMM d, yyyy')}
               </p>
-              <p className="text-indigo-600 font-medium">
+              <p className="text-navy-600 font-medium">
                 {format(pendingSlot.start, 'h:mm a')} – {format(pendingSlot.end, 'h:mm a')}
               </p>
             </div>
@@ -197,7 +197,7 @@ export function InstructorCalendar({ instructorId }: InstructorCalendarProps) {
               Cancel
             </Button>
             <Button
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-navy-600 hover:bg-navy-700"
               onClick={confirmAddSlot}
               disabled={loading}
             >

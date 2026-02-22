@@ -151,7 +151,7 @@ function SubscriptionContent() {
                 <span>Secured by Stripe · 256-bit SSL encryption</span>
               </div>
               <Button
-                className="bg-indigo-600 hover:bg-indigo-700"
+                className="bg-navy-600 hover:bg-navy-700"
                 onClick={handleAddCard}
                 disabled={loading}
               >
@@ -251,7 +251,7 @@ function SubscriptionContent() {
           {/* Monthly */}
           <div
             className={`rounded-xl border p-5 ${
-              isActive ? 'border-indigo-400 bg-indigo-50' : 'border-gray-200 bg-white'
+              isActive ? 'border-navy-400 bg-navy-50' : 'border-gray-200 bg-white'
             }`}
           >
             <h3 className="font-bold text-gray-900 mb-1">{t('monthly_plan')}</h3>
@@ -266,7 +266,7 @@ function SubscriptionContent() {
               <li>✓ Cancel anytime</li>
             </ul>
             {isActive && (
-              <span className="mt-3 inline-block text-xs font-medium text-indigo-600 bg-indigo-100 px-2 py-1 rounded-full">
+              <span className="mt-3 inline-block text-xs font-medium text-navy-600 bg-navy-100 px-2 py-1 rounded-full">
                 Current Plan
               </span>
             )}
@@ -276,7 +276,7 @@ function SubscriptionContent() {
         {/* ── Action buttons ───────────────────────────────────────────────── */}
         {!isActive && (
           <Button
-            className="w-full bg-indigo-600 hover:bg-indigo-700 h-12 text-base"
+            className="w-full bg-navy-600 hover:bg-navy-700 h-12 text-base"
             onClick={handleSubscribe}
             disabled={loading}
           >

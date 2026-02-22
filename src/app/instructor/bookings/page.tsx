@@ -62,7 +62,7 @@ export default async function InstructorBookingsPage() {
                   className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                    <div className="w-10 h-10 rounded-full bg-navy-100 flex items-center justify-center text-navy-600 font-bold">
                       {booking.profiles?.full_name?.charAt(0) || '?'}
                     </div>
                     <div>
@@ -85,7 +85,7 @@ export default async function InstructorBookingsPage() {
                         href={booking.google_meet_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+                        className="inline-flex items-center gap-1.5 bg-navy-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-navy-700 transition"
                       >
                         <Video className="h-4 w-4" />
                         {t('join_meeting')}

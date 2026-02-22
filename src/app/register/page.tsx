@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslations } from 'next-intl'
@@ -58,20 +59,26 @@ function RegisterForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-linen-200 via-sage-50 to-navy-50 dark:from-navy-900 dark:via-navy-800 dark:to-navy-900 flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-lg p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <span className="text-3xl">🧘</span>
-            <span className="font-bold text-2xl text-indigo-600">YogaConnect</span>
+          <Link href="/" className="inline-flex items-center justify-center mb-4">
+            <Image
+              src="/reset-yoga-logo.png"
+              alt="Reset Yoga"
+              width={160}
+              height={52}
+              className="h-12 w-auto object-contain dark:brightness-90"
+              priority
+            />
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">{t('register_title')}</h1>
-          <p className="text-gray-500 mt-1">{t('register_subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('register_title')}</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">{t('register_subtitle')}</p>
         </div>
 
         <Button
           variant="outline"
-          className="w-full mb-4 h-11 border-gray-300"
+          className="w-full mb-4 h-11 border-gray-300 dark:border-navy-600 dark:bg-navy-700 dark:text-gray-200 dark:hover:bg-navy-600"
           onClick={handleGoogleRegister}
         >
           <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -85,27 +92,27 @@ function RegisterForm() {
 
         <div className="relative mb-4">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200" />
+            <div className="w-full border-t border-gray-200 dark:border-navy-600" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">or</span>
+            <span className="px-2 bg-white dark:bg-navy-800 text-gray-500 dark:text-gray-400">or</span>
           </div>
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
-            <Label htmlFor="fullName">{t('full_name')}</Label>
+            <Label htmlFor="fullName" className="dark:text-gray-200">{t('full_name')}</Label>
             <Input
               id="fullName"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your Name"
               required
-              className="mt-1"
+              className="mt-1 dark:bg-navy-700 dark:border-navy-600 dark:text-gray-100 dark:placeholder-gray-500"
             />
           </div>
           <div>
-            <Label htmlFor="email">{t('email')}</Label>
+            <Label htmlFor="email" className="dark:text-gray-200">{t('email')}</Label>
             <Input
               id="email"
               type="email"
@@ -113,11 +120,11 @@ function RegisterForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="mt-1"
+              className="mt-1 dark:bg-navy-700 dark:border-navy-600 dark:text-gray-100 dark:placeholder-gray-500"
             />
           </div>
           <div>
-            <Label htmlFor="password">{t('password')}</Label>
+            <Label htmlFor="password" className="dark:text-gray-200">{t('password')}</Label>
             <Input
               id="password"
               type="password"
@@ -126,21 +133,21 @@ function RegisterForm() {
               placeholder="••••••••"
               minLength={8}
               required
-              className="mt-1"
+              className="mt-1 dark:bg-navy-700 dark:border-navy-600 dark:text-gray-100 dark:placeholder-gray-500"
             />
           </div>
           <Button
             type="submit"
-            className="w-full bg-indigo-600 hover:bg-indigo-700 h-11"
+            className="w-full bg-navy-600 hover:bg-navy-700 dark:bg-navy-500 dark:hover:bg-navy-600 text-white h-11"
             disabled={loading}
           >
             {loading ? 'Creating account...' : t('register_btn')}
           </Button>
         </form>
 
-        <p className="text-center text-gray-500 text-sm mt-6">
+        <p className="text-center text-gray-500 dark:text-gray-400 text-sm mt-6">
           {t('have_account')}{' '}
-          <Link href="/login" className="text-indigo-600 font-medium hover:underline">
+          <Link href="/login" className="text-navy-600 dark:text-sage-400 font-medium hover:underline">
             {t('sign_in')}
           </Link>
         </p>
@@ -151,7 +158,7 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center dark:bg-navy-900">Loading...</div>}>
       <RegisterForm />
     </Suspense>
   )

@@ -45,7 +45,7 @@ export async function createMeetEvent({
     conferenceDataVersion: 1,
     requestBody: {
       summary: title,
-      description: `Yoga session between ${instructorName} (instructor) and ${studentName} (student).\n\nPowered by YogaConnect.`,
+      description: `Yoga session between ${instructorName} (instructor) and ${studentName} (student).\n\nPowered by Reset Yoga.`,
       start: {
         dateTime: startTime,
         timeZone: 'UTC',

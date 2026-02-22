@@ -133,8 +133,8 @@ export default function InstructorProfilePage() {
                   onClick={() => toggle(yogaStyles, style, setYogaStyles)}
                   className={`px-3 py-1 rounded-full text-sm border transition-all ${
                     yogaStyles.includes(style)
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
+                      ? 'bg-navy-600 text-white border-navy-600'
+                      : 'bg-white text-gray-600 border-gray-300 hover:border-navy-400'
                   }`}
                 >
                   {style}
@@ -152,8 +152,8 @@ export default function InstructorProfilePage() {
                   onClick={() => toggle(languages, lang, setLanguages)}
                   className={`px-3 py-1 rounded-full text-sm border transition-all ${
                     languages.includes(lang)
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
+                      ? 'bg-navy-600 text-white border-navy-600'
+                      : 'bg-white text-gray-600 border-gray-300 hover:border-navy-400'
                   }`}
                 >
                   {lang}
@@ -176,7 +176,7 @@ export default function InstructorProfilePage() {
           </div>
 
           <Button
-            className="w-full bg-indigo-600 hover:bg-indigo-700"
+            className="w-full bg-navy-600 hover:bg-navy-700"
             onClick={handleSave}
             disabled={loading}
           >

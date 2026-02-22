@@ -8,7 +8,7 @@
     "logout": "ログアウト"
   },
   "landing": {
-    "hero_title": "世界トップクラスの講師からヨガを学ぼう",
+    "hero_title": "45分でリセット。体と心を整えよう",
     "hero_subtitle": "インドや日本など世界中の認定ヨガ講師とつながれます。2回の無料体験でスタートしましょう。",
     "cta_start": "無料で始める",
     "cta_browse": "講師を探す",
@@ -29,7 +29,7 @@
     "pricing_monthly": "月額1,980円（$19.99）",
     "pricing_monthly_desc": "月4回まで、いつでも解約可能",
     "instructor_cta_title": "ヨガ講師の方へ",
-    "instructor_cta_desc": "プラットフォームに参加して世界中の生徒に教えましょう。スケジュールは自由に設定できます。",
+    "instructor_cta_desc": "Reset Yogaに参加して世界中の生徒に教えましょう。スケジュールは自由に設定できます。",
     "instructor_cta_btn": "講師として応募する"
   },
   "auth": {

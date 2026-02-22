@@ -57,7 +57,7 @@ export default async function InstructorDetailPage({
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl border border-gray-200 p-6 sticky top-24">
               {/* Avatar */}
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-navy-400 to-purple-500 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
                 {instructor.full_name?.charAt(0) || '?'}
               </div>
 
@@ -85,11 +85,11 @@ export default async function InstructorDetailPage({
 
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-2 text-gray-600">
-                  <Clock className="h-4 w-4 text-indigo-500" />
+                  <Clock className="h-4 w-4 text-navy-500" />
                   {t('years_exp', { count: ip?.years_experience || 0 })}
                 </div>
                 <div className="flex items-start gap-2 text-gray-600">
-                  <Globe className="h-4 w-4 text-indigo-500 mt-0.5" />
+                  <Globe className="h-4 w-4 text-navy-500 mt-0.5" />
                   <span>{ip?.languages?.join(', ') || '—'}</span>
                 </div>
               </div>
@@ -103,7 +103,7 @@ export default async function InstructorDetailPage({
                     {ip.yoga_styles.map((s: string) => (
                       <span
                         key={s}
-                        className="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full border border-indigo-100"
+                        className="text-xs bg-navy-50 text-navy-600 px-2 py-1 rounded-full border border-navy-100"
                       >
                         {s}
                       </span>

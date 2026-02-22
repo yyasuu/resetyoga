@@ -257,7 +257,7 @@ export function StudentBookingCalendar({
               <p className="font-bold text-gray-900">
                 {format(new Date(selectedSlot.start_time), 'EEEE, MMMM d, yyyy')}
               </p>
-              <p className="text-indigo-600 font-medium text-lg">
+              <p className="text-navy-600 font-medium text-lg">
                 {format(new Date(selectedSlot.start_time), 'h:mm a')} –{' '}
                 {format(new Date(selectedSlot.end_time), 'h:mm a')}
               </p>
@@ -283,7 +283,7 @@ export function StudentBookingCalendar({
               Cancel
             </Button>
             <Button
-              className="bg-indigo-600 hover:bg-indigo-700"
+              className="bg-navy-600 hover:bg-navy-700"
               onClick={handleBook}
               disabled={loading}
             >
@@ -306,7 +306,7 @@ export function StudentBookingCalendar({
                 href={meetLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-3 rounded-xl font-medium hover:bg-indigo-700 transition w-fit"
+                className="flex items-center gap-2 bg-navy-600 text-white px-4 py-3 rounded-xl font-medium hover:bg-navy-700 transition w-fit"
               >
                 <Video className="h-5 w-5" />
                 {tBook('join_meeting')}

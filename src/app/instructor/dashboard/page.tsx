@@ -75,7 +75,7 @@ export default async function InstructorDashboardPage() {
             </p>
           </div>
           <Link href="/instructor/availability">
-            <Button className="bg-indigo-600 hover:bg-indigo-700">
+            <Button className="bg-navy-600 hover:bg-navy-700">
               <Calendar className="h-4 w-4 mr-2" />
               {t('availability')}
             </Button>
@@ -86,8 +86,8 @@ export default async function InstructorDashboardPage() {
         <div className="grid sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border border-gray-200">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <Video className="h-5 w-5 text-indigo-600" />
+              <div className="w-10 h-10 bg-navy-100 rounded-lg flex items-center justify-center">
+                <Video className="h-5 w-5 text-navy-600" />
               </div>
               <span className="text-gray-500 text-sm">{t('total_sessions')}</span>
             </div>
@@ -130,7 +130,7 @@ export default async function InstructorDashboardPage() {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-bold text-gray-900">{t('upcoming_bookings')}</h2>
               <Link href="/instructor/bookings">
-                <Button variant="ghost" size="sm" className="text-indigo-600">
+                <Button variant="ghost" size="sm" className="text-navy-600">
                   View all <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               </Link>
@@ -144,7 +144,7 @@ export default async function InstructorDashboardPage() {
                     className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-sm">
+                      <div className="w-10 h-10 rounded-full bg-navy-100 flex items-center justify-center text-navy-600 font-bold text-sm">
                         {booking.profiles?.full_name?.charAt(0) || '?'}
                       </div>
                       <div>
@@ -166,7 +166,7 @@ export default async function InstructorDashboardPage() {
                         href={booking.google_meet_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:underline font-medium"
+                        className="inline-flex items-center gap-1 text-sm text-navy-600 hover:underline font-medium"
                       >
                         <Video className="h-4 w-4" />
                         Join
@@ -180,7 +180,7 @@ export default async function InstructorDashboardPage() {
                 <Calendar className="h-12 w-12 mx-auto mb-3 opacity-30" />
                 <p>No upcoming sessions</p>
                 <Link href="/instructor/availability" className="mt-3 inline-block">
-                  <Button size="sm" className="bg-indigo-600 hover:bg-indigo-700">
+                  <Button size="sm" className="bg-navy-600 hover:bg-navy-700">
                     Set Availability
                   </Button>
                 </Link>
@@ -195,7 +195,7 @@ export default async function InstructorDashboardPage() {
               <div className="space-y-3">
                 <Link href="/instructor/availability">
                   <Button variant="outline" className="w-full justify-start gap-2">
-                    <Calendar className="h-4 w-4 text-indigo-600" />
+                    <Calendar className="h-4 w-4 text-navy-600" />
                     Manage Availability
                   </Button>
                 </Link>
@@ -215,10 +215,10 @@ export default async function InstructorDashboardPage() {
             </div>
 
             {/* Available slots count */}
-            <div className="bg-indigo-50 rounded-xl border border-indigo-100 p-6">
-              <h3 className="font-bold text-indigo-900 mb-1">Available Slots</h3>
-              <p className="text-3xl font-bold text-indigo-600">{slots?.length || 0}</p>
-              <p className="text-indigo-600 text-sm">upcoming open slots</p>
+            <div className="bg-navy-50 rounded-xl border border-navy-100 p-6">
+              <h3 className="font-bold text-navy-900 mb-1">Available Slots</h3>
+              <p className="text-3xl font-bold text-navy-600">{slots?.length || 0}</p>
+              <p className="text-navy-600 text-sm">upcoming open slots</p>
             </div>
           </div>
         </div>

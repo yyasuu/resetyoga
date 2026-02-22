@@ -66,14 +66,14 @@ export default async function InstructorsPage({
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             {instructors.map((instructor: any) => (
               <Link key={instructor.id} href={`/instructors/${instructor.id}`}>
-                <div className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg hover:border-indigo-200 transition-all cursor-pointer group h-full flex flex-col">
+                <div className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg hover:border-navy-200 transition-all cursor-pointer group h-full flex flex-col">
                   {/* Avatar & Name */}
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-navy-400 to-purple-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                       {instructor.full_name?.charAt(0) || '?'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">
+                      <h3 className="font-bold text-gray-900 group-hover:text-navy-600 transition-colors truncate">
                         {instructor.full_name}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
@@ -115,7 +115,7 @@ export default async function InstructorsPage({
                       {instructor.instructor_profiles.yoga_styles.slice(0, 4).map((s: string) => (
                         <span
                           key={s}
-                          className="text-xs bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-full border border-indigo-100"
+                          className="text-xs bg-navy-50 text-navy-600 px-2 py-0.5 rounded-full border border-navy-100"
                         >
                           {s}
                         </span>
@@ -135,7 +135,7 @@ export default async function InstructorsPage({
                   )}
 
                   <div className="mt-4 pt-4 border-t border-gray-100">
-                    <span className="text-indigo-600 font-medium text-sm group-hover:underline">
+                    <span className="text-navy-600 font-medium text-sm group-hover:underline">
                       {t('view_profile')} →
                     </span>
                   </div>
