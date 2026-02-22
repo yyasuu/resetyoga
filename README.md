@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# YogaConnect 🧘
 
-## Getting Started
+グローバルなオンラインヨガプラットフォーム。インド・日本など世界中の認定講師が45分授業枠を設定し、生徒がGoogle Meet経由でリアルタイムレッスンを受けられる。
 
-First, run the development server:
+## 機能
+
+- **講師**: カレンダーから45分枠を追加・削除
+- **生徒**: 講師一覧を検索・フィルタリング → 空き枠を予約 → Google MeetリンクをEメールで受信
+- **決済**: Stripe サブスクリプション（無料2回 → $19.99/月・4コマ）
+- **UI言語**: 英語 / 日本語
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router) + TypeScript
+- **Database/Auth**: Supabase (PostgreSQL + RLS)
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Calendar**: FullCalendar
+- **Payments**: Stripe
+- **Video**: Google Calendar API (Meet link 自動生成)
+- **Email**: Resend
+- **i18n**: next-intl
+
+## セットアップ
+
+### 1. 環境変数を設定
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.local.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Supabase
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. https://supabase.com でプロジェクトを作成
+2. SQL Editor で `supabase/migrations/001_initial.sql` を実行
+3. Authentication → Google OAuth を有効化（Redirect URL: `https://your-domain/auth/callback`）
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Stripe
 
-## Learn More
+1. 商品・価格を作成: $19.99/月（recurring）
+2. Webhook: `https://your-domain/api/stripe/webhook`
+   - イベント: `checkout.session.completed`, `invoice.payment_succeeded`, `customer.subscription.deleted`
+3. ローカルテスト: `stripe listen --forward-to localhost:3000/api/stripe/webhook`
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Google Calendar API
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Google Cloud Console → Calendar API を有効化
+2. サービスアカウント作成・JSONキーをダウンロード
+3. 共有カレンダーを作成し、サービスアカウントに「編集者」権限を付与
+4. Calendar ID を `.env.local` に設定
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 5. 起動
 
-## Deploy on Vercel
+```bash
+npm install
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+http://localhost:3000
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 管理者設定
+
+Supabase Dashboard → `profiles` テーブルで `role` を `admin` に変更。
+
+## デプロイ (Vercel推奨)
+
+```bash
+vercel --prod
+```
+
+環境変数をVercel Dashboardで設定し、`NEXT_PUBLIC_APP_URL` を本番URLに更新。

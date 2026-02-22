@@ -1,0 +1,58 @@
+import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { addMinutes } from 'date-fns'
+
+const schema = z.object({
+  startTime: z.string(),
+})
+
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role !== 'instructor') {
+      return NextResponse.json({ error: 'Only instructors can add slots' }, { status: 403 })
+    }
+
+    const body = await request.json()
+    const { startTime } = schema.parse(body)
+
+    const start = new Date(startTime)
+    const end = addMinutes(start, 45)
+
+    if (start < new Date()) {
+      return NextResponse.json({ error: 'Cannot add slots in the past' }, { status: 400 })
+    }
+
+    const { data, error } = await supabase
+      .from('time_slots')
+      .insert({
+        instructor_id: user.id,
+        start_time: start.toISOString(),
+        end_time: end.toISOString(),
+        status: 'available',
+      })
+      .select()
+      .single()
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ slot: data })
+  } catch (err) {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
