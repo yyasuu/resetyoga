@@ -66,9 +66,9 @@ function RegisterForm() {
             <Image
               src="/reset-yoga-logo.png"
               alt="Reset Yoga"
-              width={160}
-              height={52}
-              className="h-12 w-auto object-contain dark:brightness-90"
+              width={1536}
+              height={1024}
+              className="h-16 w-auto object-contain dark:brightness-[2.5] dark:saturate-[0.8]"
               priority
             />
           </Link>

@@ -51,18 +51,18 @@ export function Navbar({ user }: NavbarProps) {
   }
 
   return (
-    <nav className="bg-white dark:bg-navy-900 border-b border-gray-100 dark:border-navy-700 sticky top-0 z-50 transition-colors">
+    <nav className="bg-white dark:bg-navy-900 border-b border-gray-100 dark:border-navy-700 sticky top-0 z-50 transition-colors overflow-visible">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-[72px]">
 
-          {/* Logo — place the PNG at /public/reset-yoga-logo.png */}
+          {/* Logo */}
           <Link href="/" className="flex items-center">
             <Image
               src="/reset-yoga-logo.png"
               alt="Reset Yoga"
-              width={160}
-              height={52}
-              className="h-11 w-auto object-contain dark:brightness-90"
+              width={1536}
+              height={1024}
+              className="h-[121px] w-auto object-contain dark:brightness-[2.5] dark:saturate-[0.8]"
               priority
             />
           </Link>

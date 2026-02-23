@@ -20,38 +20,69 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setLoading(true)
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const { error } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error) {
+  if (error) {
+    const msg = (error.message || "").toLowerCase()
+
+    if (msg.includes("invalid login credentials")) {
+      toast.error(
+        "ログインに失敗しました。\n\n" +
+        "・このメールは Google で登録されている可能性があります。Googleでログインしてください。\n" +
+        "・メールログインを使いたい場合は「パスワードを忘れた方」から再設定できます。"
+      )
+    } else {
       toast.error(error.message)
-      setLoading(false)
-      return
     }
 
-    // Get profile to redirect to right dashboard
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-      if (profile?.role === 'instructor') {
-        router.push('/instructor/dashboard')
-      } else if (profile?.role === 'admin') {
-        router.push('/admin/dashboard')
-      } else {
-        router.push('/dashboard')
-      }
-      router.refresh()
-    }
     setLoading(false)
+    return
   }
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.role === 'instructor') {
+      router.push('/instructor/dashboard')
+    } else if (profile?.role === 'admin') {
+      router.push('/admin/dashboard')
+    } else {
+      router.push('/dashboard')
+    }
+
+    router.refresh()
+  }
+
+  setLoading(false)
+}
+
+const handleForgotPassword = async () => {
+  if (!email) {
+    toast.error("メールアドレスを入力してください。")
+    return
+  }
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/auth/callback`
+  })
+
+  if (error) {
+    toast.error(error.message)
+    return
+  }
+
+  toast.success("パスワード再設定メールを送信しました。受信トレイをご確認ください。")
+}
 
   const handleGoogleLogin = async () => {
     await supabase.auth.signInWithOAuth({
@@ -69,9 +100,9 @@ export default function LoginPage() {
             <Image
               src="/reset-yoga-logo.png"
               alt="Reset Yoga"
-              width={160}
-              height={52}
-              className="h-12 w-auto object-contain dark:brightness-90"
+              width={1536}
+              height={1024}
+              className="h-16 w-auto object-contain dark:brightness-[2.5] dark:saturate-[0.8]"
               priority
             />
           </Link>

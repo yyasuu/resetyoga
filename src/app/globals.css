@@ -4,6 +4,11 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─── Typography ──────────────────────────────────────────────────────────── */
+@theme {
+  --font-playfair: var(--font-playfair), "Playfair Display", Georgia, serif;
+}
+
 /* ─── Reset Yoga brand color palettes ─────────────────────────────────────── */
 @theme {
   /* Navy – primary brand (deep #1B2B4B) */
@@ -168,5 +173,9 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-playfair), "Playfair Display", Georgia, serif;
+  }
+  h1, h2, h3, h4, h5, h6, p, span, a, button, input, label, li {
+    font-family: inherit;
   }
 }
