@@ -4,6 +4,16 @@ import { createCheckoutSession, createStripeCustomer, STRIPE_PRICE_ID } from '@/
 
 export async function POST(request: NextRequest) {
   try {
+    // Fail fast if the price env var is missing — avoids a cryptic Stripe error
+    if (!STRIPE_PRICE_ID) {
+      console.error('[checkout] priceId: <not set> — STRIPE_PRICE_ID env var is missing')
+      return NextResponse.json(
+        { error: 'Service misconfiguration: subscription price is not configured' },
+        { status: 400 }
+      )
+    }
+    console.log(`[checkout] priceId: ${STRIPE_PRICE_ID.slice(0, 8)}***`)
+
     const supabase = await createClient()
     const {
       data: { user },
