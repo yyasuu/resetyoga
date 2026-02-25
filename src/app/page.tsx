@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
 import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
 import { Profile } from '@/types'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, Star, Video, Clock } from 'lucide-react'
@@ -257,27 +258,7 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-navy-900 text-navy-300 py-12 px-4">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-3">
-            {/* Text logo fallback until PNG is placed at /public/reset-yoga-logo.png */}
-            <span className="font-bold text-white text-lg tracking-wide">Reset Yoga</span>
-          </div>
-          <div className="flex gap-8 text-sm">
-            <Link href="/instructors" className="hover:text-white transition-colors">
-              Find Instructors
-            </Link>
-            <Link href="/register" className="hover:text-white transition-colors">
-              Sign Up
-            </Link>
-            <Link href="/login" className="hover:text-white transition-colors">
-              Log In
-            </Link>
-          </div>
-          <p className="text-sm">© 2026 Reset Yoga. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

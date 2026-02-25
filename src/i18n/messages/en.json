@@ -154,6 +154,15 @@
     "total_students": "Total Students",
     "total_bookings": "Total Bookings"
   },
+  "footer": {
+    "nav_title": "Navigation",
+    "legal_title": "Legal",
+    "tokusho": "Tokusho (JP Disclosure)",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "refund": "Refund / Cancellation",
+    "copyright": "© 2026 Reset Yoga. All rights reserved."
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",

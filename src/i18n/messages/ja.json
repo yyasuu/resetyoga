@@ -154,6 +154,15 @@
     "total_students": "総生徒数",
     "total_bookings": "総予約数"
   },
+  "footer": {
+    "nav_title": "ナビゲーション",
+    "legal_title": "法的情報",
+    "tokusho": "特定商取引法に基づく表記",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー",
+    "refund": "返金・キャンセルポリシー",
+    "copyright": "© 2026 Reset Yoga. All rights reserved."
+  },
   "common": {
     "loading": "読み込み中...",
     "error": "エラーが発生しました",
