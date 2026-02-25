@@ -85,17 +85,12 @@ function OnboardingForm() {
       }
       setDone(true)
     } else {
-      // Create student subscription (trial)
-      const { error: subError } = await supabase.from('student_subscriptions').upsert({
-        student_id: user.id,
-        status: 'trial',
-        trial_used: 0,
-        trial_limit: 2,
-        sessions_used: 0,
-        sessions_limit: 4,
-      })
+      // Initialize student subscription via server-side API (uses admin client to bypass RLS)
+      const res = await fetch('/api/onboarding/student', { method: 'POST' })
 
-      if (subError) {
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        console.error('Failed to initialize subscription:', body)
         toast.error('Failed to initialize subscription')
         setLoading(false)
         return
