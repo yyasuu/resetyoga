@@ -25,56 +25,63 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // ── 2. Subscription & session quota check ────────────────────────────────
-    const { data: subscription } = await supabase
-      .from('student_subscriptions')
-      .select('*')
-      .eq('student_id', user.id)
+    // ── 2. Admin bypass — skip all subscription/quota checks for testing ──────
+    const { data: callerProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
       .single()
 
-    if (!subscription) {
-      return NextResponse.json(
-        { error: 'No subscription found', requiresSubscription: true },
-        { status: 403 },
-      )
-    }
+    const isAdmin = callerProfile?.role === 'admin'
 
-    const isTrial = subscription.status === 'trial'
-    const isActive = subscription.status === 'active'
+    let isTrial = false
 
-    if (isTrial && subscription.trial_used >= subscription.trial_limit) {
-      return NextResponse.json(
-        { error: 'Trial sessions exhausted', requiresSubscription: true },
-        { status: 403 },
-      )
-    }
+    if (!isAdmin) {
+      // ── 3. Subscription & session quota check ────────────────────────────────
+      const { data: subscription } = await supabase
+        .from('student_subscriptions')
+        .select('*')
+        .eq('student_id', user.id)
+        .single()
 
-    if (isActive && subscription.sessions_used >= subscription.sessions_limit) {
-      return NextResponse.json(
-        { error: 'Monthly session limit reached', requiresSubscription: true },
-        { status: 403 },
-      )
-    }
+      if (!subscription) {
+        return NextResponse.json(
+          { error: 'No subscription found', requiresSubscription: true },
+          { status: 403 },
+        )
+      }
 
-    if (!isTrial && !isActive) {
-      return NextResponse.json(
-        { error: 'Subscription inactive', requiresSubscription: true },
-        { status: 403 },
-      )
-    }
+      isTrial = subscription.status === 'trial'
+      const isActive = subscription.status === 'active'
 
-    // ── 3. Trial abuse guard: require card on file before first booking ───────
-    //
-    // We use the presence of stripe_customer_id as a proxy for "card registered".
-    // The student went through /api/stripe/setup (Checkout mode=setup) which
-    // creates a Stripe Customer and attaches a PaymentMethod, then the webhook
-    // stores the customer_id back here.
-    //
-    if (isTrial && !subscription.stripe_customer_id) {
-      return NextResponse.json(
-        { error: 'Payment method required to start your free trial', requiresCard: true },
-        { status: 402 },
-      )
+      if (isTrial && subscription.trial_used >= subscription.trial_limit) {
+        return NextResponse.json(
+          { error: 'Trial sessions exhausted', requiresSubscription: true },
+          { status: 403 },
+        )
+      }
+
+      if (isActive && subscription.sessions_used >= subscription.sessions_limit) {
+        return NextResponse.json(
+          { error: 'Monthly session limit reached', requiresSubscription: true },
+          { status: 403 },
+        )
+      }
+
+      if (!isTrial && !isActive) {
+        return NextResponse.json(
+          { error: 'Subscription inactive', requiresSubscription: true },
+          { status: 403 },
+        )
+      }
+
+      // ── 4. Trial abuse guard: require card on file before first booking ───────
+      if (isTrial && !subscription.stripe_customer_id) {
+        return NextResponse.json(
+          { error: 'Payment method required to start your free trial', requiresCard: true },
+          { status: 402 },
+        )
+      }
     }
 
     // ── 4. Fetch slot + profiles (needed for Meet event + emails) ────────────
