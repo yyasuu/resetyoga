@@ -26,7 +26,7 @@ export default async function PrivacyPage() {
         <h1 className="text-3xl font-bold text-navy-900 dark:text-white mb-2">
           Privacy Policy
         </h1>
-        <p className="text-gray-500 dark:text-navy-400 text-sm mb-8">プライバシーポリシー — Last updated: February 2026</p>
+        <p className="text-gray-500 dark:text-navy-400 text-sm mb-8">Last updated: February 2026</p>
 
         <div className="space-y-6 text-gray-700 dark:text-gray-300">
 
@@ -56,7 +56,8 @@ export default async function PrivacyPage() {
               <li><strong>Supabase</strong> — database and authentication (EU/US data centers)</li>
               <li><strong>Stripe</strong> — payment processing (PCI-DSS compliant)</li>
               <li><strong>Resend</strong> — transactional email</li>
-              <li><strong>Google</strong> — Google Meet for live sessions; Google OAuth for sign-in</li>
+              <li><strong>Jitsi Meet</strong> — video sessions for live classes</li>
+              <li><strong>Google</strong> — Google OAuth for sign-in</li>
               <li><strong>Vercel</strong> — hosting and CDN</li>
             </ul>
             <p className="text-sm mt-2">

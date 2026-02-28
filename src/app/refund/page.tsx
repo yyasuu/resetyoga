@@ -26,25 +26,20 @@ export default async function RefundPage() {
         <h1 className="text-3xl font-bold text-navy-900 dark:text-white mb-2">
           Refund &amp; Cancellation Policy
         </h1>
-        <p className="text-gray-500 dark:text-navy-400 text-sm mb-2">返金・キャンセルポリシー</p>
         <p className="text-gray-500 dark:text-navy-400 text-sm mb-8">Last updated: February 2026</p>
 
         <div className="space-y-6 text-gray-700 dark:text-gray-300">
 
-          <Section title="1. Digital Service — No Refund Policy / デジタル役務の性質について">
+          <Section title="1. Digital Service — No Refund Policy">
             <p className="text-sm">
               Reset Yoga provides a digital subscription service granting immediate access to live online
               yoga sessions. Because the service is delivered electronically and access is granted upon
               payment, <strong>all sales are final and we do not offer refunds</strong> for completed
               billing periods.
             </p>
-            <p className="text-sm mt-2 text-gray-500 dark:text-navy-400">
-              本サービスはデジタル役務であり、決済完了と同時にサービスへのアクセスが提供されます。
-              そのため、原則として返金はお受けできません。
-            </p>
           </Section>
 
-          <Section title="2. Subscription Cancellation / サブスクリプションの解約">
+          <Section title="2. Subscription Cancellation">
             <p className="text-sm">
               You may cancel your subscription at any time from your account dashboard or by contacting
               support. Upon cancellation:
@@ -54,13 +49,9 @@ export default async function RefundPage() {
               <li>No further charges will be made after cancellation.</li>
               <li>Unused sessions in the current period are forfeited upon cancellation.</li>
             </ul>
-            <p className="text-sm mt-2 text-gray-500 dark:text-navy-400">
-              解約はダッシュボードまたはサポートへのご連絡にて随時承ります。
-              解約後も現在の請求期間終了まではサービスをご利用いただけます。
-            </p>
           </Section>
 
-          <Section title="3. Exceptional Refund Cases / 例外的な返金対応">
+          <Section title="3. Exceptional Refund Cases">
             <p className="text-sm">
               We may issue a refund or service credit at our sole discretion in the following circumstances:
             </p>
@@ -84,47 +75,33 @@ export default async function RefundPage() {
               </a>{' '}
               within <strong>14 days</strong> of the charge with your order details.
             </p>
-            <p className="text-sm mt-2 text-gray-500 dark:text-navy-400">
-              上記に該当する場合は、請求日から14日以内にサポートまでご連絡ください。
-              当社の裁量により返金またはサービスクレジットにて対応いたします。
-            </p>
           </Section>
 
-          <Section title="4. Session Cancellation by Student / 受講者によるセッションキャンセル">
+          <Section title="4. Session Cancellation by Student">
             <p className="text-sm">
               Individual session cancellations are subject to the following policy:
             </p>
             <ul className="list-disc pl-5 space-y-1 text-sm mt-2">
-              <li>Cancellations made <strong>24 hours or more</strong> before the session: the session credit is returned to your account.</li>
-              <li>Cancellations made <strong>less than 24 hours</strong> before the session: the session credit is forfeited.</li>
+              <li>Cancellations made <strong>more than 12 hours</strong> before the session: the session credit is returned to your account.</li>
+              <li>Cancellations made <strong>12 hours or less</strong> before the session: the session credit is forfeited.</li>
             </ul>
-            <p className="text-sm mt-2 text-gray-500 dark:text-navy-400">
-              セッション開始24時間以上前のキャンセル：セッション回数が返還されます。<br />
-              24時間未満のキャンセル：セッション回数は消費されます。
-            </p>
           </Section>
 
-          <Section title="5. Session Cancellation by Instructor / 講師都合によるキャンセル">
+          <Section title="5. Session Cancellation by Instructor">
             <p className="text-sm">
               If an instructor cancels a confirmed session, your session credit will be fully refunded
-              to your account. We will also notify you by email as soon as possible.
-            </p>
-            <p className="text-sm mt-2 text-gray-500 dark:text-navy-400">
-              講師都合によるキャンセルの場合、セッション回数を返還し、メールにてお知らせします。
+              to your account. You will also be notified by email as soon as possible.
             </p>
           </Section>
 
-          <Section title="6. Free Trial / 無料トライアル">
+          <Section title="6. Free Trial">
             <p className="text-sm">
-              The free trial (2 sessions) requires no credit card and carries no financial obligation.
+              The free trial (2 sessions) requires a payment method on file but carries no initial charge.
               Trial sessions do not convert to paid sessions and cannot be carried over after subscribing.
             </p>
-            <p className="text-sm mt-2 text-gray-500 dark:text-navy-400">
-              無料トライアル（2回）はクレジットカード不要です。未使用のトライアル回数は有料プランへの移行後には引き継がれません。
-            </p>
           </Section>
 
-          <Section title="7. Contact / お問い合わせ">
+          <Section title="7. Contact">
             <p className="text-sm">
               For any questions or refund requests, contact our support team at{' '}
               <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">

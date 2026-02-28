@@ -26,7 +26,7 @@ export default async function TermsPage() {
         <h1 className="text-3xl font-bold text-navy-900 dark:text-white mb-2">
           Terms of Service
         </h1>
-        <p className="text-gray-500 dark:text-navy-400 text-sm mb-8">利用規約 — Last updated: February 2026</p>
+        <p className="text-gray-500 dark:text-navy-400 text-sm mb-8">Last updated: February 2026</p>
 
         <div className="prose prose-sm dark:prose-invert max-w-none space-y-6 text-gray-700 dark:text-gray-300">
 
@@ -35,15 +35,12 @@ export default async function TermsPage() {
               By accessing or using Reset Yoga (&ldquo;Service&rdquo;), you agree to be bound by these Terms of Service.
               If you do not agree, please do not use the Service.
             </p>
-            <p className="text-gray-500 dark:text-navy-400 text-xs mt-1">
-              本サービスを利用することで、本利用規約に同意したものとみなされます。
-            </p>
           </Section>
 
           <Section title="2. Description of Service">
             <p>
               Reset Yoga provides an online platform connecting students with certified yoga instructors for
-              live 45-minute sessions conducted via Google Meet. Sessions are available through a monthly
+              live 45-minute sessions conducted via video call. Sessions are available through a monthly
               subscription plan ($19.99/month, 4 sessions) or a free trial (2 sessions).
             </p>
           </Section>
@@ -111,9 +108,6 @@ export default async function TermsPage() {
             <p>
               These Terms are governed by the laws of Japan. Any disputes shall be subject to the
               exclusive jurisdiction of the Tokyo District Court.
-            </p>
-            <p className="text-gray-500 dark:text-navy-400 text-xs mt-1">
-              本規約は日本法に準拠し、東京地方裁判所を専属的合意管轄裁判所とします。
             </p>
           </Section>
 
