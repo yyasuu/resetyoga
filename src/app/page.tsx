@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { Profile } from '@/types'
@@ -88,6 +89,18 @@ export default async function LandingPage() {
             <span className="flex items-center gap-1.5"><CheckCircle className="h-4 w-4 text-sage-500" /> {t('trust_certified')}</span>
             <span className="flex items-center gap-1.5"><Globe className="h-4 w-4 text-navy-400" /> {t('trust_global')}</span>
           </div>
+
+          {/* Hero image */}
+          <div className="mt-14 relative rounded-3xl overflow-hidden shadow-2xl max-w-3xl mx-auto">
+            <Image
+              src="/yogastudent.png"
+              alt="Woman practicing yoga at home"
+              width={1440}
+              height={816}
+              className="w-full object-cover"
+              priority
+            />
+          </div>
         </div>
       </section>
 
@@ -111,6 +124,17 @@ export default async function LandingPage() {
               </div>
             ))}
           </div>
+          {/* Before / After image */}
+          <div className="mt-10 rounded-2xl overflow-hidden shadow-lg">
+            <Image
+              src="/yoga_before_after.png"
+              alt="Before and after yoga – from exhausted to refreshed"
+              width={1440}
+              height={720}
+              className="w-full object-cover"
+            />
+          </div>
+
           <p className="mt-10 text-xl text-navy-700 dark:text-linen-200 font-bold">
             {t('pain_cta')}<br />
             <span className="text-sage-600 dark:text-sage-400">{t('pain_cta_highlight')}</span>
@@ -387,19 +411,32 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Instructor CTA ───────────────────────────────────────────── */}
-      <section className="py-16 px-4 bg-white dark:bg-navy-900 border-t border-gray-100 dark:border-navy-800">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">{t('instructor_cta_title')}</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">{t('instructor_cta_desc')}</p>
-          <Link href="/register?role=instructor">
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-navy-300 dark:border-navy-500 text-navy-700 dark:text-navy-200 hover:bg-navy-50 dark:hover:bg-navy-800 px-8 rounded-full"
-            >
-              {t('instructor_cta_btn')}
-            </Button>
-          </Link>
+      <section className="py-0 bg-white dark:bg-navy-900 border-t border-gray-100 dark:border-navy-800 overflow-hidden">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center">
+          {/* Image */}
+          <div className="w-full md:w-1/2 flex-shrink-0">
+            <Image
+              src="/yogainstructor.png"
+              alt="Airi Yukiyoshi – Yoga Instructor"
+              width={1440}
+              height={816}
+              className="w-full h-80 md:h-full object-cover object-top"
+            />
+          </div>
+          {/* Text */}
+          <div className="w-full md:w-1/2 px-8 py-12 md:px-16 text-center md:text-left">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-3">{t('instructor_cta_title')}</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-8">{t('instructor_cta_desc')}</p>
+            <Link href="/register?role=instructor">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-navy-300 dark:border-navy-500 text-navy-700 dark:text-navy-200 hover:bg-navy-50 dark:hover:bg-navy-800 px-8 rounded-full"
+              >
+                {t('instructor_cta_btn')}
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
