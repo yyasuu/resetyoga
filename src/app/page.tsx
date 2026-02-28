@@ -416,7 +416,7 @@ export default async function LandingPage() {
           {/* Image */}
           <div className="w-full md:w-1/2 flex-shrink-0">
             <Image
-              src="/yogainstructor.png"
+              src="/yogainstructor_airi.png"
               alt="Airi Yukiyoshi – Yoga Instructor"
               width={1440}
               height={816}
