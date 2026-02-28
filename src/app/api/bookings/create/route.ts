@@ -208,7 +208,7 @@ export async function POST(request: NextRequest) {
       instructorName: instructorProfile.full_name || 'Instructor',
       startTime: slotInfo.start_time,
       meetLink: meetLink || undefined,
-    }).catch(console.error)
+    }).catch((err) => console.error('[booking] student email error:', err))
 
     sendBookingConfirmationInstructor({
       to: instructorProfile.email,
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
       studentName: studentProfile.full_name || 'Student',
       startTime: slotInfo.start_time,
       meetLink: meetLink || undefined,
-    }).catch(console.error)
+    }).catch((err) => console.error('[booking] instructor email error:', err))
 
     return NextResponse.json({
       booking: result.booking_id,

@@ -120,6 +120,68 @@ export async function sendCancellationEmail({
   })
 }
 
+// ── Registration: welcome email sent to new students ─────────────────────────
+export async function sendStudentWelcomeEmail({
+  to,
+  name,
+}: {
+  to: string
+  name: string
+}) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tryresetyoga.com'
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: 'Welcome to Reset Yoga!',
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:${BRAND_LINEN};padding:24px;border-radius:12px;">
+        <h2 style="color:${BRAND_NAVY};">Welcome to Reset Yoga! 🧘</h2>
+        <p>Hi ${name},</p>
+        <p>Thank you for joining Reset Yoga. Your account is ready — you can now browse certified instructors and book your first 45-minute session.</p>
+        <div style="background:#fff;padding:16px;border-radius:8px;margin:16px 0;border-left:4px solid ${BRAND_SAGE};">
+          <p><strong>Trial sessions:</strong> 2 free sessions included</p>
+          <p><strong>After trial:</strong> $19.99 / month for 4 sessions</p>
+        </div>
+        <a href="${appUrl}/instructors" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
+          Find an Instructor
+        </a>
+        <p style="margin-top:16px;color:#666;font-size:14px;">Reset your body and mind in 45 minutes.</p>
+        <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;" />
+        <p style="color:#999;font-size:12px;">Reset Yoga Team</p>
+      </div>
+    `,
+  })
+}
+
+// ── Registration: application received email sent to new instructors ──────────
+export async function sendInstructorApplicationEmail({
+  to,
+  name,
+}: {
+  to: string
+  name: string
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: 'Your Reset Yoga Instructor Application is Received',
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:${BRAND_LINEN};padding:24px;border-radius:12px;">
+        <h2 style="color:${BRAND_NAVY};">Application Received!</h2>
+        <p>Hi ${name},</p>
+        <p>Thank you for applying to become a Reset Yoga instructor. We have received your application and will review it shortly.</p>
+        <div style="background:#fff;padding:16px;border-radius:8px;margin:16px 0;border-left:4px solid ${BRAND_SAGE};">
+          <p>Our team typically reviews applications within <strong>1–3 business days</strong>.</p>
+          <p>You will receive another email once your account is approved.</p>
+        </div>
+        <p>If you have any questions, please reply to this email.</p>
+        <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;" />
+        <p style="color:#999;font-size:12px;">Reset Yoga Team</p>
+      </div>
+    `,
+  })
+}
+
 export async function sendInstructorApprovalEmail({
   to,
   name,

@@ -1,5 +1,6 @@
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { sendInstructorApplicationEmail } from '@/lib/email'
 
 /**
  * POST /api/onboarding/instructor
@@ -87,6 +88,20 @@ export async function POST(request: NextRequest) {
           { status: 200 }
         )
       }
+    }
+
+    // Send application received email (fire-and-forget)
+    const { data: profile } = await adminSupabase
+      .from('profiles')
+      .select('full_name, email')
+      .eq('id', user.id)
+      .single()
+
+    if (profile) {
+      sendInstructorApplicationEmail({
+        to: profile.email,
+        name: profile.full_name || 'there',
+      }).catch((err) => console.error('[onboarding/instructor] application email error:', err))
     }
 
     return NextResponse.json({ ok: true })
