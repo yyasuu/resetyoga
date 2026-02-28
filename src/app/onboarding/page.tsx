@@ -92,6 +92,7 @@ function OnboardingForm() {
   const [role, setRole] = useState<'instructor' | 'student'>(initialRole)
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
+  const [termsAgreed, setTermsAgreed] = useState(false)
 
   // Step 1
   const [timezone, setTimezone] = useState('Asia/Tokyo')
@@ -122,7 +123,7 @@ function OnboardingForm() {
   const [accountNumber, setAccountNumber] = useState('')
   const [accountHolderName, setAccountHolderName] = useState('')
 
-  const INSTRUCTOR_STEPS = 5
+  const INSTRUCTOR_STEPS = 6
 
   const toggle = (arr: string[], item: string, setter: (v: string[]) => void) => {
     setter(arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item])
@@ -312,11 +313,64 @@ function OnboardingForm() {
 
             <Button
               className="w-full bg-navy-600 hover:bg-navy-700 rounded-full"
-              onClick={() => (role === 'instructor' ? setStep(2) : handleSubmit())}
+              onClick={() => { setTermsAgreed(false); setStep(2) }}
               disabled={loading}
             >
-              {loading ? t('saving') : role === 'student' ? t('cta_student') : t('cta_next')}
+              {t('cta_next')}
             </Button>
+          </>
+        )}
+
+        {/* ── Step 2: Terms Agreement (student) ────────────────────────── */}
+        {step === 2 && role === 'student' && (
+          <>
+            <h2 className="text-xl font-bold text-gray-900 mb-1">Terms &amp; Conditions</h2>
+            <p className="text-gray-500 text-sm mb-4">Please read and agree before continuing.</p>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 max-h-64 overflow-y-auto text-sm text-gray-700 space-y-3 mb-4">
+              <p className="font-semibold text-red-700">⚠️ Non-Circumvention (Most Important)</p>
+              <p>You must not contact or arrange lessons with instructors found through Reset Yoga <strong>outside the Platform</strong>. Exchanging personal contact info (LINE, WhatsApp, email, etc.) for private lessons is strictly prohibited. This applies for <strong>12 months</strong> after your last session. Violation results in immediate account termination.</p>
+              <p className="font-semibold text-gray-800 mt-2">Key Points:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>All sessions must be booked through Reset Yoga only</li>
+                <li>Free trial: 2 sessions (card required, no charge)</li>
+                <li>Monthly plan: $19.99/month for 4 sessions</li>
+                <li>Cancellation within 12 hours of a session forfeits that session credit</li>
+                <li>Treat instructors with respect at all times</li>
+              </ul>
+              <a href="/student-terms" target="_blank" className="text-navy-600 underline text-xs">
+                Read full Student Terms →
+              </a>
+            </div>
+
+            <label className="flex items-start gap-3 cursor-pointer mb-6">
+              <input
+                type="checkbox"
+                checked={termsAgreed}
+                onChange={(e) => setTermsAgreed(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-navy-600"
+              />
+              <span className="text-sm text-gray-700">
+                I have read and agree to the{' '}
+                <a href="/student-terms" target="_blank" className="text-navy-600 underline">
+                  Student Terms &amp; Conditions
+                </a>
+                , including the non-circumvention clause.
+              </span>
+            </label>
+
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(1)}>
+                <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
+              </Button>
+              <Button
+                className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full"
+                onClick={handleSubmit}
+                disabled={!termsAgreed || loading}
+              >
+                {loading ? t('saving') : 'Start My Trial'}
+              </Button>
+            </div>
           </>
         )}
 
@@ -639,22 +693,74 @@ function OnboardingForm() {
               </Button>
               <Button
                 className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full"
-                onClick={handleSubmit}
-                disabled={loading}
+                onClick={() => { setTermsAgreed(false); setStep(6) }}
               >
-                {loading ? t('submitting') : t('submit_application')}
+                {t('next')} <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
             <button
               type="button"
               className="w-full text-sm text-gray-400 hover:text-gray-600 mt-3"
-              onClick={handleSubmit}
-              disabled={loading}
+              onClick={() => { setTermsAgreed(false); setStep(6) }}
             >
               {t('skip_payout')}
             </button>
           </>
         )}
+        {/* ── Step 6: Terms Agreement (instructor) ─────────────────────── */}
+        {step === 6 && role === 'instructor' && (
+          <>
+            <ProgressBar current={5} total={INSTRUCTOR_STEPS} />
+            <h2 className="text-xl font-bold text-gray-900 mb-1">Instructor Terms &amp; Conditions</h2>
+            <p className="text-gray-500 text-sm mb-4">Please read and agree to complete your application.</p>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 max-h-64 overflow-y-auto text-sm text-gray-700 space-y-3 mb-4">
+              <p className="font-semibold text-red-700">⚠️ Non-Circumvention (Most Important)</p>
+              <p>You must not solicit or conduct sessions with students found through Reset Yoga <strong>outside the Platform</strong>. Exchanging personal contact info (LINE, WhatsApp, email, etc.) for private lessons is strictly prohibited. This applies during your membership and for <strong>12 months</strong> after your last session. Violation results in immediate account termination and you may be liable for damages.</p>
+              <p className="font-semibold text-gray-800 mt-2">Key Points:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Conduct all sessions exclusively through the Reset Yoga platform</li>
+                <li>You are an independent contractor, not an employee</li>
+                <li>Platform fees apply to all sessions booked through Reset Yoga</li>
+                <li>Keep all student data confidential</li>
+                <li>Maintain professional conduct; violations may result in termination</li>
+              </ul>
+              <a href="/instructor-terms" target="_blank" className="text-navy-600 underline text-xs">
+                Read full Instructor Terms →
+              </a>
+            </div>
+
+            <label className="flex items-start gap-3 cursor-pointer mb-6">
+              <input
+                type="checkbox"
+                checked={termsAgreed}
+                onChange={(e) => setTermsAgreed(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gray-300 text-navy-600"
+              />
+              <span className="text-sm text-gray-700">
+                I have read and agree to the{' '}
+                <a href="/instructor-terms" target="_blank" className="text-navy-600 underline">
+                  Instructor Terms &amp; Conditions
+                </a>
+                , including the non-circumvention clause.
+              </span>
+            </label>
+
+            <div className="flex gap-3">
+              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(5)}>
+                <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
+              </Button>
+              <Button
+                className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full"
+                onClick={handleSubmit}
+                disabled={!termsAgreed || loading}
+              >
+                {loading ? t('submitting') : t('submit_application')}
+              </Button>
+            </div>
+          </>
+        )}
+
       </div>
     </div>
   )

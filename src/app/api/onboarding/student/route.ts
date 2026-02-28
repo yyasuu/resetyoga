@@ -1,6 +1,6 @@
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
-import { sendStudentWelcomeEmail } from '@/lib/email'
+import { sendStudentWelcomeEmail, sendStudentTermsEmail } from '@/lib/email'
 
 /**
  * POST /api/onboarding/student
@@ -60,6 +60,11 @@ export async function POST(_request: NextRequest) {
         to: profile.email,
         name: profile.full_name || 'there',
       }).catch((err) => console.error('[onboarding/student] welcome email error:', err))
+
+      sendStudentTermsEmail({
+        to: profile.email,
+        name: profile.full_name || 'there',
+      }).catch((err) => console.error('[onboarding/student] terms email error:', err))
     }
 
     return NextResponse.json({ ok: true })

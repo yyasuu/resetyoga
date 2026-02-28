@@ -227,6 +227,87 @@ export async function sendInstructorApplicationEmail({
   })
 }
 
+// ── Terms emails sent after onboarding ───────────────────────────────────────
+export async function sendInstructorTermsEmail({
+  to,
+  name,
+}: {
+  to: string
+  name: string
+}) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tryresetyoga.com'
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: 'Reset Yoga – Instructor Terms & Conditions',
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:${BRAND_LINEN};padding:24px;border-radius:12px;">
+        <h2 style="color:${BRAND_NAVY};">Instructor Terms &amp; Conditions</h2>
+        <p>Hi ${name},</p>
+        <p>Thank you for registering as an instructor on Reset Yoga. Please review and keep a copy of our Instructor Terms &amp; Conditions.</p>
+        <div style="background:#fff;padding:16px;border-radius:8px;margin:16px 0;border-left:4px solid #ef4444;">
+          <p style="font-weight:bold;color:#b91c1c;">⚠️ Non-Circumvention (Key Clause)</p>
+          <p style="font-size:14px;color:#374151;">You must not solicit, arrange, or conduct sessions with students found through Reset Yoga <strong>outside the Platform</strong>. This includes exchanging personal contact details (email, LINE, WhatsApp, etc.) for private lessons. This prohibition applies during your membership and for <strong>12 months</strong> after your last session. Violation results in immediate account termination.</p>
+        </div>
+        <div style="background:#fff;padding:16px;border-radius:8px;margin:16px 0;border-left:4px solid ${BRAND_SAGE};">
+          <p style="font-size:14px;color:#374151;"><strong>Other key points:</strong></p>
+          <ul style="font-size:14px;color:#374151;padding-left:20px;">
+            <li>Conduct all sessions professionally and on time</li>
+            <li>You operate as an independent contractor, not an employee</li>
+            <li>Platform fees apply to all sessions booked through Reset Yoga</li>
+            <li>Student data must be kept confidential</li>
+          </ul>
+        </div>
+        <a href="${appUrl}/instructor-terms" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
+          Read Full Instructor Terms
+        </a>
+        <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;" />
+        <p style="color:#999;font-size:12px;">Reset Yoga Team – support@tryresetyoga.com</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendStudentTermsEmail({
+  to,
+  name,
+}: {
+  to: string
+  name: string
+}) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tryresetyoga.com'
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: 'Reset Yoga – Student Terms & Conditions',
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:${BRAND_LINEN};padding:24px;border-radius:12px;">
+        <h2 style="color:${BRAND_NAVY};">Student Terms &amp; Conditions</h2>
+        <p>Hi ${name},</p>
+        <p>Welcome to Reset Yoga! Please review and keep a copy of our Student Terms &amp; Conditions.</p>
+        <div style="background:#fff;padding:16px;border-radius:8px;margin:16px 0;border-left:4px solid #ef4444;">
+          <p style="font-weight:bold;color:#b91c1c;">⚠️ Non-Circumvention (Key Clause)</p>
+          <p style="font-size:14px;color:#374151;">You must not contact or arrange lessons with instructors found through Reset Yoga <strong>outside the Platform</strong>. Exchanging personal contact info for private lessons is prohibited. This applies during your membership and for <strong>12 months</strong> after your last session. Violation results in immediate account termination.</p>
+        </div>
+        <div style="background:#fff;padding:16px;border-radius:8px;margin:16px 0;border-left:4px solid ${BRAND_SAGE};">
+          <p style="font-size:14px;color:#374151;"><strong>Key points:</strong></p>
+          <ul style="font-size:14px;color:#374151;padding-left:20px;">
+            <li>Free trial: 2 sessions (card required, no charge)</li>
+            <li>Monthly plan: $19.99/month for 4 sessions</li>
+            <li>Cancel anytime from your account dashboard</li>
+            <li>Cancellations within 12 hours of a session forfeit that session credit</li>
+          </ul>
+        </div>
+        <a href="${appUrl}/student-terms" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
+          Read Full Student Terms
+        </a>
+        <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;" />
+        <p style="color:#999;font-size:12px;">Reset Yoga Team – support@tryresetyoga.com</p>
+      </div>
+    `,
+  })
+}
+
 // ── 5-minute reminder: sent to both student and instructor ───────────────────
 export async function sendSessionReminderEmail({
   to,
