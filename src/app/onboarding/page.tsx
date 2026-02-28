@@ -115,12 +115,12 @@ function OnboardingForm() {
   const [instagramUrl, setInstagramUrl] = useState('')
   const [youtubeUrl, setYoutubeUrl] = useState('')
 
-  // Step 5 – payout
+  // Step 5 – payout (international)
+  const [bankCountry, setBankCountry] = useState('Japan')
   const [bankName, setBankName] = useState('')
-  const [bankBranch, setBankBranch] = useState('')
-  const [accountType, setAccountType] = useState<'普通' | '当座'>('普通')
+  const [swiftCode, setSwiftCode] = useState('')
   const [accountNumber, setAccountNumber] = useState('')
-  const [accountHolderKana, setAccountHolderKana] = useState('')
+  const [accountHolderName, setAccountHolderName] = useState('')
 
   const INSTRUCTOR_STEPS = 5
 
@@ -198,11 +198,11 @@ function OnboardingForm() {
           careerHistory,
           instagramUrl,
           youtubeUrl,
+          bankCountry,
           bankName,
-          bankBranch,
-          accountType,
+          swiftCode,
           accountNumber,
-          accountHolderKana,
+          accountHolderName,
         }),
       })
 
@@ -569,6 +569,24 @@ function OnboardingForm() {
 
             <div className="space-y-4">
               <div>
+                <Label>{t('bank_country')}</Label>
+                <Select value={bankCountry} onValueChange={setBankCountry}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[
+                      'Japan', 'India', 'United States', 'United Kingdom',
+                      'Singapore', 'Australia', 'Canada', 'Germany',
+                      'France', 'Brazil', 'Other',
+                    ].map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Label>{t('bank_name')}</Label>
                 <Input
                   value={bankName}
@@ -579,44 +597,33 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label>{t('bank_branch')}</Label>
+                <Label>
+                  {t('swift_code')}
+                  <span className="text-gray-400 text-xs font-normal ml-1">{t('swift_code_hint')}</span>
+                </Label>
                 <Input
-                  value={bankBranch}
-                  onChange={(e) => setBankBranch(e.target.value)}
-                  placeholder={t('bank_branch_placeholder')}
+                  value={swiftCode}
+                  onChange={(e) => setSwiftCode(e.target.value.toUpperCase())}
+                  placeholder={t('swift_code_placeholder')}
                   className="mt-1"
                 />
-              </div>
-
-              <div>
-                <Label>{t('account_type')}</Label>
-                <Select value={accountType} onValueChange={(v) => setAccountType(v as '普通' | '当座')}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="普通">{t('account_ordinary')}</SelectItem>
-                    <SelectItem value="当座">{t('account_checking')}</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
 
               <div>
                 <Label>{t('account_number')}</Label>
                 <Input
                   value={accountNumber}
-                  onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
+                  onChange={(e) => setAccountNumber(e.target.value)}
                   placeholder={t('account_number_placeholder')}
-                  maxLength={8}
                   className="mt-1"
                 />
               </div>
 
               <div>
-                <Label>{t('account_holder_kana')}</Label>
+                <Label>{t('account_holder_name')}</Label>
                 <Input
-                  value={accountHolderKana}
-                  onChange={(e) => setAccountHolderKana(e.target.value)}
+                  value={accountHolderName}
+                  onChange={(e) => setAccountHolderName(e.target.value)}
                   placeholder={t('account_holder_placeholder')}
                   className="mt-1"
                 />

@@ -31,11 +31,15 @@ export interface InstructorProfile {
 
 export interface InstructorPayoutInfo {
   id: string
+  bank_country: string
   bank_name: string | null
-  bank_branch: string | null
-  account_type: '普通' | '当座'
+  swift_code: string | null
   account_number: string | null
-  account_holder_kana: string | null
+  account_holder_name: string | null
+  // legacy fields kept for backward compat
+  bank_branch?: string | null
+  account_type?: string | null
+  account_holder_kana?: string | null
   created_at: string
   updated_at: string
 }

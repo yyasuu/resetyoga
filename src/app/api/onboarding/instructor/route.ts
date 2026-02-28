@@ -32,11 +32,11 @@ export async function POST(request: NextRequest) {
       careerHistory,
       instagramUrl,
       youtubeUrl,
+      bankCountry,
       bankName,
-      bankBranch,
-      accountType,
+      swiftCode,
       accountNumber,
-      accountHolderKana,
+      accountHolderName,
     } = body
 
     const adminSupabase = await createAdminClient()
@@ -67,16 +67,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Upsert payout info only if any bank field is provided
-    if (bankName || accountNumber || accountHolderKana) {
+    if (bankName || accountNumber || accountHolderName) {
       const { error: payoutError } = await adminSupabase
         .from('instructor_payout_info')
         .upsert({
           id: user.id,
+          bank_country: bankCountry || 'Japan',
           bank_name: bankName || null,
-          bank_branch: bankBranch || null,
-          account_type: accountType || '普通',
+          swift_code: swiftCode || null,
           account_number: accountNumber || null,
-          account_holder_kana: accountHolderKana || null,
+          account_holder_name: accountHolderName || null,
         }, { onConflict: 'id' })
 
       if (payoutError) {

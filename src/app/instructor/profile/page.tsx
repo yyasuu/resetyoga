@@ -81,12 +81,12 @@ export default function InstructorProfilePage() {
   const [instagramUrl, setInstagramUrl] = useState('')
   const [youtubeUrl, setYoutubeUrl] = useState('')
 
-  // Payout
+  // Payout (international)
+  const [bankCountry, setBankCountry] = useState('Japan')
   const [bankName, setBankName] = useState('')
-  const [bankBranch, setBankBranch] = useState('')
-  const [accountType, setAccountType] = useState<'普通' | '当座'>('普通')
+  const [swiftCode, setSwiftCode] = useState('')
   const [accountNumber, setAccountNumber] = useState('')
-  const [accountHolderKana, setAccountHolderKana] = useState('')
+  const [accountHolderName, setAccountHolderName] = useState('')
 
   useEffect(() => {
     const load = async () => {
@@ -116,12 +116,12 @@ export default function InstructorProfilePage() {
         setYoutubeUrl(i.youtube_url || '')
       }
       if (pay) {
-        const po = pay as InstructorPayoutInfo
+        const po = pay as any
+        setBankCountry(po.bank_country || 'Japan')
         setBankName(po.bank_name || '')
-        setBankBranch(po.bank_branch || '')
-        setAccountType(po.account_type || '普通')
+        setSwiftCode(po.swift_code || '')
         setAccountNumber(po.account_number || '')
-        setAccountHolderKana(po.account_holder_kana || '')
+        setAccountHolderName(po.account_holder_name || po.account_holder_kana || '')
       }
     }
     load()
@@ -183,11 +183,11 @@ export default function InstructorProfilePage() {
 
     await supabase.from('instructor_payout_info').upsert({
       id: user.id,
+      bank_country: bankCountry || 'Japan',
       bank_name: bankName || null,
-      bank_branch: bankBranch || null,
-      account_type: accountType,
+      swift_code: swiftCode || null,
       account_number: accountNumber || null,
-      account_holder_kana: accountHolderKana || null,
+      account_holder_name: accountHolderName || null,
     })
 
     toast.success(t('saved'))
@@ -370,45 +370,45 @@ export default function InstructorProfilePage() {
             {t('payout_note')}
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <Label>{tOnb('bank_name')}</Label>
-              <Input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder={tOnb('bank_name_placeholder')} className="mt-1" />
-            </div>
-            <div>
-              <Label>{tOnb('bank_branch')}</Label>
-              <Input value={bankBranch} onChange={(e) => setBankBranch(e.target.value)} placeholder={tOnb('bank_branch_placeholder')} className="mt-1" />
-            </div>
-          </div>
-
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <Label>{tOnb('account_type')}</Label>
-              <Select value={accountType} onValueChange={(v) => setAccountType(v as '普通' | '当座')}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="普通">{tOnb('account_ordinary')}</SelectItem>
-                  <SelectItem value="当座">{tOnb('account_checking')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>{tOnb('account_number')}</Label>
-              <Input
-                value={accountNumber}
-                onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
-                placeholder={tOnb('account_number_placeholder')}
-                maxLength={8}
-                className="mt-1"
-              />
-            </div>
+          <div>
+            <Label>{tOnb('bank_country')}</Label>
+            <Select value={bankCountry} onValueChange={setBankCountry}>
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[
+                  'Japan', 'India', 'United States', 'United Kingdom',
+                  'Singapore', 'Australia', 'Canada', 'Germany',
+                  'France', 'Brazil', 'Other',
+                ].map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
-            <Label>{tOnb('account_holder_kana')}</Label>
-            <Input value={accountHolderKana} onChange={(e) => setAccountHolderKana(e.target.value)} placeholder={tOnb('account_holder_placeholder')} className="mt-1" />
+            <Label>{tOnb('bank_name')}</Label>
+            <Input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder={tOnb('bank_name_placeholder')} className="mt-1" />
+          </div>
+
+          <div>
+            <Label>
+              {tOnb('swift_code')}
+              <span className="text-gray-400 text-xs font-normal ml-1">{tOnb('swift_code_hint')}</span>
+            </Label>
+            <Input value={swiftCode} onChange={(e) => setSwiftCode(e.target.value.toUpperCase())} placeholder={tOnb('swift_code_placeholder')} className="mt-1" />
+          </div>
+
+          <div>
+            <Label>{tOnb('account_number')}</Label>
+            <Input value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder={tOnb('account_number_placeholder')} className="mt-1" />
+          </div>
+
+          <div>
+            <Label>{tOnb('account_holder_name')}</Label>
+            <Input value={accountHolderName} onChange={(e) => setAccountHolderName(e.target.value)} placeholder={tOnb('account_holder_placeholder')} className="mt-1" />
           </div>
         </Section>
 
