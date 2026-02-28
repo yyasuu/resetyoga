@@ -34,17 +34,17 @@ export default async function AdminDashboardPage() {
     .from('bookings')
     .select('*', { count: 'exact', head: true })
 
-  // Pending instructor approvals
+  // Pending instructor approvals — use !inner so only rows with is_approved=false are returned
   const { data: pendingInstructors } = await adminSupabase
     .from('profiles')
-    .select('*, instructor_profiles(*)')
+    .select('*, instructor_profiles!inner(*)')
     .eq('role', 'instructor')
     .eq('instructor_profiles.is_approved', false)
 
-  // Approved instructors
+  // Approved instructors — same !inner pattern
   const { data: approvedInstructors } = await adminSupabase
     .from('profiles')
-    .select('*, instructor_profiles(*)')
+    .select('*, instructor_profiles!inner(*)')
     .eq('role', 'instructor')
     .eq('instructor_profiles.is_approved', true)
     .order('created_at', { ascending: false })

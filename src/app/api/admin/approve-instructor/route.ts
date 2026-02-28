@@ -15,8 +15,21 @@ export async function POST(request: NextRequest) {
 
   const { instructorId, instructorName, instructorEmail } = await request.json()
 
-  // Update is_approved via admin client (bypasses RLS)
   const adminSupabase = await createAdminClient()
+
+  // Guard: check current approval status to prevent double-approval
+  const { data: current } = await adminSupabase
+    .from('instructor_profiles')
+    .select('is_approved')
+    .eq('id', instructorId)
+    .single()
+
+  if (current?.is_approved) {
+    // Already approved — return success silently (idempotent)
+    return NextResponse.json({ success: true, alreadyApproved: true })
+  }
+
+  // Update is_approved via admin client (bypasses RLS)
   const { error: updateError } = await adminSupabase
     .from('instructor_profiles')
     .update({ is_approved: true })
