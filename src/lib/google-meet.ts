@@ -54,10 +54,6 @@ export async function createMeetEvent({
         dateTime: endTime,
         timeZone: 'UTC',
       },
-      attendees: [
-        { email: instructorEmail, displayName: instructorName },
-        { email: studentEmail, displayName: studentName },
-      ],
       conferenceData: {
         createRequest: {
           requestId: `yoga-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
