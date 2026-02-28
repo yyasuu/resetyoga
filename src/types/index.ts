@@ -14,12 +14,28 @@ export interface Profile {
 export interface InstructorProfile {
   id: string
   bio: string | null
+  tagline: string | null
   yoga_styles: string[]
   languages: string[]
   years_experience: number
+  certifications: string[]
+  career_history: string | null
+  instagram_url: string | null
+  youtube_url: string | null
   is_approved: boolean
   rating: number
   total_reviews: number
+  created_at: string
+  updated_at: string
+}
+
+export interface InstructorPayoutInfo {
+  id: string
+  bank_name: string | null
+  bank_branch: string | null
+  account_type: '普通' | '当座'
+  account_number: string | null
+  account_holder_kana: string | null
   created_at: string
   updated_at: string
 }
