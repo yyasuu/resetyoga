@@ -24,7 +24,7 @@ export default async function PrivacyPage() {
 
   if (locale === 'ja') {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-navy-950 flex flex-col">
+      <div className="min-h-screen bg-gray-50 dark:bg-navy-900 flex flex-col">
         <Navbar user={profile} />
         <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-12">
           <h1 className="text-3xl font-bold text-navy-900 dark:text-white mb-2">
@@ -142,7 +142,7 @@ export default async function PrivacyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-navy-950 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-navy-900 flex flex-col">
       <Navbar user={profile} />
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-12">
