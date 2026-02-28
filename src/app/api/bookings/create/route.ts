@@ -99,7 +99,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
     }
 
-    // ── 5. Create Google Meet link BEFORE the atomic DB operation ─────────────
+    // ── 5. Student double-booking guard ──────────────────────────────────────
+    //
+    // Check if this student already has a confirmed booking that overlaps
+    // with the requested slot's time window.
+    //
+    const { data: studentSlotIds } = await adminSupabase
+      .from('bookings')
+      .select('slot_id')
+      .eq('student_id', user.id)
+      .eq('status', 'confirmed')
+
+    if (studentSlotIds && studentSlotIds.length > 0) {
+      const ids = studentSlotIds.map((b) => b.slot_id)
+      const { data: conflictingSlot } = await adminSupabase
+        .from('time_slots')
+        .select('id')
+        .in('id', ids)
+        .lt('start_time', slotInfo.end_time)
+        .gt('end_time', slotInfo.start_time)
+        .limit(1)
+        .maybeSingle()
+
+      if (conflictingSlot) {
+        return NextResponse.json(
+          { error: 'You already have a booking during this time. Please choose a different slot.' },
+          { status: 409 }
+        )
+      }
+    }
+
+    // ── 6. Create Google Meet link BEFORE the atomic DB operation ─────────────
     //
     // Meet creation is the only side-effect that cannot be rolled back inside
     // Postgres.  If the RPC fails afterward (slot taken), the orphaned Calendar

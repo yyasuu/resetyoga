@@ -89,15 +89,15 @@ export function InstructorCalendar({ instructorId }: InstructorCalendarProps) {
     if (!pendingSlot) return
     setLoading(true)
 
-    const { error } = await supabase.from('time_slots').insert({
-      instructor_id: instructorId,
-      start_time: pendingSlot.start.toISOString(),
-      end_time: pendingSlot.end.toISOString(),
-      status: 'available',
+    const res = await fetch('/api/availability/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ startTime: pendingSlot.start.toISOString() }),
     })
+    const json = await res.json()
 
-    if (error) {
-      toast.error(error.message || 'Failed to add slot')
+    if (!res.ok) {
+      toast.error(json.error || 'Failed to add slot')
     } else {
       toast.success(t('slot_added'))
       await fetchSlots()
@@ -112,14 +112,15 @@ export function InstructorCalendar({ instructorId }: InstructorCalendarProps) {
     if (!selectedSlot) return
     setLoading(true)
 
-    const { error } = await supabase
-      .from('time_slots')
-      .delete()
-      .eq('id', selectedSlot.id)
-      .eq('status', 'available')
+    const res = await fetch('/api/availability/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slotId: selectedSlot.id }),
+    })
+    const json = await res.json()
 
-    if (error) {
-      toast.error(error.message || 'Failed to remove slot')
+    if (!res.ok) {
+      toast.error(json.error || 'Failed to remove slot')
     } else {
       toast.success(t('slot_deleted'))
       await fetchSlots()

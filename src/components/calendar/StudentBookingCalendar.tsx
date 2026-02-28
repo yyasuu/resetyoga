@@ -131,8 +131,7 @@ export function StudentBookingCalendar({
         toast.error(t('requires_subscription'))
         router.push('/subscription')
       } else if (response.status === 409) {
-        // Race condition: another student booked first — refresh calendar
-        toast.error('This slot was just booked by someone else. Please choose another time.')
+        toast.error(data.error || 'This slot is no longer available. Please choose another time.')
         await fetchSlots()
       } else {
         toast.error(data.error || t('booking_failed'))

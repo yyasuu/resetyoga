@@ -36,6 +36,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Cannot add slots in the past' }, { status: 400 })
     }
 
+    // Check for overlapping slots (same instructor, not cancelled)
+    // Overlap condition: existing.start_time < new.end AND existing.end_time > new.start
+    const { data: overlap } = await supabase
+      .from('time_slots')
+      .select('id')
+      .eq('instructor_id', user.id)
+      .neq('status', 'cancelled')
+      .lt('start_time', end.toISOString())
+      .gt('end_time', start.toISOString())
+      .limit(1)
+      .maybeSingle()
+
+    if (overlap) {
+      return NextResponse.json(
+        { error: 'This time overlaps with an existing slot. Please choose a different time.' },
+        { status: 409 }
+      )
+    }
+
     const { data, error } = await supabase
       .from('time_slots')
       .insert({
