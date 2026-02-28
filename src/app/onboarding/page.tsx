@@ -184,36 +184,34 @@ function OnboardingForm() {
     }
 
     if (role === 'instructor') {
-      const { error: instructorError } = await supabase.from('instructor_profiles').upsert({
-        id: user.id,
-        tagline,
-        bio,
-        yoga_styles: yogaStyles,
-        languages,
-        years_experience: yearsExperience,
-        certifications,
-        career_history: careerHistory,
-        instagram_url: instagramUrl || null,
-        youtube_url: youtubeUrl || null,
-        is_approved: false,
+      // Use server API route (admin client) to bypass RLS and handle new columns safely
+      const res = await fetch('/api/onboarding/instructor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tagline,
+          bio,
+          yogaStyles,
+          languages,
+          yearsExperience,
+          certifications,
+          careerHistory,
+          instagramUrl,
+          youtubeUrl,
+          bankName,
+          bankBranch,
+          accountType,
+          accountNumber,
+          accountHolderKana,
+        }),
       })
 
-      if (instructorError) {
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        console.error('[onboarding] instructor API error:', data)
         toast.error(t('error_instructor'))
         setLoading(false)
         return
-      }
-
-      // Save payout info if provided
-      if (bankName || accountNumber) {
-        await supabase.from('instructor_payout_info').upsert({
-          id: user.id,
-          bank_name: bankName || null,
-          bank_branch: bankBranch || null,
-          account_type: accountType,
-          account_number: accountNumber || null,
-          account_holder_kana: accountHolderKana || null,
-        })
       }
 
       setDone(true)
