@@ -68,7 +68,7 @@ function SubscriptionContent() {
     if (data.url) {
       window.location.href = data.url
     } else {
-      toast.error('Failed to start checkout')
+      toast.error(data.error || 'Failed to start checkout')
       setLoading(false)
     }
   }
@@ -251,8 +251,11 @@ function SubscriptionContent() {
           {/* Monthly */}
           <div
             className={`rounded-xl border p-5 ${
-              isActive ? 'border-navy-400 bg-navy-50' : 'border-gray-200 bg-white'
+              isActive
+                ? 'border-navy-400 bg-navy-50'
+                : 'border-gray-200 bg-white cursor-pointer hover:border-navy-400 hover:shadow-md transition-all'
             }`}
+            onClick={!isActive && !loading ? handleSubscribe : undefined}
           >
             <h3 className="font-bold text-gray-900 mb-1">{t('monthly_plan')}</h3>
             <p className="text-2xl font-extrabold text-gray-900 mb-2">

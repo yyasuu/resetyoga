@@ -4,11 +4,19 @@ import { createCheckoutSession, createStripeCustomer, STRIPE_PRICE_ID } from '@/
 
 export async function POST(request: NextRequest) {
   try {
-    // Fail fast if the price env var is missing — avoids a cryptic Stripe error
-    if (!STRIPE_PRICE_ID) {
-      console.error('[checkout] priceId: <not set> — STRIPE_PRICE_ID env var is missing')
+    // Fail fast if Stripe env vars are missing or still set to placeholder values
+    const stripeKey = process.env.STRIPE_SECRET_KEY
+    if (!stripeKey || stripeKey === 'sk_test_placeholder' || !stripeKey.startsWith('sk_')) {
+      console.error('[checkout] STRIPE_SECRET_KEY is missing or invalid')
       return NextResponse.json(
-        { error: 'Service misconfiguration: subscription price is not configured' },
+        { error: 'Stripe APIキーが設定されていません。Vercelの環境変数を確認してください。' },
+        { status: 400 }
+      )
+    }
+    if (!STRIPE_PRICE_ID || STRIPE_PRICE_ID === 'price_placeholder' || !STRIPE_PRICE_ID.startsWith('price_')) {
+      console.error('[checkout] STRIPE_PRICE_ID is missing or invalid:', STRIPE_PRICE_ID)
+      return NextResponse.json(
+        { error: 'Stripe価格IDが設定されていません。Vercelの環境変数を確認してください。' },
         { status: 400 }
       )
     }
@@ -76,8 +84,9 @@ export async function POST(request: NextRequest) {
     })
 
     return NextResponse.json({ url: session.url })
-  } catch (err) {
-    console.error('Stripe checkout error:', err)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('Stripe checkout error:', message)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
