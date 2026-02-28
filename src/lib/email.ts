@@ -120,6 +120,48 @@ export async function sendCancellationEmail({
   })
 }
 
+// ── Slot created: confirmation to instructor ──────────────────────────────────
+export async function sendSlotCreatedEmail({
+  to,
+  instructorName,
+  startTime,
+  endTime,
+}: {
+  to: string
+  instructorName: string
+  startTime: string
+  endTime: string
+}) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tryresetyoga.com'
+  const formattedDate = format(new Date(startTime), 'EEEE, MMMM d, yyyy')
+  const formattedStart = format(new Date(startTime), 'h:mm a')
+  const formattedEnd = format(new Date(endTime), 'h:mm a')
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Availability Added: ${formattedDate} ${formattedStart}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:${BRAND_LINEN};padding:24px;border-radius:12px;">
+        <h2 style="color:${BRAND_NAVY};">Slot Added ✓</h2>
+        <p>Hi ${instructorName},</p>
+        <p>Your availability has been added:</p>
+        <div style="background:#fff;padding:16px;border-radius:8px;margin:16px 0;border-left:4px solid ${BRAND_SAGE};">
+          <p><strong>Date:</strong> ${formattedDate}</p>
+          <p><strong>Time:</strong> ${formattedStart} – ${formattedEnd}</p>
+          <p><strong>Duration:</strong> 45 minutes</p>
+        </div>
+        <p style="color:#666;font-size:14px;">Students can now book this slot. We'll notify you as soon as someone books.</p>
+        <a href="${appUrl}/instructor/availability" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
+          Manage Availability
+        </a>
+        <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;" />
+        <p style="color:#999;font-size:12px;">Reset Yoga Team</p>
+      </div>
+    `,
+  })
+}
+
 // ── Registration: welcome email sent to new students ─────────────────────────
 export async function sendStudentWelcomeEmail({
   to,

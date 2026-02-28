@@ -201,22 +201,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Booking failed unexpectedly' }, { status: 500 })
     }
 
-    // ── 7. Confirmation emails (fire-and-forget) ──────────────────────────────
-    sendBookingConfirmationStudent({
-      to: studentProfile.email,
-      studentName: studentProfile.full_name || 'Student',
-      instructorName: instructorProfile.full_name || 'Instructor',
-      startTime: slotInfo.start_time,
-      meetLink: meetLink || undefined,
-    }).catch((err) => console.error('[booking] student email error:', err))
+    // ── 7. Confirmation emails ────────────────────────────────────────────────
+    // Await both so errors appear clearly in Vercel Function logs
+    await Promise.allSettled([
+      sendBookingConfirmationStudent({
+        to: studentProfile.email,
+        studentName: studentProfile.full_name || 'Student',
+        instructorName: instructorProfile.full_name || 'Instructor',
+        startTime: slotInfo.start_time,
+        meetLink: meetLink || undefined,
+      }).catch((err) => console.error('[booking] student email failed:', studentProfile.email, err?.message)),
 
-    sendBookingConfirmationInstructor({
-      to: instructorProfile.email,
-      instructorName: instructorProfile.full_name || 'Instructor',
-      studentName: studentProfile.full_name || 'Student',
-      startTime: slotInfo.start_time,
-      meetLink: meetLink || undefined,
-    }).catch((err) => console.error('[booking] instructor email error:', err))
+      sendBookingConfirmationInstructor({
+        to: instructorProfile.email,
+        instructorName: instructorProfile.full_name || 'Instructor',
+        studentName: studentProfile.full_name || 'Student',
+        startTime: slotInfo.start_time,
+        meetLink: meetLink || undefined,
+      }).catch((err) => console.error('[booking] instructor email failed:', instructorProfile.email, err?.message)),
+    ])
 
     return NextResponse.json({
       booking: result.booking_id,

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { addMinutes } from 'date-fns'
+import { sendSlotCreatedEmail } from '@/lib/email'
 
 const schema = z.object({
   startTime: z.string(),
@@ -68,6 +69,22 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    // Send confirmation email to instructor (fire-and-forget)
+    const { data: instructorProfile } = await supabase
+      .from('profiles')
+      .select('email, full_name')
+      .eq('id', user.id)
+      .single()
+
+    if (instructorProfile) {
+      sendSlotCreatedEmail({
+        to: instructorProfile.email,
+        instructorName: instructorProfile.full_name || 'Instructor',
+        startTime: start.toISOString(),
+        endTime: end.toISOString(),
+      }).catch((err) => console.error('[availability/create] slot email error:', err))
     }
 
     return NextResponse.json({ slot: data })
