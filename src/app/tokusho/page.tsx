@@ -31,10 +31,10 @@ export default async function TokushoPage() {
           <table className="w-full text-sm">
             <tbody className="divide-y divide-gray-100 dark:divide-navy-800">
               <Row label="販売業者">
-                【運営者名】（準備中 / To be disclosed upon request）
+                請求があった場合は遅滞なく開示いたします。
               </Row>
               <Row label="運営統括責任者">
-                【責任者名】（準備中）
+                雪吉愛里
               </Row>
               <Row label="所在地">
                 請求があった場合には遅滞なく開示いたします。
