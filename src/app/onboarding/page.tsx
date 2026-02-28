@@ -161,7 +161,10 @@ function OnboardingForm() {
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(path, avatarFile, { upsert: true })
-      if (!uploadError) {
+      if (uploadError) {
+        console.error('Avatar upload error:', uploadError)
+        toast.error('Photo upload failed: ' + uploadError.message)
+      } else {
         const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
         avatarUrl = urlData.publicUrl
       }

@@ -156,8 +156,11 @@ export default function InstructorProfilePage() {
     if (avatarFile) {
       const ext = avatarFile.name.split('.').pop()
       const path = `${user.id}/avatar.${ext}`
-      const { error } = await supabase.storage.from('avatars').upload(path, avatarFile, { upsert: true })
-      if (!error) {
+      const { error: uploadError } = await supabase.storage.from('avatars').upload(path, avatarFile, { upsert: true })
+      if (uploadError) {
+        console.error('Avatar upload error:', uploadError)
+        toast.error('Photo upload failed: ' + uploadError.message)
+      } else {
         const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
         avatarUrl = urlData.publicUrl
       }
