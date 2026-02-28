@@ -178,7 +178,7 @@ function OnboardingForm() {
       .eq('id', user.id)
 
     if (profileError) {
-      toast.error('プロフィールの保存に失敗しました')
+      toast.error(t('error_profile'))
       setLoading(false)
       return
     }
@@ -199,7 +199,7 @@ function OnboardingForm() {
       })
 
       if (instructorError) {
-        toast.error('講師プロフィールの保存に失敗しました')
+        toast.error(t('error_instructor'))
         setLoading(false)
         return
       }
@@ -220,7 +220,7 @@ function OnboardingForm() {
     } else {
       const res = await fetch('/api/onboarding/student', { method: 'POST' })
       if (!res.ok) {
-        toast.error('初期設定に失敗しました')
+        toast.error(t('error_init'))
         setLoading(false)
         return
       }
@@ -239,13 +239,13 @@ function OnboardingForm() {
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="h-10 w-10 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">申請を受け付けました！</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">{t('done_title')}</h2>
           <p className="text-gray-600 mb-2">{t('pending_approval')}</p>
           <p className="text-sm text-gray-400 mb-8">
-            審査には通常1〜3営業日かかります。承認後にメールでご連絡します。
+            {t('done_note')}
           </p>
           <Button onClick={() => router.push('/')} className="bg-navy-600 hover:bg-navy-700 w-full rounded-full">
-            ホームへ戻る
+            {t('done_btn')}
           </Button>
         </div>
       </div>
@@ -314,7 +314,7 @@ function OnboardingForm() {
               onClick={() => (role === 'instructor' ? setStep(2) : handleSubmit())}
               disabled={loading}
             >
-              {loading ? '保存中...' : role === 'student' ? 'はじめる' : `次へ →`}
+              {loading ? t('saving') : role === 'student' ? t('cta_student') : t('cta_next')}
             </Button>
           </>
         )}
@@ -323,8 +323,8 @@ function OnboardingForm() {
         {step === 2 && role === 'instructor' && (
           <>
             <ProgressBar current={1} total={INSTRUCTOR_STEPS} />
-            <h2 className="text-xl font-bold text-gray-900 mb-1">基本情報</h2>
-            <p className="text-gray-500 text-sm mb-6">生徒に表示される名前と写真を設定してください。</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-1">{t('step_basic_title')}</h2>
+            <p className="text-gray-500 text-sm mb-6">{t('step_basic_desc')}</p>
 
             {/* Photo upload */}
             <div className="flex flex-col items-center mb-6">
@@ -343,7 +343,7 @@ function OnboardingForm() {
                 onClick={() => fileInputRef.current?.click()}
                 className="mt-3 text-sm text-navy-600 hover:underline"
               >
-                写真を選択（任意）
+                {t('photo_select')}
               </button>
               <input
                 ref={fileInputRef}
@@ -356,11 +356,11 @@ function OnboardingForm() {
 
             <div className="space-y-4">
               <div>
-                <Label>表示名 <span className="text-red-500">*</span></Label>
+                <Label>{t('display_name')} <span className="text-red-500">*</span></Label>
                 <Input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="例：田中 アシュウィン"
+                  placeholder={t('display_name_placeholder')}
                   className="mt-1"
                 />
               </div>
@@ -368,14 +368,14 @@ function OnboardingForm() {
 
             <div className="flex gap-3 mt-8">
               <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(1)}>
-                <ChevronLeft className="h-4 w-4 mr-1" /> 戻る
+                <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
               </Button>
               <Button
                 className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full"
                 disabled={!fullName.trim()}
                 onClick={() => setStep(3)}
               >
-                次へ <ChevronRight className="h-4 w-4 ml-1" />
+                {t('next')} <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
           </>
@@ -385,16 +385,16 @@ function OnboardingForm() {
         {step === 3 && role === 'instructor' && (
           <>
             <ProgressBar current={2} total={INSTRUCTOR_STEPS} />
-            <h2 className="text-xl font-bold text-gray-900 mb-1">自己紹介</h2>
-            <p className="text-gray-500 text-sm mb-6">あなたのヨガの魅力を伝えましょう。</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-1">{t('step_intro_title')}</h2>
+            <p className="text-gray-500 text-sm mb-6">{t('step_intro_desc')}</p>
 
             <div className="space-y-5">
               <div>
-                <Label>キャッチコピー <span className="text-gray-400 text-xs font-normal">（一言で自分を表現）</span></Label>
+                <Label>{t('tagline_label')} <span className="text-gray-400 text-xs font-normal">{t('tagline_hint')}</span></Label>
                 <Input
                   value={tagline}
                   onChange={(e) => setTagline(e.target.value)}
-                  placeholder="例：呼吸から始まる、心の旅へ"
+                  placeholder={t('tagline_placeholder')}
                   maxLength={60}
                   className="mt-1"
                 />
@@ -402,7 +402,7 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label>{t('bio')} <span className="text-gray-400 text-xs font-normal">（詳しい自己紹介）</span></Label>
+                <Label>{t('bio')}</Label>
                 <Textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
@@ -443,14 +443,14 @@ function OnboardingForm() {
 
             <div className="flex gap-3 mt-8">
               <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(2)}>
-                <ChevronLeft className="h-4 w-4 mr-1" /> 戻る
+                <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
               </Button>
               <Button
                 className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full"
                 disabled={yogaStyles.length === 0 || languages.length === 0}
                 onClick={() => setStep(4)}
               >
-                次へ <ChevronRight className="h-4 w-4 ml-1" />
+                {t('next')} <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
           </>
@@ -460,12 +460,12 @@ function OnboardingForm() {
         {step === 4 && role === 'instructor' && (
           <>
             <ProgressBar current={3} total={INSTRUCTOR_STEPS} />
-            <h2 className="text-xl font-bold text-gray-900 mb-1">経験・資格・SNS</h2>
-            <p className="text-gray-500 text-sm mb-6">あなたの実績と活動を教えてください。</p>
+            <h2 className="text-xl font-bold text-gray-900 mb-1">{t('step_exp_title')}</h2>
+            <p className="text-gray-500 text-sm mb-6">{t('step_exp_desc')}</p>
 
             <div className="space-y-5">
               <div>
-                <Label>{t('experience')}（年）</Label>
+                <Label>{t('experience')}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -477,14 +477,14 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label>保有資格・認定証</Label>
-                <p className="text-xs text-gray-400 mb-2">取得している資格や認定証を追加してください（複数可）</p>
+                <Label>{t('certifications_label')}</Label>
+                <p className="text-xs text-gray-400 mb-2">{t('certifications_hint')}</p>
                 <div className="flex gap-2 mb-2">
                   <Input
                     value={certInput}
                     onChange={(e) => setCertInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCert())}
-                    placeholder="例：全米ヨガアライアンス RYT200"
+                    placeholder={t('cert_placeholder')}
                     className="flex-1"
                   />
                   <Button type="button" variant="outline" onClick={addCert} size="icon">
@@ -507,11 +507,11 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label>経歴・専門分野</Label>
+                <Label>{t('career_history_label')}</Label>
                 <Textarea
                   value={careerHistory}
                   onChange={(e) => setCareerHistory(e.target.value)}
-                  placeholder="例：インドのリシケシュで5年修行後、東京でヨガスタジオを主宰。産前産後ヨガを専門としています。"
+                  placeholder={t('career_placeholder')}
                   rows={3}
                   className="mt-1"
                 />
@@ -519,7 +519,7 @@ function OnboardingForm() {
 
               <div className="border-t pt-4">
                 <Label className="flex items-center gap-2 mb-3">
-                  <Instagram className="h-4 w-4 text-pink-500" /> Instagram（任意）
+                  <Instagram className="h-4 w-4 text-pink-500" /> {t('instagram_label')}
                 </Label>
                 <Input
                   value={instagramUrl}
@@ -531,7 +531,7 @@ function OnboardingForm() {
 
               <div>
                 <Label className="flex items-center gap-2 mb-1">
-                  <Youtube className="h-4 w-4 text-red-500" /> YouTube（任意）
+                  <Youtube className="h-4 w-4 text-red-500" /> {t('youtube_label')}
                 </Label>
                 <Input
                   value={youtubeUrl}
@@ -544,13 +544,13 @@ function OnboardingForm() {
 
             <div className="flex gap-3 mt-8">
               <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(3)}>
-                <ChevronLeft className="h-4 w-4 mr-1" /> 戻る
+                <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
               </Button>
               <Button
                 className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full"
                 onClick={() => setStep(5)}
               >
-                次へ <ChevronRight className="h-4 w-4 ml-1" />
+                {t('next')} <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
           </>
@@ -562,64 +562,64 @@ function OnboardingForm() {
             <ProgressBar current={4} total={INSTRUCTOR_STEPS} />
             <h2 className="text-xl font-bold text-gray-900 mb-1">
               <Landmark className="inline h-5 w-5 mr-2 text-navy-600" />
-              入金口座情報
+              {t('step_payout_title')}
             </h2>
-            <p className="text-gray-500 text-sm mb-2">セッション報酬の振込先を登録してください。</p>
+            <p className="text-gray-500 text-sm mb-2">{t('step_payout_desc')}</p>
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-6 text-sm text-blue-700">
-              この情報は暗号化されて保存されます。後から変更できます。スキップして後で登録することも可能です。
+              {t('payout_note')}
             </div>
 
             <div className="space-y-4">
               <div>
-                <Label>銀行名</Label>
+                <Label>{t('bank_name')}</Label>
                 <Input
                   value={bankName}
                   onChange={(e) => setBankName(e.target.value)}
-                  placeholder="例：三菱UFJ銀行"
+                  placeholder={t('bank_name_placeholder')}
                   className="mt-1"
                 />
               </div>
 
               <div>
-                <Label>支店名</Label>
+                <Label>{t('bank_branch')}</Label>
                 <Input
                   value={bankBranch}
                   onChange={(e) => setBankBranch(e.target.value)}
-                  placeholder="例：新宿支店"
+                  placeholder={t('bank_branch_placeholder')}
                   className="mt-1"
                 />
               </div>
 
               <div>
-                <Label>口座種別</Label>
+                <Label>{t('account_type')}</Label>
                 <Select value={accountType} onValueChange={(v) => setAccountType(v as '普通' | '当座')}>
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="普通">普通</SelectItem>
-                    <SelectItem value="当座">当座</SelectItem>
+                    <SelectItem value="普通">{t('account_ordinary')}</SelectItem>
+                    <SelectItem value="当座">{t('account_checking')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label>口座番号</Label>
+                <Label>{t('account_number')}</Label>
                 <Input
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
-                  placeholder="例：1234567"
+                  placeholder={t('account_number_placeholder')}
                   maxLength={8}
                   className="mt-1"
                 />
               </div>
 
               <div>
-                <Label>口座名義（カナ）</Label>
+                <Label>{t('account_holder_kana')}</Label>
                 <Input
                   value={accountHolderKana}
                   onChange={(e) => setAccountHolderKana(e.target.value)}
-                  placeholder="例：ヤマダ ハナコ"
+                  placeholder={t('account_holder_placeholder')}
                   className="mt-1"
                 />
               </div>
@@ -627,14 +627,14 @@ function OnboardingForm() {
 
             <div className="flex gap-3 mt-8">
               <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(4)}>
-                <ChevronLeft className="h-4 w-4 mr-1" /> 戻る
+                <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
               </Button>
               <Button
                 className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full"
                 onClick={handleSubmit}
                 disabled={loading}
               >
-                {loading ? '申請中...' : '申請する ✓'}
+                {loading ? t('submitting') : t('submit_application')}
               </Button>
             </div>
             <button
@@ -643,7 +643,7 @@ function OnboardingForm() {
               onClick={handleSubmit}
               disabled={loading}
             >
-              口座情報はあとで登録する
+              {t('skip_payout')}
             </button>
           </>
         )}
@@ -654,7 +654,7 @@ function OnboardingForm() {
 
 export default function OnboardingPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">読み込み中...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
       <OnboardingForm />
     </Suspense>
   )

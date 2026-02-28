@@ -50,7 +50,8 @@ function Section({ icon, title, children }: { icon: React.ReactNode; title: stri
 }
 
 export default function InstructorProfilePage() {
-  const t = useTranslations('onboarding')
+  const t = useTranslations('instructor')
+  const tOnb = useTranslations('onboarding')
   const router = useRouter()
   const supabase = createClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -189,12 +190,12 @@ export default function InstructorProfilePage() {
       account_holder_kana: accountHolderKana || null,
     })
 
-    toast.success('プロフィールを更新しました')
+    toast.success(t('saved'))
     setSaving(false)
   }
 
   if (!profile) {
-    return <div className="min-h-screen flex items-center justify-center text-gray-400">読み込み中...</div>
+    return <div className="min-h-screen flex items-center justify-center text-gray-400">{t('loading')}</div>
   }
 
   return (
@@ -202,11 +203,11 @@ export default function InstructorProfilePage() {
       <Navbar user={profile} />
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">プロフィール編集</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{t('profile_edit_title')}</h1>
         </div>
 
         {/* ── 基本情報 ─────────────────────────────────────────────────── */}
-        <Section icon={<User className="h-4 w-4 text-navy-600" />} title="基本情報">
+        <Section icon={<User className="h-4 w-4 text-navy-600" />} title={t('section_basic')}>
           {/* Avatar */}
           <div className="flex items-center gap-5">
             <div
@@ -225,20 +226,20 @@ export default function InstructorProfilePage() {
                 onClick={() => fileInputRef.current?.click()}
                 className="text-sm text-navy-600 hover:underline"
               >
-                写真を変更
+                {t('change_photo')}
               </button>
-              <p className="text-xs text-gray-400 mt-1">JPG / PNG・推奨：正方形</p>
+              <p className="text-xs text-gray-400 mt-1">{t('photo_hint')}</p>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
             </div>
           </div>
 
           <div>
-            <Label>表示名</Label>
+            <Label>{t('display_name')}</Label>
             <Input value={fullName} onChange={(e) => setFullName(e.target.value)} className="mt-1" />
           </div>
 
           <div>
-            <Label>{t('your_timezone')}</Label>
+            <Label>{tOnb('your_timezone')}</Label>
             <Select value={timezone} onValueChange={setTimezone}>
               <SelectTrigger className="mt-1">
                 <SelectValue />
@@ -253,13 +254,13 @@ export default function InstructorProfilePage() {
         </Section>
 
         {/* ── 自己紹介 ─────────────────────────────────────────────────── */}
-        <Section icon={<BookOpen className="h-4 w-4 text-sage-600" />} title="自己紹介">
+        <Section icon={<BookOpen className="h-4 w-4 text-sage-600" />} title={t('section_intro')}>
           <div>
-            <Label>キャッチコピー <span className="text-gray-400 text-xs font-normal">（60字以内）</span></Label>
+            <Label>{t('tagline_label')} <span className="text-gray-400 text-xs font-normal">{t('tagline_hint')}</span></Label>
             <Input
               value={tagline}
               onChange={(e) => setTagline(e.target.value)}
-              placeholder="例：呼吸から始まる、心の旅へ"
+              placeholder={tOnb('tagline_placeholder')}
               maxLength={60}
               className="mt-1"
             />
@@ -267,18 +268,18 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label>{t('bio')}</Label>
+            <Label>{tOnb('bio')}</Label>
             <Textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              placeholder={t('bio_placeholder')}
+              placeholder={tOnb('bio_placeholder')}
               rows={4}
               className="mt-1"
             />
           </div>
 
           <div>
-            <Label className="mb-2 block">{t('yoga_styles')}</Label>
+            <Label className="mb-2 block">{tOnb('yoga_styles')}</Label>
             <div className="flex flex-wrap gap-2">
               {YOGA_STYLES.map((s) => (
                 <TagButton key={s} label={s} selected={yogaStyles.includes(s)} onClick={() => toggle(yogaStyles, s, setYogaStyles)} />
@@ -287,7 +288,7 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label className="mb-2 block">{t('languages')}</Label>
+            <Label className="mb-2 block">{tOnb('languages')}</Label>
             <div className="flex flex-wrap gap-2">
               {LANGUAGES.map((l) => (
                 <TagButton key={l} label={l} selected={languages.includes(l)} onClick={() => toggle(languages, l, setLanguages)} />
@@ -297,9 +298,9 @@ export default function InstructorProfilePage() {
         </Section>
 
         {/* ── 経験・資格 ───────────────────────────────────────────────── */}
-        <Section icon={<Award className="h-4 w-4 text-amber-500" />} title="経験・資格">
+        <Section icon={<Award className="h-4 w-4 text-amber-500" />} title={t('section_experience')}>
           <div>
-            <Label>{t('experience')}（年）</Label>
+            <Label>{tOnb('experience')}</Label>
             <Input
               type="number"
               min={0}
@@ -311,13 +312,13 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label>保有資格・認定証</Label>
+            <Label>{tOnb('certifications_label')}</Label>
             <div className="flex gap-2 mt-1 mb-2">
               <Input
                 value={certInput}
                 onChange={(e) => setCertInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCert())}
-                placeholder="例：全米ヨガアライアンス RYT200"
+                placeholder={tOnb('cert_placeholder')}
                 className="flex-1"
               />
               <Button type="button" variant="outline" onClick={addCert} size="icon">
@@ -337,11 +338,11 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label>経歴・専門分野</Label>
+            <Label>{t('career_history_label')}</Label>
             <Textarea
               value={careerHistory}
               onChange={(e) => setCareerHistory(e.target.value)}
-              placeholder="例：インドのリシケシュで修行後、東京でヨガスタジオを主宰。"
+              placeholder={t('career_placeholder')}
               rows={3}
               className="mt-1"
             />
@@ -364,41 +365,41 @@ export default function InstructorProfilePage() {
         </Section>
 
         {/* ── 入金口座 ─────────────────────────────────────────────────── */}
-        <Section icon={<Landmark className="h-4 w-4 text-navy-600" />} title="入金口座情報">
+        <Section icon={<Landmark className="h-4 w-4 text-navy-600" />} title={t('section_payout')}>
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-700">
-            セッション報酬の振込先です。情報は安全に保存されます。
+            {t('payout_note')}
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <Label>銀行名</Label>
-              <Input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="例：三菱UFJ銀行" className="mt-1" />
+              <Label>{tOnb('bank_name')}</Label>
+              <Input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder={tOnb('bank_name_placeholder')} className="mt-1" />
             </div>
             <div>
-              <Label>支店名</Label>
-              <Input value={bankBranch} onChange={(e) => setBankBranch(e.target.value)} placeholder="例：新宿支店" className="mt-1" />
+              <Label>{tOnb('bank_branch')}</Label>
+              <Input value={bankBranch} onChange={(e) => setBankBranch(e.target.value)} placeholder={tOnb('bank_branch_placeholder')} className="mt-1" />
             </div>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <Label>口座種別</Label>
+              <Label>{tOnb('account_type')}</Label>
               <Select value={accountType} onValueChange={(v) => setAccountType(v as '普通' | '当座')}>
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="普通">普通</SelectItem>
-                  <SelectItem value="当座">当座</SelectItem>
+                  <SelectItem value="普通">{tOnb('account_ordinary')}</SelectItem>
+                  <SelectItem value="当座">{tOnb('account_checking')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>口座番号</Label>
+              <Label>{tOnb('account_number')}</Label>
               <Input
                 value={accountNumber}
                 onChange={(e) => setAccountNumber(e.target.value.replace(/\D/g, ''))}
-                placeholder="例：1234567"
+                placeholder={tOnb('account_number_placeholder')}
                 maxLength={8}
                 className="mt-1"
               />
@@ -406,8 +407,8 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label>口座名義（カナ）</Label>
-            <Input value={accountHolderKana} onChange={(e) => setAccountHolderKana(e.target.value)} placeholder="例：ヤマダ ハナコ" className="mt-1" />
+            <Label>{tOnb('account_holder_kana')}</Label>
+            <Input value={accountHolderKana} onChange={(e) => setAccountHolderKana(e.target.value)} placeholder={tOnb('account_holder_placeholder')} className="mt-1" />
           </div>
         </Section>
 
@@ -416,7 +417,7 @@ export default function InstructorProfilePage() {
           onClick={handleSave}
           disabled={saving}
         >
-          {saving ? '保存中...' : '変更を保存する'}
+          {saving ? t('saving') : t('save_btn')}
         </Button>
       </div>
     </div>
