@@ -165,23 +165,21 @@ export async function POST(request: NextRequest) {
     }
 
     // ── 7. Confirmation emails (fire-and-forget) ──────────────────────────────
-    if (slotInfo && meetLink) {
-      sendBookingConfirmationStudent({
-        to: studentProfile.email,
-        studentName: studentProfile.full_name || 'Student',
-        instructorName: instructorProfile.full_name || 'Instructor',
-        startTime: slotInfo.start_time,
-        meetLink,
-      }).catch(console.error)
+    sendBookingConfirmationStudent({
+      to: studentProfile.email,
+      studentName: studentProfile.full_name || 'Student',
+      instructorName: instructorProfile.full_name || 'Instructor',
+      startTime: slotInfo.start_time,
+      meetLink: meetLink || undefined,
+    }).catch(console.error)
 
-      sendBookingConfirmationInstructor({
-        to: instructorProfile.email,
-        instructorName: instructorProfile.full_name || 'Instructor',
-        studentName: studentProfile.full_name || 'Student',
-        startTime: slotInfo.start_time,
-        meetLink,
-      }).catch(console.error)
-    }
+    sendBookingConfirmationInstructor({
+      to: instructorProfile.email,
+      instructorName: instructorProfile.full_name || 'Instructor',
+      studentName: studentProfile.full_name || 'Student',
+      startTime: slotInfo.start_time,
+      meetLink: meetLink || undefined,
+    }).catch(console.error)
 
     return NextResponse.json({
       booking: result.booking_id,

@@ -16,14 +16,34 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { slotId } = schema.parse(body)
 
-    const { error } = await supabase
-      .from('time_slots')
-      .delete()
-      .eq('id', slotId)
-      .eq('instructor_id', user.id)
-      .eq('status', 'available')
+    // Check if any booking references this slot (even cancelled ones)
+    const { data: existingBooking } = await supabase
+      .from('bookings')
+      .select('id')
+      .eq('slot_id', slotId)
+      .limit(1)
+      .maybeSingle()
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (existingBooking) {
+      // Soft-delete: mark as cancelled to avoid FK constraint violation
+      const { error } = await supabase
+        .from('time_slots')
+        .update({ status: 'cancelled' })
+        .eq('id', slotId)
+        .eq('instructor_id', user.id)
+
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    } else {
+      // No bookings reference this slot — safe to hard delete
+      const { error } = await supabase
+        .from('time_slots')
+        .delete()
+        .eq('id', slotId)
+        .eq('instructor_id', user.id)
+        .eq('status', 'available')
+
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true })
   } catch (err) {

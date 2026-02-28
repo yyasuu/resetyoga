@@ -39,6 +39,7 @@ export function InstructorCalendar({ instructorId }: InstructorCalendarProps) {
       .from('time_slots')
       .select('*')
       .eq('instructor_id', instructorId)
+      .neq('status', 'cancelled')
       .gte('start_time', new Date().toISOString())
       .order('start_time')
 

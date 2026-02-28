@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendInstructorApprovalEmail } from '@/lib/email'
 
@@ -15,10 +15,23 @@ export async function POST(request: NextRequest) {
 
   const { instructorId, instructorName, instructorEmail } = await request.json()
 
+  // Update is_approved via admin client (bypasses RLS)
+  const adminSupabase = await createAdminClient()
+  const { error: updateError } = await adminSupabase
+    .from('instructor_profiles')
+    .update({ is_approved: true })
+    .eq('id', instructorId)
+
+  if (updateError) {
+    console.error('Failed to approve instructor in DB:', updateError)
+    return NextResponse.json({ error: updateError.message }, { status: 500 })
+  }
+
   try {
     await sendInstructorApprovalEmail({ to: instructorEmail, name: instructorName })
   } catch (err) {
     console.error('Failed to send approval email:', err)
+    // Non-fatal: DB was updated, email failed
   }
 
   return NextResponse.json({ success: true })

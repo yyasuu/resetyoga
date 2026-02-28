@@ -20,9 +20,13 @@ export async function sendBookingConfirmationStudent({
   studentName: string
   instructorName: string
   startTime: string
-  meetLink: string
+  meetLink?: string
 }) {
   const formattedTime = format(new Date(startTime), 'EEEE, MMMM d, yyyy • h:mm a zzz')
+  const meetSection = meetLink
+    ? `<a href="${meetLink}" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Join Google Meet</a>
+       <p style="margin-top:16px;color:#666;font-size:14px;">The meeting link will be active 10 minutes before your session starts.</p>`
+    : `<p style="color:#666;font-size:14px;">A Google Meet link will be sent to you shortly before your session.</p>`
 
   await resend.emails.send({
     from: FROM,
@@ -38,12 +42,7 @@ export async function sendBookingConfirmationStudent({
           <p><strong>Date &amp; Time:</strong> ${formattedTime}</p>
           <p><strong>Duration:</strong> 45 minutes</p>
         </div>
-        <a href="${meetLink}" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
-          Join Google Meet
-        </a>
-        <p style="margin-top:16px;color:#666;font-size:14px;">
-          The meeting link will be active 10 minutes before your session starts.
-        </p>
+        ${meetSection}
         <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;" />
         <p style="color:#999;font-size:12px;">Reset Yoga Team – Reset your body and mind in 45 minutes.</p>
       </div>
@@ -62,9 +61,12 @@ export async function sendBookingConfirmationInstructor({
   instructorName: string
   studentName: string
   startTime: string
-  meetLink: string
+  meetLink?: string
 }) {
   const formattedTime = format(new Date(startTime), 'EEEE, MMMM d, yyyy • h:mm a zzz')
+  const meetSection = meetLink
+    ? `<a href="${meetLink}" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Join Google Meet</a>`
+    : `<p style="color:#666;font-size:14px;">A Google Meet link will be available shortly before the session.</p>`
 
   await resend.emails.send({
     from: FROM,
@@ -80,9 +82,7 @@ export async function sendBookingConfirmationInstructor({
           <p><strong>Date &amp; Time:</strong> ${formattedTime}</p>
           <p><strong>Duration:</strong> 45 minutes</p>
         </div>
-        <a href="${meetLink}" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">
-          Join Google Meet
-        </a>
+        ${meetSection}
         <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;" />
         <p style="color:#999;font-size:12px;">Reset Yoga Team</p>
       </div>
