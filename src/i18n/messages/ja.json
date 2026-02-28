@@ -68,7 +68,7 @@
     "pricing_monthly": "月額プラン",
     "pricing_monthly_desc": "月4回まで、いつでも解約可能",
     "pricing_monthly_badge": "人気No.1",
-    "pricing_monthly_period": "/ 月（税込）",
+    "pricing_monthly_period": "/ month",
     "pricing_monthly_btn": "今すぐ始める",
     "pricing_premium": "プレミアム",
     "pricing_premium_badge": "近日公開",
@@ -224,7 +224,7 @@
     "all_bookings": "全予約",
     "subscription": "サブスクリプション",
     "join_meet": "Meet に参加",
-    "trial_upsell": "ヨガを楽しんでいますか？トライアル後は月額1,980円でご継続いただけます。"
+    "trial_upsell": "ヨガを楽しんでいますか？トライアル後は$19.99/月でご継続いただけます。"
   },
   "instructors": {
     "page_title": "講師を探す",

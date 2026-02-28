@@ -345,7 +345,7 @@ export default async function LandingPage() {
               </div>
               <h3 className="text-lg font-bold text-white mb-2">{t('pricing_monthly')}</h3>
               <p className="text-4xl font-extrabold text-white mb-1">
-                ¥1,980
+                $19.99
               </p>
               <p className="text-sm text-navy-200 mb-6">{t('pricing_monthly_period')}</p>
               <ul className="space-y-2.5 mb-8 flex-1">
