@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
@@ -8,6 +9,9 @@ export const metadata = {
 }
 
 export default async function RefundPage() {
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
+
   let profile: Profile | null = null
   try {
     const supabase = await createClient()
@@ -17,6 +21,103 @@ export default async function RefundPage() {
       profile = data
     }
   } catch {}
+
+  if (locale === 'ja') {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-navy-950 flex flex-col">
+        <Navbar user={profile} />
+        <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-12">
+          <h1 className="text-3xl font-bold text-navy-900 dark:text-white mb-2">
+            返金・キャンセルポリシー
+          </h1>
+          <p className="text-gray-500 dark:text-navy-400 text-sm mb-8">最終更新日：2026年2月</p>
+
+          <div className="space-y-6 text-gray-700 dark:text-gray-300">
+
+            <Section title="第1条（デジタルサービスの返金不可方針）">
+              <p className="text-sm">
+                Reset Yogaはライブオンラインヨガセッションへの即時アクセスを提供するデジタルサブスクリプションサービスです。
+                サービスは電子的に提供され、支払い時にアクセスが付与されるため、
+                <strong>完了した請求期間に対する返金は原則行いません。</strong>
+              </p>
+            </Section>
+
+            <Section title="第2条（サブスクリプションのキャンセル）">
+              <p className="text-sm">
+                サブスクリプションはアカウントダッシュボードまたはサポートへの連絡によりいつでもキャンセルできます。
+                キャンセル後の取り扱い：
+              </p>
+              <ul className="list-disc pl-5 space-y-1 text-sm mt-2">
+                <li>サブスクリプションは現在の請求期間末日まで有効です。</li>
+                <li>キャンセル後に追加の請求は発生しません。</li>
+                <li>現在の期間に残った未使用セッションはキャンセル時に失効します。</li>
+              </ul>
+            </Section>
+
+            <Section title="第3条（例外的な返金対応）">
+              <p className="text-sm">
+                以下の場合に限り、当社の裁量により返金またはサービスクレジットを発行することがあります：
+              </p>
+              <ul className="list-disc pl-5 space-y-1 text-sm mt-2">
+                <li>
+                  <strong>システム障害：</strong>プラットフォーム側の確認済みエラーによりセッションが提供できなかった場合。
+                </li>
+                <li>
+                  <strong>二重請求：</strong>同一請求期間に複数回請求された場合。
+                </li>
+                <li>
+                  <strong>不正請求：</strong>取引を承認しておらず、14日以内に申告した場合。
+                </li>
+              </ul>
+              <p className="text-sm mt-2">
+                例外対応をご希望の場合は、請求から<strong>14日以内</strong>に注文詳細を添えて{' '}
+                <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
+                  support@tryresetyoga.com
+                </a>
+                {' '}までご連絡ください。
+              </p>
+            </Section>
+
+            <Section title="第4条（生徒によるセッションキャンセル）">
+              <p className="text-sm">
+                個別セッションのキャンセルには以下のポリシーが適用されます：
+              </p>
+              <ul className="list-disc pl-5 space-y-1 text-sm mt-2">
+                <li>セッション開始<strong>12時間超前</strong>のキャンセル：セッションクレジットをアカウントに返還します。</li>
+                <li>セッション開始<strong>12時間以内</strong>のキャンセル：セッションクレジットは失効します。</li>
+              </ul>
+            </Section>
+
+            <Section title="第5条（講師によるセッションキャンセル）">
+              <p className="text-sm">
+                講師が確定済みセッションをキャンセルした場合、セッションクレジットをアカウントに全額返還します。
+                また、できる限り速やかにメールでお知らせします。
+              </p>
+            </Section>
+
+            <Section title="第6条（無料体験）">
+              <p className="text-sm">
+                無料体験（2回）には支払い方法の登録が必要ですが、初回請求は発生しません。
+                体験セッションは有料セッションへの繰り越しができず、サブスクリプション登録後に持ち越すことはできません。
+              </p>
+            </Section>
+
+            <Section title="第7条（お問い合わせ）">
+              <p className="text-sm">
+                ご質問や返金リクエストは、{' '}
+                <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
+                  support@tryresetyoga.com
+                </a>
+                {' '}までご連絡ください。2営業日以内にご返答いたします。
+              </p>
+            </Section>
+
+          </div>
+        </main>
+        <Footer />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-navy-950 flex flex-col">
