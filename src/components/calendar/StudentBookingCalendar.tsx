@@ -228,8 +228,8 @@ export function StudentBookingCalendar({
           }}
           events={events}
           eventClick={handleEventClick}
-          slotMinTime="06:00:00"
-          slotMaxTime="22:00:00"
+          slotMinTime="00:00:00"
+          slotMaxTime="24:00:00"
           slotDuration="00:15:00"
           height="auto"
           nowIndicator={true}
@@ -260,7 +260,7 @@ export function StudentBookingCalendar({
                 {format(new Date(selectedSlot.start_time), 'h:mm a')} –{' '}
                 {format(new Date(selectedSlot.end_time), 'h:mm a')}
               </p>
-              <p className="text-gray-500 text-sm">Duration: 45 minutes · Google Meet</p>
+              <p className="text-gray-500 text-sm">Duration: 45 minutes · Video Session</p>
               {subscription?.status === 'trial' && (
                 <p className="text-blue-600 text-sm font-medium">
                   This will use 1 of your{' '}

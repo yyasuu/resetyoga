@@ -23,10 +23,11 @@ export async function sendBookingConfirmationStudent({
   meetLink?: string
 }) {
   const formattedTime = format(new Date(startTime), 'EEEE, MMMM d, yyyy • h:mm a zzz')
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tryresetyoga.com'
   const meetSection = meetLink
-    ? `<a href="${meetLink}" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Join Google Meet</a>
-       <p style="margin-top:16px;color:#666;font-size:14px;">The meeting link will be active 10 minutes before your session starts.</p>`
-    : `<p style="color:#666;font-size:14px;">A Google Meet link will be sent to you shortly before your session.</p>`
+    ? `<a href="${meetLink}" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Join Session</a>
+       <p style="margin-top:16px;color:#666;font-size:14px;">You can also access this link anytime from <a href="${appUrl}/bookings" style="color:${BRAND_NAVY};">My Bookings</a> in your account.</p>`
+    : `<p style="color:#666;font-size:14px;">Your session link is available in <a href="${appUrl}/bookings" style="color:${BRAND_NAVY};">My Bookings</a> in your account.</p>`
 
   await resend.emails.send({
     from: FROM,
@@ -64,9 +65,11 @@ export async function sendBookingConfirmationInstructor({
   meetLink?: string
 }) {
   const formattedTime = format(new Date(startTime), 'EEEE, MMMM d, yyyy • h:mm a zzz')
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tryresetyoga.com'
   const meetSection = meetLink
-    ? `<a href="${meetLink}" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Join Google Meet</a>`
-    : `<p style="color:#666;font-size:14px;">A Google Meet link will be available shortly before the session.</p>`
+    ? `<a href="${meetLink}" style="display:inline-block;background:${BRAND_NAVY};color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">Join Session</a>
+       <p style="margin-top:16px;color:#666;font-size:14px;">You can also access this link anytime from <a href="${appUrl}/instructor/bookings" style="color:${BRAND_NAVY};">My Bookings</a> in your account.</p>`
+    : `<p style="color:#666;font-size:14px;">Your session link is available in <a href="${appUrl}/instructor/bookings" style="color:${BRAND_NAVY};">My Bookings</a> in your account.</p>`
 
   await resend.emails.send({
     from: FROM,

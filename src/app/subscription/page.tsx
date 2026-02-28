@@ -238,7 +238,7 @@ function SubscriptionContent() {
             <ul className="text-sm text-gray-600 space-y-1">
               <li>✓ 2 sessions total</li>
               <li>✓ All instructors</li>
-              <li>✓ Google Meet</li>
+              <li>✓ Live Video Sessions</li>
               <li>✓ Card required (not charged)</li>
             </ul>
             {isTrial && (
@@ -265,7 +265,7 @@ function SubscriptionContent() {
             <ul className="text-sm text-gray-600 space-y-1">
               <li>✓ 4 sessions per month</li>
               <li>✓ All instructors</li>
-              <li>✓ Google Meet</li>
+              <li>✓ Live Video Sessions</li>
               <li>✓ Cancel anytime</li>
             </ul>
             {isActive && (
