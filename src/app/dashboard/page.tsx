@@ -169,17 +169,15 @@ export default async function StudentDashboardPage() {
                         </p>
                       </div>
                     </div>
-                    {booking.google_meet_link && (
-                      <a
-                        href={booking.google_meet_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 bg-navy-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-navy-700"
-                      >
-                        <Video className="h-4 w-4" />
-                        Join Meet
-                      </a>
-                    )}
+                    <a
+                      href={booking.google_meet_link || `https://meet.jit.si/reset-yoga-${booking.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 bg-navy-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-navy-700"
+                    >
+                      <Video className="h-4 w-4" />
+                      Join Session
+                    </a>
                   </div>
                 ))}
               </div>

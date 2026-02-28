@@ -227,6 +227,54 @@ export async function sendInstructorApplicationEmail({
   })
 }
 
+// ── 5-minute reminder: sent to both student and instructor ───────────────────
+export async function sendSessionReminderEmail({
+  to,
+  name,
+  otherPartyName,
+  startTime,
+  meetLink,
+  role,
+}: {
+  to: string
+  name: string
+  otherPartyName: string
+  startTime: string
+  meetLink: string
+  role: 'student' | 'instructor'
+}) {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://tryresetyoga.com'
+  const formattedTime = format(new Date(startTime), 'EEEE, MMMM d, yyyy • h:mm a')
+  const bookingsUrl = role === 'instructor' ? `${appUrl}/instructor/bookings` : `${appUrl}/bookings`
+  const withLabel = role === 'instructor' ? `Student: ${otherPartyName}` : `Instructor: ${otherPartyName}`
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Your session starts in 5 minutes`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:${BRAND_LINEN};padding:24px;border-radius:12px;">
+        <h2 style="color:${BRAND_NAVY};">Your session is starting soon! ⏰</h2>
+        <p>Hi ${name},</p>
+        <p>Your yoga session begins in <strong>5 minutes</strong>. Get ready!</p>
+        <div style="background:#fff;padding:16px;border-radius:8px;margin:16px 0;border-left:4px solid ${BRAND_SAGE};">
+          <p><strong>${withLabel}</strong></p>
+          <p><strong>Time:</strong> ${formattedTime}</p>
+          <p><strong>Duration:</strong> 45 minutes</p>
+        </div>
+        <a href="${meetLink}" style="display:inline-block;background:#16a34a;color:white;padding:14px 28px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:16px;">
+          Join Session Now
+        </a>
+        <p style="margin-top:16px;color:#666;font-size:14px;">
+          You can also find this link in <a href="${bookingsUrl}" style="color:${BRAND_NAVY};">My Bookings</a>.
+        </p>
+        <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;" />
+        <p style="color:#999;font-size:12px;">Reset Yoga Team</p>
+      </div>
+    `,
+  })
+}
+
 export async function sendInstructorApprovalEmail({
   to,
   name,
