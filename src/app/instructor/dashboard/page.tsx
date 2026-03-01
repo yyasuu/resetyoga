@@ -8,6 +8,7 @@ import { format } from 'date-fns'
 import { Calendar, Users, Star, Video, ChevronRight, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { AccountCancelButton } from '@/components/account/AccountCancelButton'
 
 export default async function InstructorDashboardPage() {
   const supabase = await createClient()
@@ -220,6 +221,7 @@ export default async function InstructorDashboardPage() {
                     {locale === 'ja' ? '講師利用規約' : 'Instructor Terms'}
                   </Button>
                 </Link>
+                <AccountCancelButton role="instructor" />
               </div>
             </div>
 

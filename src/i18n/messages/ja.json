@@ -371,6 +371,16 @@
     "refund": "返金・キャンセルポリシー",
     "copyright": "© 2026 Reset Yoga. All rights reserved."
   },
+  "account": {
+    "cancel_btn": "アカウントを解約する",
+    "cancel_confirm_title": "アカウントを解約しますか？",
+    "cancel_confirm_body_student": "すべてのデータが完全に削除されます。有効なサブスクリプションは即時解約されます。この操作は取り消せません。",
+    "cancel_confirm_body_instructor": "講師プロフィールを含むすべてのデータが完全に削除されます。今後の予約はキャンセルされます。この操作は取り消せません。",
+    "cancel_yes": "解約する",
+    "cancel_no": "アカウントを続ける",
+    "canceling": "解約中…",
+    "cancel_error": "解約に失敗しました。再度お試しいただくか、サポートにご連絡ください。"
+  },
   "common": {
     "loading": "読み込み中...",
     "error": "エラーが発生しました",

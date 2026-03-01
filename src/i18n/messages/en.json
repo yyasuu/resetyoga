@@ -371,6 +371,16 @@
     "refund": "Refund / Cancellation",
     "copyright": "© 2026 Reset Yoga. All rights reserved."
   },
+  "account": {
+    "cancel_btn": "Cancel Account",
+    "cancel_confirm_title": "Cancel your account?",
+    "cancel_confirm_body_student": "All your data will be permanently deleted. Any active subscription will be cancelled immediately. This action cannot be undone.",
+    "cancel_confirm_body_instructor": "Your instructor profile and all data will be permanently deleted. Any upcoming bookings will be cancelled. This action cannot be undone.",
+    "cancel_yes": "Yes, cancel account",
+    "cancel_no": "Keep account",
+    "canceling": "Cancelling…",
+    "cancel_error": "Failed to cancel account. Please try again or contact support."
+  },
   "common": {
     "loading": "Loading...",
     "error": "Something went wrong",

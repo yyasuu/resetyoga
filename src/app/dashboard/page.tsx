@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Calendar, Search, Video, AlertCircle, FileText } from 'lucide-react'
 import { cookies } from 'next/headers'
 import { StudentSubscription } from '@/types'
+import { AccountCancelButton } from '@/components/account/AccountCancelButton'
 
 export default async function StudentDashboardPage() {
   const supabase = await createClient()
@@ -231,6 +232,7 @@ export default async function StudentDashboardPage() {
                     {locale === 'ja' ? '生徒利用規約' : 'Student Terms'}
                   </Button>
                 </Link>
+                <AccountCancelButton role="student" />
               </div>
             </div>
           </div>
