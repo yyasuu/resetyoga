@@ -128,7 +128,16 @@
     "back_to_login": "ログインに戻る",
     "login_error_google": "このメールアドレスはGoogleで登録されている可能性があります。Googleでサインインをお試しください。",
     "login_error_password": "パスワードが正しくありません。以下から再設定してアクセスを回復してください。",
-    "reset_password_link": "パスワードを再設定する →"
+    "reset_password_link": "パスワードを再設定する →",
+    "link_expired_title": "このリンクは有効期限切れまたは無効です",
+    "link_expired_body": "メール認証リンクは24時間で期限切れになるか、1度しか使用できません。新しいパスワード再設定リンクをリクエストしてください。",
+    "reset_steps_title": "📬 手順：",
+    "reset_step_1": "Reset Yoga からのメールを開く（件名：パスワードのリセット）",
+    "reset_step_2": "メール内のリンクをクリック — 今使っているブラウザで開いてください",
+    "reset_step_3": "表示されたページで新しいパスワードを設定",
+    "reset_step_4": "新しいパスワードでサインイン",
+    "reset_spam_note": "メールが届かない場合は、迷惑メールフォルダをご確認ください。Hotmail / Outlook をお使いの方は「フォーカス済み」と「その他」両方のフォルダを確認してください。",
+    "reset_resend": "メールを再送する"
   },
   "onboarding": {
     "title": "あなたについて教えてください",

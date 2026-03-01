@@ -128,7 +128,16 @@
     "back_to_login": "Back to login",
     "login_error_google": "This email may be registered with Google. Try signing in with Google.",
     "login_error_password": "Incorrect password. Reset it below to regain access.",
-    "reset_password_link": "Reset my password →"
+    "reset_password_link": "Reset my password →",
+    "link_expired_title": "This link has expired or is invalid",
+    "link_expired_body": "Email confirmation links expire after 24 hours or can only be used once. Please request a new password reset link.",
+    "reset_steps_title": "📬 Next steps:",
+    "reset_step_1": "Open the email from Reset Yoga (subject: Reset your password)",
+    "reset_step_2": "Click the link — open it in the same browser you're using now",
+    "reset_step_3": "Set your new password on the page that opens",
+    "reset_step_4": "Sign in with your new password",
+    "reset_spam_note": "Can't find the email? Check your Spam or Junk folder. Hotmail / Outlook users: also check Focused vs Other inbox.",
+    "reset_resend": "Resend the email"
   },
   "onboarding": {
     "title": "Tell us about yourself",

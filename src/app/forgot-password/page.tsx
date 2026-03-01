@@ -9,7 +9,7 @@ import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { CheckCircle, Mail } from 'lucide-react'
+import { CheckCircle, Mail, AlertTriangle } from 'lucide-react'
 
 function ForgotPasswordForm() {
   const t = useTranslations('auth')
@@ -19,20 +19,31 @@ function ForgotPasswordForm() {
   const [email, setEmail] = useState(searchParams.get('email') || '')
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
+  const [sendError, setSendError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setSendError('')
+
+    // Set a short-lived cookie so the auth callback knows to redirect to
+    // reset-password instead of onboarding/dashboard.
+    // The cookie is scoped to the domain so it is present when the email
+    // link is clicked (same device) and the callback route reads it.
+    document.cookie = 'ry_recovery=1; path=/; max-age=3600; SameSite=Lax'
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/auth/reset-password`,
+      // Use the base callback URL — this is already whitelisted in Supabase
+      // for Google OAuth, so password-reset emails will be delivered correctly.
+      redirectTo: `${window.location.origin}/auth/callback`,
     })
 
     setLoading(false)
 
     if (error) {
-      // Still show success to avoid email enumeration
       console.error('Reset error:', error.message)
+      // Still show the success screen to avoid email enumeration,
+      // but log internally. Real delivery errors are usually rate-limit.
     }
 
     setSent(true)
@@ -65,24 +76,43 @@ function ForgotPasswordForm() {
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               {t('forgot_password_success_title')}
             </h2>
-            <p className="text-gray-500 dark:text-navy-300 text-sm mb-6">
+            <p className="text-gray-500 dark:text-navy-300 text-sm mb-5">
               {t('forgot_password_success_desc', { email })}
             </p>
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 text-sm text-blue-700 dark:text-blue-300 text-left mb-6 space-y-1">
-              <p className="font-semibold">📬 Next steps:</p>
+
+            {/* Step-by-step guide */}
+            <div className="bg-navy-50 dark:bg-navy-900 border border-navy-200 dark:border-navy-700 rounded-xl p-4 text-sm text-navy-800 dark:text-navy-200 text-left mb-4 space-y-2">
+              <p className="font-semibold text-navy-900 dark:text-white">
+                {t('reset_steps_title')}
+              </p>
               <ol className="list-decimal pl-4 space-y-1">
-                <li>Open the email from Reset Yoga</li>
-                <li>Click the reset link inside</li>
-                <li>Set your new password</li>
-                <li>Sign in with your new password</li>
+                <li>{t('reset_step_1')}</li>
+                <li>{t('reset_step_2')}</li>
+                <li>{t('reset_step_3')}</li>
+                <li>{t('reset_step_4')}</li>
               </ol>
             </div>
-            <Link
-              href="/login"
-              className="inline-block text-sm text-navy-600 dark:text-sage-400 hover:underline"
-            >
-              ← {t('back_to_login')}
-            </Link>
+
+            {/* Spam warning */}
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3 text-sm text-amber-800 dark:text-amber-300 text-left mb-5 flex gap-2">
+              <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+              <p>{t('reset_spam_note')}</p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => { setSent(false); setSendError('') }}
+                className="text-sm text-navy-600 dark:text-sage-400 hover:underline"
+              >
+                {t('reset_resend')}
+              </button>
+              <Link
+                href="/login"
+                className="text-sm text-gray-500 dark:text-navy-400 hover:underline"
+              >
+                ← {t('back_to_login')}
+              </Link>
+            </div>
           </div>
         ) : (
           /* ── Form state ────────────────────────────────────────────── */
@@ -93,6 +123,12 @@ function ForgotPasswordForm() {
             <p className="text-gray-500 dark:text-navy-300 text-sm mb-6">
               {t('forgot_password_subtitle')}
             </p>
+
+            {sendError && (
+              <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-300">
+                {sendError}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

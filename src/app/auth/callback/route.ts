@@ -5,25 +5,31 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const role = searchParams.get('role') || 'student'
-  // next=/auth/reset-password is set when coming from a password reset email
-  const next = searchParams.get('next')
+
+  // The forgot-password page sets this cookie before calling
+  // resetPasswordForEmail so we know to redirect to the reset-password page
+  // instead of the normal post-login destination.
+  const isRecovery = request.cookies.get('ry_recovery')?.value === '1'
 
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      // If this is a password reset flow, redirect to the reset-password page
-      if (next && next.startsWith('/') && !next.startsWith('//')) {
-        return NextResponse.redirect(`${origin}${next}`)
+      // ── Password recovery flow ────────────────────────────────────────
+      if (isRecovery) {
+        const response = NextResponse.redirect(`${origin}/auth/reset-password`)
+        // Clear the one-time recovery cookie
+        response.cookies.set('ry_recovery', '', { path: '/', maxAge: 0 })
+        return response
       }
 
+      // ── Normal login / signup confirmation ────────────────────────────
       const {
         data: { user },
       } = await supabase.auth.getUser()
 
       if (user) {
-        // Check if profile exists and has a role set
         const { data: profile } = await supabase
           .from('profiles')
           .select('role')
@@ -31,11 +37,8 @@ export async function GET(request: NextRequest) {
           .single()
 
         if (!profile?.role || profile.role === 'student') {
-          // New user or student - go to onboarding
           return NextResponse.redirect(`${origin}/onboarding?role=${role}`)
         }
-
-        // Existing user - redirect based on role
         if (profile.role === 'instructor') {
           return NextResponse.redirect(`${origin}/instructor/dashboard`)
         }
@@ -45,6 +48,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(`${origin}/dashboard`)
       }
     }
+
+    // Code exchange failed (expired link, wrong browser, etc.)
+    return NextResponse.redirect(`${origin}/login?error=link_expired`)
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth_failed`)

@@ -1,17 +1,57 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, AlertTriangle } from 'lucide-react'
 
-export default function LoginPage() {
+// ── URL-error banner (needs Suspense because of useSearchParams) ──────────────
+function UrlErrorBanner() {
+  const t = useTranslations('auth')
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
+  if (!error) return null
+
+  const messages: Record<string, { title: string; body: string }> = {
+    link_expired: {
+      title: t('link_expired_title'),
+      body: t('link_expired_body'),
+    },
+    auth_failed: {
+      title: t('link_expired_title'),
+      body: t('link_expired_body'),
+    },
+  }
+  const msg = messages[error] ?? {
+    title: t('link_expired_title'),
+    body: t('link_expired_body'),
+  }
+
+  return (
+    <div className="mb-5 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4 flex gap-3">
+      <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+      <div className="text-sm">
+        <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">{msg.title}</p>
+        <p className="text-amber-800 dark:text-amber-300">{msg.body}</p>
+        <Link
+          href="/forgot-password"
+          className="mt-2 inline-block font-semibold text-navy-700 dark:text-sage-400 underline underline-offset-2 hover:opacity-80"
+        >
+          {t('reset_password_link')}
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+// ── Main login form ───────────────────────────────────────────────────────────
+function LoginForm() {
   const t = useTranslations('auth')
   const router = useRouter()
   const supabase = createClient()
@@ -19,8 +59,8 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  // 'none' | 'google' | 'password'
-  const [loginError, setLoginError] = useState<'none' | 'google' | 'password'>('none')
+  // 'none' | 'password'
+  const [loginError, setLoginError] = useState<'none' | 'password'>('none')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,19 +70,12 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      const msg = (error.message || '').toLowerCase()
-      if (msg.includes('invalid login credentials')) {
-        // Could be wrong password or Google-only account — show both options
-        setLoginError('password')
-      } else {
-        setLoginError('google')
-      }
+      setLoginError('password')
       setLoading(false)
       return
     }
 
     const { data: { user } } = await supabase.auth.getUser()
-
     if (user) {
       const { data: profile } = await supabase
         .from('profiles')
@@ -59,7 +92,6 @@ export default function LoginPage() {
       }
       router.refresh()
     }
-
     setLoading(false)
   }
 
@@ -73,6 +105,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-linen-200 via-sage-50 to-navy-50 dark:from-navy-900 dark:via-navy-800 dark:to-navy-900 flex items-center justify-center p-4">
       <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-lg p-8 w-full max-w-md">
+
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center justify-center mb-4">
@@ -89,7 +122,12 @@ export default function LoginPage() {
           <p className="text-gray-500 dark:text-gray-400 mt-1">{t('login_subtitle')}</p>
         </div>
 
-        {/* Inline error banner */}
+        {/* URL error banner (e.g. expired email link) */}
+        <Suspense>
+          <UrlErrorBanner />
+        </Suspense>
+
+        {/* Wrong-password inline banner */}
         {loginError === 'password' && (
           <div className="mb-5 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20 p-4">
             <div className="flex items-start gap-3">
@@ -98,6 +136,7 @@ export default function LoginPage() {
                 <p className="font-semibold text-amber-900 dark:text-amber-200">
                   {t('login_title')}
                 </p>
+                {/* Option A: Google */}
                 <p className="text-amber-800 dark:text-amber-300">
                   {t('login_error_google')}
                 </p>
@@ -105,7 +144,7 @@ export default function LoginPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="mt-1 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-800/30 h-8 text-xs"
+                  className="border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-800/30 h-8 text-xs"
                   onClick={handleGoogleLogin}
                 >
                   <svg className="w-3.5 h-3.5 mr-1.5" viewBox="0 0 24 24">
@@ -116,6 +155,7 @@ export default function LoginPage() {
                   </svg>
                   {t('google_btn')}
                 </Button>
+                {/* Option B: Reset password */}
                 <div className="border-t border-amber-200 dark:border-amber-800 pt-2 mt-2">
                   <p className="text-amber-800 dark:text-amber-300">
                     {t('login_error_password')}
@@ -190,7 +230,7 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : t('login_btn')}
           </Button>
 
-          {/* Forgot password link — always visible below Sign In */}
+          {/* Forgot password — always visible below Sign In */}
           <p className="text-center text-sm">
             <Link
               href={`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ''}`}
@@ -209,5 +249,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+      <LoginForm />
+    </Suspense>
   )
 }
