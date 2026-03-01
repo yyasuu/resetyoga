@@ -10,6 +10,12 @@ const publicPaths = [
   '/instructors',
   '/auth',
   '/api',
+  '/tokusho',
+  '/terms',
+  '/privacy',
+  '/refund',
+  '/instructor-terms',
+  '/student-terms',
 ]
 
 function isPublicPath(pathname: string): boolean {
