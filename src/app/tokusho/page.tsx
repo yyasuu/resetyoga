@@ -36,7 +36,7 @@ export default async function TokushoPage() {
             <table className="w-full text-sm">
               <tbody className="divide-y divide-gray-100 dark:divide-navy-800">
                 <Row label="販売業者">
-                  請求があった場合は遅滞なく開示いたします。
+                  Reset Yoga
                 </Row>
                 <Row label="運営統括責任者">
                   雪吉愛里
@@ -126,7 +126,7 @@ export default async function TokushoPage() {
           <table className="w-full text-sm">
             <tbody className="divide-y divide-gray-100 dark:divide-navy-800">
               <Row label="Business Operator">
-                Disclosed promptly upon request.
+                Reset Yoga
               </Row>
               <Row label="Responsible Manager">
                 Airi Yukiyoshi
