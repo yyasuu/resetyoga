@@ -382,3 +382,51 @@ export async function sendInstructorApprovalEmail({
     `,
   })
 }
+
+// ── Password reset ────────────────────────────────────────────────────────────
+export async function sendPasswordResetEmail({
+  to,
+  resetLink,
+  locale = 'en',
+}: {
+  to: string
+  resetLink: string
+  locale?: string
+}) {
+  const isJa = locale === 'ja'
+
+  const subject = isJa
+    ? 'Reset Yoga — パスワードの再設定'
+    : 'Reset Yoga — Reset your password'
+
+  const heading = isJa ? 'パスワードの再設定' : 'Reset your password'
+  const bodyLine1 = isJa
+    ? 'パスワードの再設定リクエストを受け付けました。下のボタンをクリックして新しいパスワードを設定してください。'
+    : 'We received a request to reset your password. Click the button below to set a new one.'
+  const btnLabel = isJa ? 'パスワードを再設定する' : 'Reset Password'
+  const expiry = isJa
+    ? 'このリンクは <strong>1時間</strong> 有効です。リクエストに心当たりがない場合は無視してください。'
+    : 'This link expires in <strong>1 hour</strong>. If you did not request this, you can safely ignore this email.'
+  const footer = isJa ? 'Reset Yoga チーム' : 'The Reset Yoga Team'
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:${BRAND_LINEN};padding:24px;border-radius:12px;">
+        <h2 style="color:${BRAND_NAVY};margin-top:0;">${heading}</h2>
+        <p style="color:#333;">${bodyLine1}</p>
+        <div style="text-align:center;margin:32px 0;">
+          <a href="${resetLink}"
+             style="display:inline-block;background:${BRAND_NAVY};color:white;padding:14px 32px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:16px;">
+            ${btnLabel}
+          </a>
+        </div>
+        <p style="color:#666;font-size:13px;">${expiry}</p>
+        <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;" />
+        <p style="color:#999;font-size:12px;">${footer}</p>
+      </div>
+    `,
+  })
+}

@@ -3,9 +3,8 @@
 import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { useTranslations } from 'next-intl'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { useTranslations, useLocale } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,8 +12,8 @@ import { CheckCircle, Mail, AlertTriangle } from 'lucide-react'
 
 function ForgotPasswordForm() {
   const t = useTranslations('auth')
+  const locale = useLocale()
   const searchParams = useSearchParams()
-  const supabase = createClient()
 
   const [email, setEmail] = useState(searchParams.get('email') || '')
   const [loading, setLoading] = useState(false)
@@ -26,24 +25,20 @@ function ForgotPasswordForm() {
     setLoading(true)
     setSendError('')
 
-    // Set a short-lived cookie so the auth callback knows to redirect to
-    // reset-password instead of onboarding/dashboard.
-    // The cookie is scoped to the domain so it is present when the email
-    // link is clicked (same device) and the callback route reads it.
-    document.cookie = 'ry_recovery=1; path=/; max-age=3600; SameSite=Lax'
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      // Use the base callback URL — this is already whitelisted in Supabase
-      // for Google OAuth, so password-reset emails will be delivered correctly.
-      redirectTo: `${window.location.origin}/auth/callback`,
+    // Call our server API route which uses Supabase Admin to generate a
+    // real recovery link and sends it via Resend (better deliverability
+    // than Supabase's default SMTP, especially for Hotmail / Outlook).
+    const res = await fetch('/api/auth/send-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, locale }),
     })
 
     setLoading(false)
 
-    if (error) {
-      console.error('Reset error:', error.message)
-      // Still show the success screen to avoid email enumeration,
-      // but log internally. Real delivery errors are usually rate-limit.
+    if (!res.ok) {
+      // Network / server error — still show success to avoid enumeration
+      console.error('[forgot-password] API error', await res.text())
     }
 
     setSent(true)
