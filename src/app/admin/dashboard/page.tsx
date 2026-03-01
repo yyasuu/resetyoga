@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { ApproveInstructorButton } from '@/components/admin/ApproveInstructorButton'
-import { Users, Calendar, BookOpen, Star } from 'lucide-react'
+import { Users, Calendar, BookOpen, Star, FileText } from 'lucide-react'
+import Link from 'next/link'
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
@@ -137,6 +138,48 @@ export default async function AdminDashboardPage() {
           ) : (
             <p className="text-gray-400">No pending approvals</p>
           )}
+        </div>
+
+        {/* Legal Documents */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <FileText className="h-5 w-5 text-gray-400" />
+            Legal Documents
+          </h2>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/instructor-terms"
+              target="_blank"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-navy-50 text-navy-700 border border-navy-100 hover:bg-navy-100 text-sm font-medium transition-colors"
+            >
+              <FileText className="h-4 w-4" />
+              Instructor Terms &amp; Conditions
+            </Link>
+            <Link
+              href="/student-terms"
+              target="_blank"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-navy-50 text-navy-700 border border-navy-100 hover:bg-navy-100 text-sm font-medium transition-colors"
+            >
+              <FileText className="h-4 w-4" />
+              Student Terms &amp; Conditions
+            </Link>
+            <Link
+              href="/terms"
+              target="_blank"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 text-sm font-medium transition-colors"
+            >
+              <FileText className="h-4 w-4" />
+              Terms of Service
+            </Link>
+            <Link
+              href="/privacy"
+              target="_blank"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 text-sm font-medium transition-colors"
+            >
+              <FileText className="h-4 w-4" />
+              Privacy Policy
+            </Link>
+          </div>
         </div>
 
         {/* Approved Instructors */}

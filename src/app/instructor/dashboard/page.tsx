@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { format } from 'date-fns'
-import { Calendar, Users, Star, Video, ChevronRight } from 'lucide-react'
+import { Calendar, Users, Star, Video, ChevronRight, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 
@@ -209,6 +209,12 @@ export default async function InstructorDashboardPage() {
                   <Button variant="outline" className="w-full justify-start gap-2">
                     <Users className="h-4 w-4 text-green-600" />
                     Edit Profile
+                  </Button>
+                </Link>
+                <Link href="/instructor-terms" target="_blank">
+                  <Button variant="outline" className="w-full justify-start gap-2">
+                    <FileText className="h-4 w-4 text-gray-500" />
+                    Instructor Terms
                   </Button>
                 </Link>
               </div>
