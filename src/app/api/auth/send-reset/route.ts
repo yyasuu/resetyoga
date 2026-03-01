@@ -31,11 +31,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true })
     }
 
-    const resetLink = data.properties?.action_link
-    if (!resetLink) {
-      console.error('[send-reset] No action_link in response')
+    // Build the reset link directly using hashed_token so the user's browser
+    // goes straight to our /auth/callback — bypassing Supabase's verify endpoint
+    // which breaks PKCE compatibility when the link was generated server-side.
+    const hashedToken = data.properties?.hashed_token
+    if (!hashedToken) {
+      console.error('[send-reset] No hashed_token in response')
       return NextResponse.json({ success: true })
     }
+    const resetLink = `${origin}/auth/callback?token_hash=${encodeURIComponent(hashedToken)}&type=recovery`
 
     // Send via Resend (much better deliverability than Supabase's default SMTP)
     await sendPasswordResetEmail({ to: email, resetLink, locale: locale || 'en' })
