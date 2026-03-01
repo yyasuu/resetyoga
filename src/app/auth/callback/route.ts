@@ -5,12 +5,19 @@ export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const role = searchParams.get('role') || 'student'
+  // next=/auth/reset-password is set when coming from a password reset email
+  const next = searchParams.get('next')
 
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
+      // If this is a password reset flow, redirect to the reset-password page
+      if (next && next.startsWith('/') && !next.startsWith('//')) {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
+
       const {
         data: { user },
       } = await supabase.auth.getUser()
