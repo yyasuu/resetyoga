@@ -29,7 +29,7 @@ function TagButton({ label, selected, onClick }: { label: string; selected: bool
       className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
         selected
           ? 'bg-navy-600 text-white border-navy-600'
-          : 'bg-white text-gray-600 border-gray-300 hover:border-navy-400'
+          : 'bg-white dark:bg-navy-700 text-gray-600 dark:text-navy-200 border-gray-300 dark:border-navy-600 hover:border-navy-400 dark:hover:border-navy-400'
       }`}
     >
       {label}
@@ -39,8 +39,8 @@ function TagButton({ label, selected, onClick }: { label: string; selected: bool
 
 function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-5">
-      <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+    <div className="bg-white dark:bg-navy-800 rounded-2xl border border-gray-200 dark:border-navy-700 p-6 space-y-5">
+      <h2 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
         {icon}
         {title}
       </h2>
@@ -198,15 +198,19 @@ export default function InstructorProfilePage() {
   }
 
   if (!profile) {
-    return <div className="min-h-screen flex items-center justify-center text-gray-400">{t('loading')}</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-navy-900 text-gray-400 dark:text-navy-500">
+        {t('loading')}
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-navy-900">
       <Navbar user={profile} />
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-900">{t('profile_edit_title')}</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('profile_edit_title')}</h1>
         </div>
 
         {/* ── 基本情報 ─────────────────────────────────────────────────── */}
@@ -214,35 +218,35 @@ export default function InstructorProfilePage() {
           {/* Avatar */}
           <div className="flex items-center gap-5">
             <div
-              className="relative w-20 h-20 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-navy-400 transition-colors overflow-hidden flex-shrink-0"
+              className="relative w-20 h-20 rounded-full bg-gray-100 dark:bg-navy-700 border-2 border-dashed border-gray-300 dark:border-navy-500 flex items-center justify-center cursor-pointer hover:border-navy-400 transition-colors overflow-hidden flex-shrink-0"
               onClick={() => fileInputRef.current?.click()}
             >
               {avatarPreview ? (
                 <Image src={avatarPreview} alt="avatar" fill className="object-cover" />
               ) : (
-                <Camera className="h-6 w-6 text-gray-400" />
+                <Camera className="h-6 w-6 text-gray-400 dark:text-navy-400" />
               )}
             </div>
             <div>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="text-sm text-navy-600 hover:underline"
+                className="text-sm text-navy-600 dark:text-sage-400 hover:underline"
               >
                 {t('change_photo')}
               </button>
-              <p className="text-xs text-gray-400 mt-1">{t('photo_hint')}</p>
+              <p className="text-xs text-gray-400 dark:text-navy-400 mt-1">{t('photo_hint')}</p>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
             </div>
           </div>
 
           <div>
-            <Label>{t('display_name')}</Label>
+            <Label className="dark:text-navy-200">{t('display_name')}</Label>
             <Input value={fullName} onChange={(e) => setFullName(e.target.value)} className="mt-1" />
           </div>
 
           <div>
-            <Label>{tOnb('your_timezone')}</Label>
+            <Label className="dark:text-navy-200">{tOnb('your_timezone')}</Label>
             <Select value={timezone} onValueChange={setTimezone}>
               <SelectTrigger className="mt-1">
                 <SelectValue />
@@ -259,7 +263,7 @@ export default function InstructorProfilePage() {
         {/* ── 自己紹介 ─────────────────────────────────────────────────── */}
         <Section icon={<BookOpen className="h-4 w-4 text-sage-600" />} title={t('section_intro')}>
           <div>
-            <Label>{t('tagline_label')} <span className="text-gray-400 text-xs font-normal">{t('tagline_hint')}</span></Label>
+            <Label className="dark:text-navy-200">{t('tagline_label')} <span className="text-gray-400 dark:text-navy-500 text-xs font-normal">{t('tagline_hint')}</span></Label>
             <Input
               value={tagline}
               onChange={(e) => setTagline(e.target.value)}
@@ -267,11 +271,11 @@ export default function InstructorProfilePage() {
               maxLength={60}
               className="mt-1"
             />
-            <p className="text-xs text-gray-400 mt-1 text-right">{tagline.length}/60</p>
+            <p className="text-xs text-gray-400 dark:text-navy-400 mt-1 text-right">{tagline.length}/60</p>
           </div>
 
           <div>
-            <Label>{tOnb('bio')}</Label>
+            <Label className="dark:text-navy-200">{tOnb('bio')}</Label>
             <Textarea
               value={bio}
               onChange={(e) => setBio(e.target.value)}
@@ -282,7 +286,7 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label className="mb-2 block">{tOnb('yoga_styles')}</Label>
+            <Label className="mb-2 block dark:text-navy-200">{tOnb('yoga_styles')}</Label>
             <div className="flex flex-wrap gap-2">
               {YOGA_STYLES.map((s) => (
                 <TagButton key={s} label={s} selected={yogaStyles.includes(s)} onClick={() => toggle(yogaStyles, s, setYogaStyles)} />
@@ -291,7 +295,7 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label className="mb-2 block">{tOnb('languages')}</Label>
+            <Label className="mb-2 block dark:text-navy-200">{tOnb('languages')}</Label>
             <div className="flex flex-wrap gap-2">
               {LANGUAGES.map((l) => (
                 <TagButton key={l} label={l} selected={languages.includes(l)} onClick={() => toggle(languages, l, setLanguages)} />
@@ -303,7 +307,7 @@ export default function InstructorProfilePage() {
         {/* ── 経験・資格 ───────────────────────────────────────────────── */}
         <Section icon={<Award className="h-4 w-4 text-amber-500" />} title={t('section_experience')}>
           <div>
-            <Label>{tOnb('experience')}</Label>
+            <Label className="dark:text-navy-200">{tOnb('experience')}</Label>
             <Input
               type="number"
               min={0}
@@ -315,7 +319,7 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label>{tOnb('certifications_label')}</Label>
+            <Label className="dark:text-navy-200">{tOnb('certifications_label')}</Label>
             <div className="flex gap-2 mt-1 mb-2">
               <Input
                 value={certInput}
@@ -324,13 +328,13 @@ export default function InstructorProfilePage() {
                 placeholder={tOnb('cert_placeholder')}
                 className="flex-1"
               />
-              <Button type="button" variant="outline" onClick={addCert} size="icon">
+              <Button type="button" variant="outline" onClick={addCert} size="icon" className="dark:border-navy-600 dark:text-navy-200">
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
               {certifications.map((c) => (
-                <span key={c} className="inline-flex items-center gap-1 bg-navy-50 text-navy-700 border border-navy-200 px-3 py-1 rounded-full text-sm">
+                <span key={c} className="inline-flex items-center gap-1 bg-navy-50 dark:bg-navy-700 text-navy-700 dark:text-navy-200 border border-navy-200 dark:border-navy-600 px-3 py-1 rounded-full text-sm">
                   {c}
                   <button onClick={() => setCertifications(certifications.filter((x) => x !== c))}>
                     <X className="h-3 w-3" />
@@ -341,7 +345,7 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label>{t('career_history_label')}</Label>
+            <Label className="dark:text-navy-200">{t('career_history_label')}</Label>
             <Textarea
               value={careerHistory}
               onChange={(e) => setCareerHistory(e.target.value)}
@@ -351,15 +355,15 @@ export default function InstructorProfilePage() {
             />
           </div>
 
-          <div className="border-t pt-4 space-y-4">
+          <div className="border-t dark:border-navy-700 pt-4 space-y-4">
             <div>
-              <Label className="flex items-center gap-2">
+              <Label className="flex items-center gap-2 dark:text-navy-200">
                 <Instagram className="h-4 w-4 text-pink-500" /> Instagram
               </Label>
               <Input value={instagramUrl} onChange={(e) => setInstagramUrl(e.target.value)} placeholder="https://www.instagram.com/yourhandle" className="mt-1" />
             </div>
             <div>
-              <Label className="flex items-center gap-2">
+              <Label className="flex items-center gap-2 dark:text-navy-200">
                 <Youtube className="h-4 w-4 text-red-500" /> YouTube
               </Label>
               <Input value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="https://www.youtube.com/@yourchannel" className="mt-1" />
@@ -369,12 +373,12 @@ export default function InstructorProfilePage() {
 
         {/* ── 入金口座 ─────────────────────────────────────────────────── */}
         <Section icon={<Landmark className="h-4 w-4 text-navy-600" />} title={t('section_payout')}>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-700">
+          <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-3 text-sm text-blue-700 dark:text-blue-300">
             {t('payout_note')}
           </div>
 
           <div>
-            <Label>{tOnb('bank_country')}</Label>
+            <Label className="dark:text-navy-200">{tOnb('bank_country')}</Label>
             <Select value={bankCountry} onValueChange={setBankCountry}>
               <SelectTrigger className="mt-1">
                 <SelectValue />
@@ -392,25 +396,25 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label>{tOnb('bank_name')}</Label>
+            <Label className="dark:text-navy-200">{tOnb('bank_name')}</Label>
             <Input value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder={tOnb('bank_name_placeholder')} className="mt-1" />
           </div>
 
           <div>
-            <Label>
+            <Label className="dark:text-navy-200">
               {tOnb('swift_code')}
-              <span className="text-gray-400 text-xs font-normal ml-1">{tOnb('swift_code_hint')}</span>
+              <span className="text-gray-400 dark:text-navy-500 text-xs font-normal ml-1">{tOnb('swift_code_hint')}</span>
             </Label>
             <Input value={swiftCode} onChange={(e) => setSwiftCode(e.target.value.toUpperCase())} placeholder={tOnb('swift_code_placeholder')} className="mt-1" />
           </div>
 
           <div>
-            <Label>{tOnb('account_number')}</Label>
+            <Label className="dark:text-navy-200">{tOnb('account_number')}</Label>
             <Input value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} placeholder={tOnb('account_number_placeholder')} className="mt-1" />
           </div>
 
           <div>
-            <Label>{tOnb('account_holder_name')}</Label>
+            <Label className="dark:text-navy-200">{tOnb('account_holder_name')}</Label>
             <Input value={accountHolderName} onChange={(e) => setAccountHolderName(e.target.value)} placeholder={tOnb('account_holder_placeholder')} className="mt-1" />
           </div>
         </Section>

@@ -127,6 +127,7 @@ export const LANGUAGES = [
   'English',
   'Japanese',
   'Hindi',
+  'Tamil',
   'Sanskrit',
   'Spanish',
   'French',

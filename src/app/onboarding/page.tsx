@@ -40,12 +40,16 @@ function ProgressBar({ current, total }: { current: number; total: number }) {
         <div key={i} className="flex-1 flex items-center gap-2">
           <div
             className={`h-2 rounded-full flex-1 transition-all duration-300 ${
-              i < current ? 'bg-navy-600' : i === current ? 'bg-navy-300' : 'bg-gray-200'
+              i < current
+                ? 'bg-navy-600'
+                : i === current
+                ? 'bg-navy-300 dark:bg-navy-500'
+                : 'bg-gray-200 dark:bg-navy-700'
             }`}
           />
         </div>
       ))}
-      <span className="text-xs text-gray-400 whitespace-nowrap">
+      <span className="text-xs text-gray-400 dark:text-navy-400 whitespace-nowrap">
         {current}/{total}
       </span>
     </div>
@@ -69,7 +73,7 @@ function TagButton({
       className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
         selected
           ? 'bg-navy-600 text-white border-navy-600'
-          : 'bg-white text-gray-600 border-gray-300 hover:border-navy-400'
+          : 'bg-white dark:bg-navy-700 text-gray-600 dark:text-navy-200 border-gray-300 dark:border-navy-600 hover:border-navy-400 dark:hover:border-navy-400'
       }`}
     >
       {label}
@@ -236,14 +240,14 @@ function OnboardingForm() {
   // ── Complete screen ─────────────────────────────────────────────────────────
   if (done) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sage-50 to-linen-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-10 w-full max-w-md text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="h-10 w-10 text-green-600" />
+      <div className="min-h-screen bg-gradient-to-br from-sage-50 to-linen-100 dark:from-navy-900 dark:to-navy-900 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-xl p-10 w-full max-w-md text-center">
+          <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-3">{t('done_title')}</h2>
-          <p className="text-gray-600 mb-2">{t('pending_approval')}</p>
-          <p className="text-sm text-gray-400 mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{t('done_title')}</h2>
+          <p className="text-gray-600 dark:text-navy-300 mb-2">{t('pending_approval')}</p>
+          <p className="text-sm text-gray-400 dark:text-navy-400 mb-8">
             {t('done_note')}
           </p>
           <Button onClick={() => router.push('/')} className="bg-navy-600 hover:bg-navy-700 w-full rounded-full">
@@ -254,29 +258,29 @@ function OnboardingForm() {
     )
   }
 
-  const card = 'bg-white rounded-2xl shadow-sm p-8 w-full max-w-lg'
+  const card = 'bg-white dark:bg-navy-800 rounded-2xl shadow-sm p-8 w-full max-w-lg'
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sage-50 via-linen-50 to-navy-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-sage-50 via-linen-50 to-navy-50 dark:from-navy-900 dark:via-navy-900 dark:to-navy-900 flex items-center justify-center p-4">
       <div className={card}>
 
         {/* ── Step 1: Role ──────────────────────────────────────────────── */}
         {step === 1 && (
           <>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">{t('title')}</h1>
-            <p className="text-gray-500 mb-8">{t('choose_role')}</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{t('title')}</h1>
+            <p className="text-gray-500 dark:text-navy-300 mb-8">{t('choose_role')}</p>
 
             <div className="grid grid-cols-2 gap-4 mb-8">
               {[
                 {
                   value: 'student',
-                  icon: <BookOpen className={`h-8 w-8 mb-3 ${role === 'student' ? 'text-navy-600' : 'text-gray-400'}`} />,
+                  icon: <BookOpen className={`h-8 w-8 mb-3 ${role === 'student' ? 'text-navy-600' : 'text-gray-400 dark:text-navy-500'}`} />,
                   title: t('student_role'),
                   desc: t('student_desc'),
                 },
                 {
                   value: 'instructor',
-                  icon: <GraduationCap className={`h-8 w-8 mb-3 ${role === 'instructor' ? 'text-navy-600' : 'text-gray-400'}`} />,
+                  icon: <GraduationCap className={`h-8 w-8 mb-3 ${role === 'instructor' ? 'text-navy-600' : 'text-gray-400 dark:text-navy-500'}`} />,
                   title: t('instructor_role'),
                   desc: t('instructor_desc'),
                 },
@@ -286,19 +290,19 @@ function OnboardingForm() {
                   onClick={() => setRole(value as 'student' | 'instructor')}
                   className={`p-6 rounded-xl border-2 text-left transition-all ${
                     role === value
-                      ? 'border-navy-600 bg-navy-50'
-                      : 'border-gray-200 hover:border-navy-300'
+                      ? 'border-navy-600 bg-navy-50 dark:bg-navy-700'
+                      : 'border-gray-200 dark:border-navy-600 hover:border-navy-300 dark:hover:border-navy-400'
                   }`}
                 >
                   {icon}
-                  <h3 className="font-bold text-gray-900 mb-1">{title}</h3>
-                  <p className="text-sm text-gray-500">{desc}</p>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-1">{title}</h3>
+                  <p className="text-sm text-gray-500 dark:text-navy-400">{desc}</p>
                 </button>
               ))}
             </div>
 
             <div className="mb-6">
-              <Label>{t('your_timezone')}</Label>
+              <Label className="dark:text-navy-200">{t('your_timezone')}</Label>
               <Select value={timezone} onValueChange={setTimezone}>
                 <SelectTrigger className="mt-1">
                   <SelectValue />
@@ -324,13 +328,13 @@ function OnboardingForm() {
         {/* ── Step 2: Terms Agreement (student) ────────────────────────── */}
         {step === 2 && role === 'student' && (
           <>
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Terms &amp; Conditions</h2>
-            <p className="text-gray-500 text-sm mb-4">Please read and agree before continuing.</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Terms &amp; Conditions</h2>
+            <p className="text-gray-500 dark:text-navy-300 text-sm mb-4">Please read and agree before continuing.</p>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 max-h-64 overflow-y-auto text-sm text-gray-700 space-y-3 mb-4">
-              <p className="font-semibold text-red-700">⚠️ Non-Circumvention (Most Important)</p>
+            <div className="bg-gray-50 dark:bg-navy-900 border border-gray-200 dark:border-navy-700 rounded-xl p-4 max-h-64 overflow-y-auto text-sm text-gray-700 dark:text-navy-200 space-y-3 mb-4">
+              <p className="font-semibold text-red-700 dark:text-red-400">⚠️ Non-Circumvention (Most Important)</p>
               <p>You must not contact or arrange lessons with instructors found through Reset Yoga <strong>outside the Platform</strong>. Exchanging personal contact info (LINE, WhatsApp, email, etc.) for private lessons is strictly prohibited. This applies for <strong>12 months</strong> after your last session. Violation results in immediate account termination.</p>
-              <p className="font-semibold text-gray-800 mt-2">Key Points:</p>
+              <p className="font-semibold text-gray-800 dark:text-navy-100 mt-2">Key Points:</p>
               <ul className="list-disc pl-5 space-y-1">
                 <li>All sessions must be booked through Reset Yoga only</li>
                 <li>Free trial: 2 sessions (card required, no charge)</li>
@@ -338,7 +342,7 @@ function OnboardingForm() {
                 <li>Cancellation within 12 hours of a session forfeits that session credit</li>
                 <li>Treat instructors with respect at all times</li>
               </ul>
-              <a href="/student-terms" target="_blank" className="text-navy-600 underline text-xs">
+              <a href="/student-terms" target="_blank" className="text-navy-600 dark:text-sage-400 underline text-xs">
                 Read full Student Terms →
               </a>
             </div>
@@ -350,9 +354,9 @@ function OnboardingForm() {
                 onChange={(e) => setTermsAgreed(e.target.checked)}
                 className="mt-1 h-4 w-4 rounded border-gray-300 text-navy-600"
               />
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-gray-700 dark:text-navy-200">
                 I have read and agree to the{' '}
-                <a href="/student-terms" target="_blank" className="text-navy-600 underline">
+                <a href="/student-terms" target="_blank" className="text-navy-600 dark:text-sage-400 underline">
                   Student Terms &amp; Conditions
                 </a>
                 , including the non-circumvention clause.
@@ -360,7 +364,7 @@ function OnboardingForm() {
             </label>
 
             <div className="flex gap-3">
-              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(1)}>
+              <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(1)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
               </Button>
               <Button
@@ -378,25 +382,25 @@ function OnboardingForm() {
         {step === 2 && role === 'instructor' && (
           <>
             <ProgressBar current={1} total={INSTRUCTOR_STEPS} />
-            <h2 className="text-xl font-bold text-gray-900 mb-1">{t('step_basic_title')}</h2>
-            <p className="text-gray-500 text-sm mb-6">{t('step_basic_desc')}</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{t('step_basic_title')}</h2>
+            <p className="text-gray-500 dark:text-navy-300 text-sm mb-6">{t('step_basic_desc')}</p>
 
             {/* Photo upload */}
             <div className="flex flex-col items-center mb-6">
               <div
-                className="relative w-28 h-28 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-navy-400 transition-colors overflow-hidden"
+                className="relative w-28 h-28 rounded-full bg-gray-100 dark:bg-navy-700 border-2 border-dashed border-gray-300 dark:border-navy-500 flex items-center justify-center cursor-pointer hover:border-navy-400 transition-colors overflow-hidden"
                 onClick={() => fileInputRef.current?.click()}
               >
                 {avatarPreview ? (
                   <Image src={avatarPreview} alt="preview" fill className="object-cover" />
                 ) : (
-                  <Camera className="h-8 w-8 text-gray-400" />
+                  <Camera className="h-8 w-8 text-gray-400 dark:text-navy-400" />
                 )}
               </div>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-3 text-sm text-navy-600 hover:underline"
+                className="mt-3 text-sm text-navy-600 dark:text-sage-400 hover:underline"
               >
                 {t('photo_select')}
               </button>
@@ -411,7 +415,7 @@ function OnboardingForm() {
 
             <div className="space-y-4">
               <div>
-                <Label>{t('display_name')} <span className="text-red-500">*</span></Label>
+                <Label className="dark:text-navy-200">{t('display_name')} <span className="text-red-500">*</span></Label>
                 <Input
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
@@ -422,7 +426,7 @@ function OnboardingForm() {
             </div>
 
             <div className="flex gap-3 mt-8">
-              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(1)}>
+              <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(1)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
               </Button>
               <Button
@@ -440,12 +444,12 @@ function OnboardingForm() {
         {step === 3 && role === 'instructor' && (
           <>
             <ProgressBar current={2} total={INSTRUCTOR_STEPS} />
-            <h2 className="text-xl font-bold text-gray-900 mb-1">{t('step_intro_title')}</h2>
-            <p className="text-gray-500 text-sm mb-6">{t('step_intro_desc')}</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{t('step_intro_title')}</h2>
+            <p className="text-gray-500 dark:text-navy-300 text-sm mb-6">{t('step_intro_desc')}</p>
 
             <div className="space-y-5">
               <div>
-                <Label>{t('tagline_label')} <span className="text-gray-400 text-xs font-normal">{t('tagline_hint')}</span></Label>
+                <Label className="dark:text-navy-200">{t('tagline_label')} <span className="text-gray-400 dark:text-navy-500 text-xs font-normal">{t('tagline_hint')}</span></Label>
                 <Input
                   value={tagline}
                   onChange={(e) => setTagline(e.target.value)}
@@ -453,11 +457,11 @@ function OnboardingForm() {
                   maxLength={60}
                   className="mt-1"
                 />
-                <p className="text-xs text-gray-400 mt-1 text-right">{tagline.length}/60</p>
+                <p className="text-xs text-gray-400 dark:text-navy-400 mt-1 text-right">{tagline.length}/60</p>
               </div>
 
               <div>
-                <Label>{t('bio')}</Label>
+                <Label className="dark:text-navy-200">{t('bio')}</Label>
                 <Textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
@@ -468,7 +472,7 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label className="mb-2 block">{t('yoga_styles')} <span className="text-red-500">*</span></Label>
+                <Label className="mb-2 block dark:text-navy-200">{t('yoga_styles')} <span className="text-red-500">*</span></Label>
                 <div className="flex flex-wrap gap-2">
                   {YOGA_STYLES.map((s) => (
                     <TagButton
@@ -482,7 +486,7 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label className="mb-2 block">{t('languages')} <span className="text-red-500">*</span></Label>
+                <Label className="mb-2 block dark:text-navy-200">{t('languages')} <span className="text-red-500">*</span></Label>
                 <div className="flex flex-wrap gap-2">
                   {LANGUAGES.map((l) => (
                     <TagButton
@@ -497,7 +501,7 @@ function OnboardingForm() {
             </div>
 
             <div className="flex gap-3 mt-8">
-              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(2)}>
+              <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(2)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
               </Button>
               <Button
@@ -515,12 +519,12 @@ function OnboardingForm() {
         {step === 4 && role === 'instructor' && (
           <>
             <ProgressBar current={3} total={INSTRUCTOR_STEPS} />
-            <h2 className="text-xl font-bold text-gray-900 mb-1">{t('step_exp_title')}</h2>
-            <p className="text-gray-500 text-sm mb-6">{t('step_exp_desc')}</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">{t('step_exp_title')}</h2>
+            <p className="text-gray-500 dark:text-navy-300 text-sm mb-6">{t('step_exp_desc')}</p>
 
             <div className="space-y-5">
               <div>
-                <Label>{t('experience')}</Label>
+                <Label className="dark:text-navy-200">{t('experience')}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -532,8 +536,8 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label>{t('certifications_label')}</Label>
-                <p className="text-xs text-gray-400 mb-2">{t('certifications_hint')}</p>
+                <Label className="dark:text-navy-200">{t('certifications_label')}</Label>
+                <p className="text-xs text-gray-400 dark:text-navy-400 mb-2">{t('certifications_hint')}</p>
                 <div className="flex gap-2 mb-2">
                   <Input
                     value={certInput}
@@ -542,7 +546,7 @@ function OnboardingForm() {
                     placeholder={t('cert_placeholder')}
                     className="flex-1"
                   />
-                  <Button type="button" variant="outline" onClick={addCert} size="icon">
+                  <Button type="button" variant="outline" onClick={addCert} size="icon" className="dark:border-navy-600 dark:text-navy-200">
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
@@ -550,7 +554,7 @@ function OnboardingForm() {
                   {certifications.map((c) => (
                     <span
                       key={c}
-                      className="inline-flex items-center gap-1 bg-navy-50 text-navy-700 border border-navy-200 px-3 py-1 rounded-full text-sm"
+                      className="inline-flex items-center gap-1 bg-navy-50 dark:bg-navy-700 text-navy-700 dark:text-navy-200 border border-navy-200 dark:border-navy-600 px-3 py-1 rounded-full text-sm"
                     >
                       {c}
                       <button onClick={() => setCertifications(certifications.filter((x) => x !== c))}>
@@ -562,7 +566,7 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label>{t('career_history_label')}</Label>
+                <Label className="dark:text-navy-200">{t('career_history_label')}</Label>
                 <Textarea
                   value={careerHistory}
                   onChange={(e) => setCareerHistory(e.target.value)}
@@ -572,8 +576,8 @@ function OnboardingForm() {
                 />
               </div>
 
-              <div className="border-t pt-4">
-                <Label className="flex items-center gap-2 mb-3">
+              <div className="border-t dark:border-navy-700 pt-4">
+                <Label className="flex items-center gap-2 mb-3 dark:text-navy-200">
                   <Instagram className="h-4 w-4 text-pink-500" /> {t('instagram_label')}
                 </Label>
                 <Input
@@ -585,7 +589,7 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label className="flex items-center gap-2 mb-1">
+                <Label className="flex items-center gap-2 mb-1 dark:text-navy-200">
                   <Youtube className="h-4 w-4 text-red-500" /> {t('youtube_label')}
                 </Label>
                 <Input
@@ -598,7 +602,7 @@ function OnboardingForm() {
             </div>
 
             <div className="flex gap-3 mt-8">
-              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(3)}>
+              <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(3)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
               </Button>
               <Button
@@ -615,18 +619,18 @@ function OnboardingForm() {
         {step === 5 && role === 'instructor' && (
           <>
             <ProgressBar current={4} total={INSTRUCTOR_STEPS} />
-            <h2 className="text-xl font-bold text-gray-900 mb-1">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
               <Landmark className="inline h-5 w-5 mr-2 text-navy-600" />
               {t('step_payout_title')}
             </h2>
-            <p className="text-gray-500 text-sm mb-2">{t('step_payout_desc')}</p>
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-6 text-sm text-blue-700">
+            <p className="text-gray-500 dark:text-navy-300 text-sm mb-2">{t('step_payout_desc')}</p>
+            <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-3 mb-6 text-sm text-blue-700 dark:text-blue-300">
               {t('payout_note')}
             </div>
 
             <div className="space-y-4">
               <div>
-                <Label>{t('bank_country')}</Label>
+                <Label className="dark:text-navy-200">{t('bank_country')}</Label>
                 <Select value={bankCountry} onValueChange={setBankCountry}>
                   <SelectTrigger className="mt-1">
                     <SelectValue />
@@ -644,7 +648,7 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label>{t('bank_name')}</Label>
+                <Label className="dark:text-navy-200">{t('bank_name')}</Label>
                 <Input
                   value={bankName}
                   onChange={(e) => setBankName(e.target.value)}
@@ -654,9 +658,9 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label>
+                <Label className="dark:text-navy-200">
                   {t('swift_code')}
-                  <span className="text-gray-400 text-xs font-normal ml-1">{t('swift_code_hint')}</span>
+                  <span className="text-gray-400 dark:text-navy-500 text-xs font-normal ml-1">{t('swift_code_hint')}</span>
                 </Label>
                 <Input
                   value={swiftCode}
@@ -667,7 +671,7 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label>{t('account_number')}</Label>
+                <Label className="dark:text-navy-200">{t('account_number')}</Label>
                 <Input
                   value={accountNumber}
                   onChange={(e) => setAccountNumber(e.target.value)}
@@ -677,7 +681,7 @@ function OnboardingForm() {
               </div>
 
               <div>
-                <Label>{t('account_holder_name')}</Label>
+                <Label className="dark:text-navy-200">{t('account_holder_name')}</Label>
                 <Input
                   value={accountHolderName}
                   onChange={(e) => setAccountHolderName(e.target.value)}
@@ -688,7 +692,7 @@ function OnboardingForm() {
             </div>
 
             <div className="flex gap-3 mt-8">
-              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(4)}>
+              <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(4)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
               </Button>
               <Button
@@ -700,24 +704,25 @@ function OnboardingForm() {
             </div>
             <button
               type="button"
-              className="w-full text-sm text-gray-400 hover:text-gray-600 mt-3"
+              className="w-full text-sm text-gray-400 dark:text-navy-400 hover:text-gray-600 dark:hover:text-navy-200 mt-3"
               onClick={() => { setTermsAgreed(false); setStep(6) }}
             >
               {t('skip_payout')}
             </button>
           </>
         )}
+
         {/* ── Step 6: Terms Agreement (instructor) ─────────────────────── */}
         {step === 6 && role === 'instructor' && (
           <>
             <ProgressBar current={5} total={INSTRUCTOR_STEPS} />
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Instructor Terms &amp; Conditions</h2>
-            <p className="text-gray-500 text-sm mb-4">Please read and agree to complete your application.</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Instructor Terms &amp; Conditions</h2>
+            <p className="text-gray-500 dark:text-navy-300 text-sm mb-4">Please read and agree to complete your application.</p>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 max-h-64 overflow-y-auto text-sm text-gray-700 space-y-3 mb-4">
-              <p className="font-semibold text-red-700">⚠️ Non-Circumvention (Most Important)</p>
+            <div className="bg-gray-50 dark:bg-navy-900 border border-gray-200 dark:border-navy-700 rounded-xl p-4 max-h-64 overflow-y-auto text-sm text-gray-700 dark:text-navy-200 space-y-3 mb-4">
+              <p className="font-semibold text-red-700 dark:text-red-400">⚠️ Non-Circumvention (Most Important)</p>
               <p>You must not solicit or conduct sessions with students found through Reset Yoga <strong>outside the Platform</strong>. Exchanging personal contact info (LINE, WhatsApp, email, etc.) for private lessons is strictly prohibited. This applies during your membership and for <strong>12 months</strong> after your last session. Violation results in immediate account termination and you may be liable for damages.</p>
-              <p className="font-semibold text-gray-800 mt-2">Key Points:</p>
+              <p className="font-semibold text-gray-800 dark:text-navy-100 mt-2">Key Points:</p>
               <ul className="list-disc pl-5 space-y-1">
                 <li>Conduct all sessions exclusively through the Reset Yoga platform</li>
                 <li>You are an independent contractor, not an employee</li>
@@ -725,7 +730,7 @@ function OnboardingForm() {
                 <li>Keep all student data confidential</li>
                 <li>Maintain professional conduct; violations may result in termination</li>
               </ul>
-              <a href="/instructor-terms" target="_blank" className="text-navy-600 underline text-xs">
+              <a href="/instructor-terms" target="_blank" className="text-navy-600 dark:text-sage-400 underline text-xs">
                 Read full Instructor Terms →
               </a>
             </div>
@@ -737,9 +742,9 @@ function OnboardingForm() {
                 onChange={(e) => setTermsAgreed(e.target.checked)}
                 className="mt-1 h-4 w-4 rounded border-gray-300 text-navy-600"
               />
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-gray-700 dark:text-navy-200">
                 I have read and agree to the{' '}
-                <a href="/instructor-terms" target="_blank" className="text-navy-600 underline">
+                <a href="/instructor-terms" target="_blank" className="text-navy-600 dark:text-sage-400 underline">
                   Instructor Terms &amp; Conditions
                 </a>
                 , including the non-circumvention clause.
@@ -747,7 +752,7 @@ function OnboardingForm() {
             </label>
 
             <div className="flex gap-3">
-              <Button variant="outline" className="flex-1 rounded-full" onClick={() => setStep(5)}>
+              <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(5)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> {t('back')}
               </Button>
               <Button
