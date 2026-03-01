@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
+import { cookies } from 'next/headers'
 import { format } from 'date-fns'
 import { Calendar, Users, Star, Video, ChevronRight, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -11,6 +12,8 @@ import { Badge } from '@/components/ui/badge'
 export default async function InstructorDashboardPage() {
   const supabase = await createClient()
   const t = await getTranslations('instructor')
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
 
   const {
     data: { user },
@@ -214,7 +217,7 @@ export default async function InstructorDashboardPage() {
                 <Link href="/instructor-terms" target="_blank">
                   <Button variant="outline" className="w-full justify-start gap-2">
                     <FileText className="h-4 w-4 text-gray-500" />
-                    Instructor Terms
+                    {locale === 'ja' ? '講師利用規約' : 'Instructor Terms'}
                   </Button>
                 </Link>
               </div>
