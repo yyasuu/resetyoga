@@ -68,7 +68,12 @@ export default async function TokushoPage() {
                 </Row>
                 <Row label="販売価格">
                   月額 US$19.99（税込）<br />
-                  ※ 無料トライアル期間中（2回まで）は課金されません。
+                  無料トライアル：2回のセッション（料金なし）。お支払い方法の登録が必要ですが、トライアル中は課金されません。<br />
+                  ※ 無料トライアルは月額プランへ自動移行しません。月額プランへの加入はお客様ご自身でお申込みください。
+                </Row>
+                <Row label="継続課金・自動更新">
+                  月額プランは<strong>月単位の自動更新契約</strong>です。契約期間の定めはなく（無期限）、解約されるまで毎月 US$19.99 が自動的に請求されます。<br />
+                  初回請求はサブスクリプション登録時に発生し、以降は毎月同日に更新・請求されます。
                 </Row>
                 <Row label="代金の支払い方法">
                   クレジットカード（Visa・Mastercard・American Express 等）<br />
@@ -82,12 +87,28 @@ export default async function TokushoPage() {
                 </Row>
                 <Row label="返品・キャンセルについて">
                   デジタルコンテンツ・役務の性質上、原則として返金・キャンセルはお受けできません。<br />
-                  次回請求日の前日までにサブスクリプションを解約した場合、以降の請求は発生しません。<br />
+                  次回請求日の前日までにサブスクリプションを解約した場合、以降の請求は発生しません。解約後も現在の請求期間末日までサービスをご利用いただけます。<br />
                   例外的な対応については{' '}
                   <a href="/refund" className="text-navy-600 dark:text-sage-400 underline">
                     返金・キャンセルポリシー
                   </a>{' '}
                   をご参照ください。
+                </Row>
+                <Row label="解約方法">
+                  アカウントにログイン後、「サブスクリプション」ページ（
+                  <a href="https://tryresetyoga.com/subscription" className="text-navy-600 dark:text-sage-400 underline">
+                    tryresetyoga.com/subscription
+                  </a>
+                  ）から、いつでも解約手続きが可能です。<br />
+                  解約に際して違約金・手数料は一切発生しません。手続きが不明な場合は{' '}
+                  <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
+                    support@tryresetyoga.com
+                  </a>{' '}
+                  までお問い合わせください。
+                </Row>
+                <Row label="サービス不備時の対応">
+                  講師側の都合によりセッションが実施できない場合は、セッションクレジットを返還します。<br />
+                  システム障害等により当社の責に帰すべき事由でサービスが提供できない場合は、次月への振り替えまたはご返金にて対応いたします。
                 </Row>
                 <Row label="動作環境">
                   安定したインターネット接続環境が必要です。ビデオ通話が動作するブラウザ（最新版のChrome推奨）およびカメラ・マイクを備えたデバイスが必要です。
@@ -100,7 +121,7 @@ export default async function TokushoPage() {
           </div>
 
           <p className="text-xs text-gray-400 dark:text-navy-500 mt-6 text-right">
-            最終更新：2026年2月
+            最終更新：2026年3月
           </p>
         </main>
 
@@ -157,7 +178,12 @@ export default async function TokushoPage() {
               </Row>
               <Row label="Price">
                 US$19.99 / month (inclusive of all fees)<br />
-                Free trial includes 2 sessions at no charge.
+                Free trial: 2 sessions at no charge. A payment method is required but no charge is made during the trial.<br />
+                The free trial does not automatically convert to a paid plan. You must subscribe manually to activate the monthly plan.
+              </Row>
+              <Row label="Recurring Charges &amp; Auto-Renewal">
+                The monthly plan is an <strong>auto-renewing subscription with no fixed term</strong> (indefinite). US$19.99 is charged automatically each month until you cancel.<br />
+                The first charge occurs when you subscribe. Subsequent charges are billed on the same date each month.
               </Row>
               <Row label="Payment Method">
                 Credit card (Visa, Mastercard, American Express, etc.)<br />
@@ -169,14 +195,29 @@ export default async function TokushoPage() {
               <Row label="Service Availability">
                 Access is granted immediately upon successful payment.
               </Row>
-              <Row label="Cancellation & Refunds">
+              <Row label="Cancellation &amp; Refunds">
                 Due to the nature of digital services, refunds for completed billing periods are not offered as a general rule.<br />
-                Cancelling before the next billing date stops future charges.<br />
+                Cancelling before the next billing date stops future charges. Access continues until the end of the current billing period.<br />
                 See our{' '}
                 <a href="/refund" className="text-navy-600 dark:text-sage-400 underline">
                   Refund &amp; Cancellation Policy
                 </a>{' '}
                 for exceptions.
+              </Row>
+              <Row label="How to Cancel">
+                Log in to your account and visit the Subscription page (
+                <a href="https://tryresetyoga.com/subscription" className="text-navy-600 dark:text-sage-400 underline">
+                  tryresetyoga.com/subscription
+                </a>
+                ) to cancel at any time.<br />
+                No cancellation fees apply. For assistance, contact{' '}
+                <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
+                  support@tryresetyoga.com
+                </a>.
+              </Row>
+              <Row label="Service Issues">
+                If an instructor cancels a session, your session credit will be returned.<br />
+                If the service cannot be provided due to reasons attributable to us (e.g., system failures), we will arrange a make-up session or issue a refund.
               </Row>
               <Row label="System Requirements">
                 A stable internet connection is required. A browser capable of video calls (latest Chrome recommended) and a device with a camera and microphone are needed.
@@ -189,7 +230,7 @@ export default async function TokushoPage() {
         </div>
 
         <p className="text-xs text-gray-400 dark:text-navy-500 mt-6 text-right">
-          Last updated: February 2026
+          Last updated: March 2026
         </p>
       </main>
 
