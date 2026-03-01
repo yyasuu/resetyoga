@@ -7,16 +7,16 @@ export const metadata = {
 
 export default async function InstructorTermsPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-navy-900 flex flex-col">
       <Navbar user={null} />
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-4 py-12">
-        <h1 className="text-3xl font-bold text-navy-900 mb-2">
+        <h1 className="text-3xl font-bold text-navy-900 dark:text-white mb-2">
           Instructor Terms &amp; Conditions
         </h1>
-        <p className="text-gray-500 text-sm mb-8">Last updated: March 2026</p>
+        <p className="text-gray-500 dark:text-navy-400 text-sm mb-8">Last updated: March 2026</p>
 
-        <div className="space-y-6 text-gray-700">
+        <div className="space-y-6 text-gray-700 dark:text-gray-300">
 
           <Section title="1. Agreement">
             <p className="text-sm">
@@ -64,11 +64,57 @@ export default async function InstructorTermsPage() {
           </Section>
 
           <Section title="4. Revenue Share & Payments">
-            <ul className="list-disc pl-5 space-y-1 text-sm">
-              <li>Reset Yoga retains a platform fee from each session booked through the Platform.</li>
-              <li>Payment details will be provided separately. Payments are processed monthly.</li>
-              <li>You are responsible for any taxes applicable to your earnings in your jurisdiction.</li>
-              <li>Reset Yoga is not your employer. You operate as an independent contractor.</li>
+            <p className="text-sm">
+              Reset Yoga operates a transparent revenue-share model. Your earnings are calculated
+              based on the session type as follows:
+            </p>
+
+            {/* Payout table */}
+            <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-navy-700 mt-3">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-navy-50 dark:bg-navy-800">
+                    <th className="px-4 py-3 text-left font-semibold text-navy-800 dark:text-navy-100">Session Type</th>
+                    <th className="px-4 py-3 text-left font-semibold text-navy-800 dark:text-navy-100">Student Price</th>
+                    <th className="px-4 py-3 text-left font-semibold text-navy-800 dark:text-navy-100 text-green-700 dark:text-green-400">Your Payout</th>
+                    <th className="px-4 py-3 text-left font-semibold text-navy-800 dark:text-navy-100">Platform Fee</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 dark:divide-navy-700">
+                  <tr className="bg-white dark:bg-navy-900">
+                    <td className="px-4 py-3">1-on-1 Session<br /><span className="text-xs text-gray-400">(from $19.99/mo plan, 4 sessions)</span></td>
+                    <td className="px-4 py-3">~$5.00 / session</td>
+                    <td className="px-4 py-3 font-semibold text-green-700 dark:text-green-400">70% ≈ <strong>$3.50</strong> / session</td>
+                    <td className="px-4 py-3 text-gray-500">30% ≈ $1.50</td>
+                  </tr>
+                  <tr className="bg-gray-50 dark:bg-navy-800/50">
+                    <td className="px-4 py-3">Group Session<br /><span className="text-xs text-gray-400">(from $9.99/mo group add-on)</span></td>
+                    <td className="px-4 py-3">~$1.25 / student</td>
+                    <td className="px-4 py-3 font-semibold text-green-700 dark:text-green-400">65% of pool<br /><span className="text-xs font-normal">(e.g. 10 students = ~$8.13)</span></td>
+                    <td className="px-4 py-3 text-gray-500">35% of pool</td>
+                  </tr>
+                  <tr className="bg-white dark:bg-navy-900">
+                    <td className="px-4 py-3">Free Trial Session<br /><span className="text-xs text-gray-400">(student&apos;s first 2 sessions)</span></td>
+                    <td className="px-4 py-3">$0 (student)</td>
+                    <td className="px-4 py-3 font-semibold text-green-700 dark:text-green-400"><strong>$2.00</strong> / session<br /><span className="text-xs font-normal">(platform-subsidized)</span></td>
+                    <td className="px-4 py-3 text-gray-500">Platform absorbs cost</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p className="text-sm mt-3 text-gray-500 dark:text-gray-400 italic">
+              Example: If you teach 10 students on the monthly plan, you earn approximately
+              10 × 4 × $3.50 = <strong>$140/month</strong> for 40 sessions.
+            </p>
+
+            <ul className="list-disc pl-5 space-y-1 text-sm mt-3">
+              <li>Payments are processed <strong>monthly</strong>, on or around the 15th of each month, for all sessions completed in the prior calendar month.</li>
+              <li>Payment is made via international bank transfer to the account registered in your profile (SWIFT/IBAN supported).</li>
+              <li>A minimum balance of <strong>$20.00</strong> is required to trigger a payout. Balances below this threshold roll over to the next month.</li>
+              <li>You are solely responsible for any taxes, social contributions, or filing obligations applicable to your earnings in your jurisdiction.</li>
+              <li>Reset Yoga is not your employer. You operate as an <strong>independent contractor</strong>.</li>
+              <li>Reset Yoga reserves the right to adjust the revenue-share percentages with <strong>30 days&apos; prior written notice</strong>.</li>
             </ul>
           </Section>
 
@@ -86,7 +132,7 @@ export default async function InstructorTermsPage() {
               <li>Reset Yoga may suspend or terminate your account at any time for violation of these Terms.</li>
               <li>Circumvention of the Platform (Section 2) will result in <strong>immediate and permanent termination</strong>.</li>
               <li>Repeated late cancellations or no-shows may result in account suspension.</li>
-              <li>Student complaints of misconduct will trigger a review; Reset Yoga's decision is final.</li>
+              <li>Student complaints of misconduct will trigger a review; Reset Yoga&apos;s decision is final.</li>
             </ul>
           </Section>
 
@@ -108,7 +154,7 @@ export default async function InstructorTermsPage() {
           <Section title="9. Contact">
             <p className="text-sm">
               For questions about these Terms, contact{' '}
-              <a href="mailto:support@tryresetyoga.com" className="text-navy-600 underline">
+              <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
                 support@tryresetyoga.com
               </a>
             </p>
@@ -125,7 +171,7 @@ export default async function InstructorTermsPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="text-base font-semibold text-navy-800 mb-2">{title}</h2>
+      <h2 className="text-base font-semibold text-navy-800 dark:text-navy-100 mb-2">{title}</h2>
       <div className="space-y-2 leading-relaxed">{children}</div>
     </section>
   )
