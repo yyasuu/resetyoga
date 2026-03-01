@@ -6,11 +6,14 @@ import { getTranslations } from 'next-intl/server'
 import { ApproveInstructorButton } from '@/components/admin/ApproveInstructorButton'
 import { Users, Calendar, BookOpen, Star, FileText } from 'lucide-react'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
   const adminSupabase = await createAdminClient()
   const t = await getTranslations('admin')
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
 
   const {
     data: { user },
@@ -144,7 +147,7 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
             <FileText className="h-5 w-5 text-gray-400" />
-            Legal Documents
+            {locale === 'ja' ? '法的書類' : 'Legal Documents'}
           </h2>
           <div className="flex flex-wrap gap-3">
             <Link
@@ -153,7 +156,7 @@ export default async function AdminDashboardPage() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-navy-50 text-navy-700 border border-navy-100 hover:bg-navy-100 text-sm font-medium transition-colors"
             >
               <FileText className="h-4 w-4" />
-              Instructor Terms &amp; Conditions
+              {locale === 'ja' ? '講師利用規約' : 'Instructor Terms & Conditions'}
             </Link>
             <Link
               href="/student-terms"
@@ -161,7 +164,7 @@ export default async function AdminDashboardPage() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-navy-50 text-navy-700 border border-navy-100 hover:bg-navy-100 text-sm font-medium transition-colors"
             >
               <FileText className="h-4 w-4" />
-              Student Terms &amp; Conditions
+              {locale === 'ja' ? '生徒利用規約' : 'Student Terms & Conditions'}
             </Link>
             <Link
               href="/terms"
@@ -169,7 +172,7 @@ export default async function AdminDashboardPage() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 text-sm font-medium transition-colors"
             >
               <FileText className="h-4 w-4" />
-              Terms of Service
+              {locale === 'ja' ? '利用規約' : 'Terms of Service'}
             </Link>
             <Link
               href="/privacy"
@@ -177,7 +180,7 @@ export default async function AdminDashboardPage() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100 text-sm font-medium transition-colors"
             >
               <FileText className="h-4 w-4" />
-              Privacy Policy
+              {locale === 'ja' ? 'プライバシーポリシー' : 'Privacy Policy'}
             </Link>
           </div>
         </div>
