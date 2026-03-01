@@ -36,7 +36,7 @@ export default async function TokushoPage() {
             <table className="w-full text-sm">
               <tbody className="divide-y divide-gray-100 dark:divide-navy-800">
                 <Row label="販売業者">
-                  Reset Yoga
+                  Reset Yoga（個人事業主：雪吉愛里）
                 </Row>
                 <Row label="運営統括責任者">
                   雪吉愛里
@@ -67,9 +67,12 @@ export default async function TokushoPage() {
                   オンラインヨガレッスンのサブスクリプションサービス。月4回（各45分）の認定講師によるライブビデオセッションをご提供します。
                 </Row>
                 <Row label="販売価格">
-                  月額 US$19.99（税込）<br />
+                  月額 US$19.99（税金が適用される場合は決済時に表示されます）<br />
                   無料トライアル：2回のセッション（料金なし）。お支払い方法の登録が必要ですが、トライアル中は課金されません。<br />
                   ※ 無料トライアルは月額プランへ自動移行しません。月額プランへの加入はお客様ご自身でお申込みください。
+                </Row>
+                <Row label="代金以外の必要料金">
+                  インターネット接続にかかる通信費はお客様のご負担となります。
                 </Row>
                 <Row label="継続課金・自動更新">
                   月額プランは<strong>月単位の自動更新契約</strong>です。契約期間の定めはなく（無期限）、解約されるまで毎月 US$19.99 が自動的に請求されます。<br />
@@ -77,16 +80,21 @@ export default async function TokushoPage() {
                 </Row>
                 <Row label="代金の支払い方法">
                   クレジットカード（Visa・Mastercard・American Express 等）<br />
-                  決済代行：Stripe, Inc.
+                  決済代行会社：Stripe, Inc.（当社はStripeを通じて決済を受け付けています）
                 </Row>
                 <Row label="代金の支払い時期">
-                  お申込み時に初回請求が発生します。以降、毎月同日に自動更新・請求されます。
+                  お申込み時に初回請求が発生します。<br />
+                  以降、毎月同日に自動更新・自動課金されます。<br />
+                  解約のお手続きをされない限り継続課金となります。
                 </Row>
                 <Row label="役務の提供時期">
                   決済完了後、即時ご利用いただけます。
                 </Row>
+                <Row label="申込有効期限">
+                  募集定員に達した場合、申込受付を終了する場合があります。
+                </Row>
                 <Row label="返品・キャンセルについて">
-                  デジタルコンテンツ・役務の性質上、原則として返金・キャンセルはお受けできません。<br />
+                  サービスの性質上、提供開始後の返金は法律上の義務がある場合を除きお受けできません。<br />
                   次回請求日の前日までにサブスクリプションを解約した場合、以降の請求は発生しません。解約後も現在の請求期間末日までサービスをご利用いただけます。<br />
                   例外的な対応については{' '}
                   <a href="/refund" className="text-navy-600 dark:text-sage-400 underline">
@@ -146,7 +154,7 @@ export default async function TokushoPage() {
           <table className="w-full text-sm">
             <tbody className="divide-y divide-gray-100 dark:divide-navy-800">
               <Row label="Business Operator">
-                Reset Yoga
+                Reset Yoga (Sole proprietor: Airi Yukiyoshi)
               </Row>
               <Row label="Responsible Manager">
                 Airi Yukiyoshi
@@ -177,9 +185,12 @@ export default async function TokushoPage() {
                 Online yoga subscription service providing 4 live 45-minute sessions per month with certified instructors via video call.
               </Row>
               <Row label="Price">
-                US$19.99 / month (inclusive of all fees)<br />
+                US$19.99 / month (applicable taxes, if any, will be displayed at checkout)<br />
                 Free trial: 2 sessions at no charge. A payment method is required but no charge is made during the trial.<br />
                 The free trial does not automatically convert to a paid plan. You must subscribe manually to activate the monthly plan.
+              </Row>
+              <Row label="Additional Costs">
+                The cost of internet connectivity required to use the service is borne by the customer.
               </Row>
               <Row label="Recurring Charges &amp; Auto-Renewal">
                 The monthly plan is an <strong>auto-renewing subscription with no fixed term</strong> (indefinite). US$19.99 is charged automatically each month until you cancel.<br />
@@ -187,16 +198,21 @@ export default async function TokushoPage() {
               </Row>
               <Row label="Payment Method">
                 Credit card (Visa, Mastercard, American Express, etc.)<br />
-                Payment processed by Stripe, Inc.
+                Payment processed by Stripe, Inc. (We accept payments through Stripe's secure payment platform.)
               </Row>
               <Row label="Payment Timing">
-                First charge occurs at the time of subscription. Subsequent charges are billed automatically on the same date each month.
+                First charge occurs at the time of subscription.<br />
+                Subsequent charges are billed automatically on the same date each month.<br />
+                Charges continue until you cancel.
               </Row>
               <Row label="Service Availability">
                 Access is granted immediately upon successful payment.
               </Row>
+              <Row label="Application Period">
+                Applications may close when capacity is reached.
+              </Row>
               <Row label="Cancellation &amp; Refunds">
-                Due to the nature of digital services, refunds for completed billing periods are not offered as a general rule.<br />
+                Due to the nature of the service, refunds after service commencement cannot be provided except as required by applicable law.<br />
                 Cancelling before the next billing date stops future charges. Access continues until the end of the current billing period.<br />
                 See our{' '}
                 <a href="/refund" className="text-navy-600 dark:text-sage-400 underline">
