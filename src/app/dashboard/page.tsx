@@ -5,12 +5,15 @@ import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
-import { Calendar, Search, Video, AlertCircle } from 'lucide-react'
+import { Calendar, Search, Video, AlertCircle, FileText } from 'lucide-react'
+import { cookies } from 'next/headers'
 import { StudentSubscription } from '@/types'
 
 export default async function StudentDashboardPage() {
   const supabase = await createClient()
   const t = await getTranslations('student')
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
 
   const {
     data: { user },
@@ -220,6 +223,12 @@ export default async function StudentDashboardPage() {
                   <Button variant="outline" className="w-full justify-start gap-2">
                     <Video className="h-4 w-4 text-green-600" />
                     Subscription
+                  </Button>
+                </Link>
+                <Link href="/student-terms" target="_blank">
+                  <Button variant="outline" className="w-full justify-start gap-2">
+                    <FileText className="h-4 w-4 text-gray-500" />
+                    {locale === 'ja' ? '生徒利用規約' : 'Student Terms'}
                   </Button>
                 </Link>
               </div>

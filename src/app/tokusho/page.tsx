@@ -54,7 +54,6 @@ export default async function TokushoPage() {
                   >
                     support@tryresetyoga.com
                   </a>
-                  （または下記お問い合わせフォームより）
                 </Row>
                 <Row label="販売URL">
                   <a
