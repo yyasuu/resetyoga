@@ -306,7 +306,22 @@
     "monthly_f3": "Google Meet",
     "monthly_f4": "Cancel anytime",
     "subscribe_btn": "Subscribe Now – $19.99/month",
-    "redirecting_btn": "Redirecting…"
+    "redirecting_btn": "Redirecting…",
+    "cancel_sub": "Cancel Subscription",
+    "cancel_confirm_title": "Cancel your subscription?",
+    "cancel_confirm_desc": "You'll keep access until {date}. No further charges after that.",
+    "cancel_confirm_nodesc": "Your subscription will end at the close of the current billing period.",
+    "cancel_yes": "Yes, Cancel",
+    "cancel_keep": "Keep Plan",
+    "cancel_success": "Subscription cancelled. Your access continues until the end of the billing period.",
+    "canceling": "Cancelling…",
+    "access_until": "Access until {date}",
+    "resubscribe": "Resubscribe – $19.99/month",
+    "instructor_account": "Instructor Account",
+    "instructor_account_desc": "As an instructor, you earn per session — no subscription needed. Manage your schedule and profile from the Instructor Dashboard.",
+    "admin_account": "Administrator Account",
+    "admin_account_desc": "Manage students, instructors, and subscriptions from the Admin Dashboard.",
+    "go_to_dashboard": "Go to Dashboard"
   },
   "admin": {
     "title": "Admin Dashboard",

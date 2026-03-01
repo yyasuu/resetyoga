@@ -306,7 +306,22 @@
     "monthly_f3": "Google Meet 込み",
     "monthly_f4": "いつでも解約可能",
     "subscribe_btn": "今すぐ登録 – $19.99/月",
-    "redirecting_btn": "リダイレクト中…"
+    "redirecting_btn": "リダイレクト中…",
+    "cancel_sub": "サブスクリプションを解約する",
+    "cancel_confirm_title": "サブスクリプションを解約しますか？",
+    "cancel_confirm_desc": "{date}まで引き続きご利用いただけます。以降の請求は発生しません。",
+    "cancel_confirm_nodesc": "現在の請求期間末日にサブスクリプションが終了します。",
+    "cancel_yes": "解約する",
+    "cancel_keep": "プランを続ける",
+    "cancel_success": "解約しました。現在の請求期間末日まで引き続きご利用いただけます。",
+    "canceling": "解約中…",
+    "access_until": "{date}まで利用可能",
+    "resubscribe": "再登録する – $19.99/月",
+    "instructor_account": "講師アカウント",
+    "instructor_account_desc": "講師はセッションごとに報酬を受け取ります。サブスクリプションは不要です。スケジュールやプロフィールは講師ダッシュボードで管理してください。",
+    "admin_account": "管理者アカウント",
+    "admin_account_desc": "生徒・講師・サブスクリプションの管理は管理者ダッシュボードから行えます。",
+    "go_to_dashboard": "ダッシュボードへ"
   },
   "admin": {
     "title": "管理者ダッシュボード",
