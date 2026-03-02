@@ -46,7 +46,12 @@ export function Navbar({ user }: NavbarProps) {
       router.push(locale === 'en' ? '/tokusho/en' : '/tokusho')
       return
     }
-    document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000`
+    if (locale === 'ja') {
+      router.push('/jp')
+      return
+    }
+    // Switch to English
+    document.cookie = `NEXT_LOCALE=en;path=/;max-age=31536000`
     window.location.reload()
   }
 

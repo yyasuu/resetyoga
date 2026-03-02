@@ -11,6 +11,7 @@ const publicPaths = [
   '/instructors',
   '/auth',
   '/api',
+  '/jp',
   '/tokusho',
   '/tokusho/en',
   '/terms',

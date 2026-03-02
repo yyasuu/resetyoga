@@ -68,6 +68,11 @@ export default async function TokushoJaPage() {
                 通常2営業日以内に返信いたします。
               </Row>
 
+              <Row label="販売URL">
+                <a href="https://tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
+                  https://tryresetyoga.com
+                </a>
+              </Row>
               <Row label="役務の内容">
                 オンラインヨガレッスンのサブスクリプションサービス。月4回（各45分）の認定講師によるライブビデオセッションをご提供します。
               </Row>

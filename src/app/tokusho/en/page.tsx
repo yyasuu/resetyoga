@@ -72,6 +72,11 @@ export default async function TokushoEnPage() {
                 We typically respond within 2 business days.
               </Row>
 
+              <Row label="Sales URL">
+                <a href="https://tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
+                  https://tryresetyoga.com
+                </a>
+              </Row>
               <Row label="Service Description">
                 Online yoga subscription service providing 4 live 45-minute sessions per month with certified instructors via video call.
               </Row>
