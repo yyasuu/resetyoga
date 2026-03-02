@@ -1,11 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 
 export function Footer() {
   const t = useTranslations('footer')
   const nav = useTranslations('nav')
+  const locale = useLocale()
 
   return (
     <footer className="bg-navy-900 text-navy-300 pt-10 pb-6 px-4">
@@ -35,7 +36,7 @@ export function Footer() {
 
           {/* Legal links (no heading) */}
           <div className="flex flex-col gap-2 text-sm">
-            <Link href="/tokusho" className="hover:text-white transition-colors">
+            <Link href={locale === 'en' ? '/tokusho/en' : '/tokusho'} className="hover:text-white transition-colors">
               {t('tokusho')}
             </Link>
             <Link href="/terms" className="hover:text-white transition-colors">
