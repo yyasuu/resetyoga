@@ -38,7 +38,7 @@ export function AccountCancelButton({ role }: Props) {
     return (
       <Button
         variant="outline"
-        className="w-full justify-start gap-2 border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+        className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700"
         onClick={() => setConfirm(true)}
       >
         <Trash2 className="h-4 w-4" />
