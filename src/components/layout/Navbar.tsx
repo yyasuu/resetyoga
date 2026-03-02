@@ -47,7 +47,7 @@ export function Navbar({ user }: NavbarProps) {
       return
     }
     if (locale === 'ja') {
-      router.push('/jp')
+      window.location.href = '/jp'
       return
     }
     // Switch to English
