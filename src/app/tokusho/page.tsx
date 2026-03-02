@@ -38,17 +38,22 @@ export default async function TokushoJaPage() {
         <div className="bg-white dark:bg-navy-900 rounded-xl shadow-sm border border-gray-100 dark:border-navy-800 overflow-hidden">
           <table className="w-full text-sm">
             <tbody className="divide-y divide-gray-100 dark:divide-navy-800">
-              <Row label="販売業者">
-                Reset Yoga（個人事業主：雪吉愛里）
+
+              <Row label="事業者名（個人事業主）">
+                雪吉愛里
+              </Row>
+              <Row label="屋号">
+                Reset Yoga
               </Row>
               <Row label="運営統括責任者">
                 雪吉愛里
               </Row>
               <Row label="所在地">
-                請求があった場合には遅滞なく開示いたします。
+                〒997-0017 山形県鶴岡市大宝寺字日本国388-5<br />
+                Park Side Village Paddy 303
               </Row>
               <Row label="電話番号">
-                請求があった場合には遅滞なく開示いたします。
+                090-8094-4582
               </Row>
               <Row label="メールアドレス">
                 <a
@@ -57,53 +62,38 @@ export default async function TokushoJaPage() {
                 >
                   support@tryresetyoga.com
                 </a>
+                <br />
+                メール受付時間：24時間<br />
+                通常2営業日以内に返信いたします。
               </Row>
-              <Row label="販売URL">
-                <a
-                  href="https://tryresetyoga.com"
-                  className="text-navy-600 dark:text-sage-400 underline"
-                >
-                  https://tryresetyoga.com
-                </a>
-              </Row>
+
               <Row label="役務の内容">
                 オンラインヨガレッスンのサブスクリプションサービス。月4回（各45分）の認定講師によるライブビデオセッションをご提供します。
               </Row>
               <Row label="販売価格">
                 月額 US$19.99（税金が適用される場合は決済時に表示されます）<br />
-                無料トライアル：2回のセッション（料金なし）。お支払い方法の登録が必要ですが、トライアル中は課金されません。<br />
+                無料トライアル：2回のセッション（料金なし）。カード登録必要・トライアル中の請求なし。<br />
                 ※ 無料トライアルは月額プランへ自動移行しません。月額プランへの加入はお客様ご自身でお申込みください。
               </Row>
               <Row label="代金以外の必要料金">
-                インターネット接続にかかる通信費はお客様のご負担となります。
-              </Row>
-              <Row label="継続課金・自動更新">
-                月額プランは<strong>月単位の自動更新契約</strong>です。契約期間の定めはなく（無期限）、解約されるまで毎月 US$19.99 が自動的に請求されます。<br />
-                初回請求はサブスクリプション登録時に発生し、以降は毎月同日に更新・請求されます。
+                インターネット接続にかかる通信費はお客様のご負担となります。<br />
+                外貨建て決済に伴い、カード会社所定の為替手数料・海外事務手数料等が発生する場合があります。詳細はご利用のカード会社にご確認ください。
               </Row>
               <Row label="代金の支払い方法">
                 クレジットカード（Visa・Mastercard・American Express 等）<br />
-                決済代行会社：Stripe, Inc.（当社はStripeを通じて決済を受け付けています）
+                決済代行会社：Stripe, Inc.（当社はStripeの安全な決済プラットフォームを通じて決済を受け付けています）
               </Row>
               <Row label="代金の支払い時期">
                 お申込み時に初回請求が発生します。<br />
                 以降、毎月同日に自動更新・自動課金されます。<br />
                 解約のお手続きをされない限り継続課金となります。
               </Row>
+              <Row label="継続課金・自動更新">
+                月額プランは<strong>月単位の自動更新契約</strong>です。契約期間の定めはなく（無期限）、解約されるまで毎月 US$19.99 が自動的に請求されます。<br />
+                初回請求はサブスクリプション登録時に発生し、以降は毎月同日に更新・請求されます。
+              </Row>
               <Row label="役務の提供時期">
                 決済完了後、即時ご利用いただけます。
-              </Row>
-              <Row label="申込有効期限">
-                募集定員に達した場合、申込受付を終了する場合があります。
-              </Row>
-              <Row label="返品・キャンセルについて">
-                サービスの性質上、提供開始後の返金は法律上の義務がある場合を除きお受けできません。<br />
-                次回請求日の前日までにサブスクリプションを解約した場合、以降の請求は発生しません。解約後も現在の請求期間末日までサービスをご利用いただけます。<br />
-                例外的な対応については{' '}
-                <a href="/refund" className="text-navy-600 dark:text-sage-400 underline">
-                  返金・キャンセルポリシー
-                </a>{' '}
-                をご参照ください。
               </Row>
               <Row label="解約方法">
                 アカウントにログイン後、「サブスクリプション」ページ（
@@ -111,22 +101,39 @@ export default async function TokushoJaPage() {
                   tryresetyoga.com/subscription
                 </a>
                 ）から、いつでも解約手続きが可能です。<br />
-                解約に際して違約金・手数料は一切発生しません。手続きが不明な場合は{' '}
+                解約に際して違約金・手数料は一切発生しません。
+              </Row>
+
+              <Row label="返品・返金・不備時対応">
+                <strong>返品・返金・キャンセルについて</strong><br />
+                本サービスはデジタル役務のため、お客様都合による返金は、法令上必要な場合を除き原則としてお受けしておりません。<br />
+                サブスクリプションは次回請求日の前日までに解約した場合、次回以降の請求は発生しません。解約後も、既にお支払済みの請求期間の末日まではサービスをご利用いただけます。<br />
+                当月中の未使用セッションは、請求期間終了後に失効します。<br />
+                <br />
+                <strong>サービス不備・当社都合による対応</strong><br />
+                講師都合により確定済みセッションを実施できなかった場合は、当該セッション分のクレジットを返還します。<br />
+                システム障害その他当社の責に帰すべき事由によりサービスを提供できなかった場合は、代替セッションの提供、サービスクレジットの付与、または返金により対応します。<br />
+                <br />
+                <strong>二重請求・不正請求への対応</strong><br />
+                二重請求が確認された場合は、確認後速やかに返金または請求取消を行います。<br />
+                不正利用の疑いがある場合は、請求日から14日以内に{' '}
                 <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
                   support@tryresetyoga.com
                 </a>{' '}
-                までお問い合わせください。
+                までご連絡ください。
               </Row>
-              <Row label="サービス不備時の対応">
-                講師側の都合によりセッションが実施できない場合は、セッションクレジットを返還します。<br />
-                システム障害等により当社の責に帰すべき事由でサービスが提供できない場合は、次月への振り替えまたはご返金にて対応いたします。
-              </Row>
+
               <Row label="動作環境">
                 安定したインターネット接続環境が必要です。ビデオ通話が動作するブラウザ（最新版のChrome推奨）およびカメラ・マイクを備えたデバイスが必要です。
               </Row>
-              <Row label="免責事項">
-                通信障害・天災・不可抗力その他当社の責に帰さない事由によりサービスが提供できない場合、当社は責任を負いかねます。
+              <Row label="問い合わせ対応時間">
+                メール受付：24時間<br />
+                返信目安：通常2営業日以内<br />
+                <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
+                  support@tryresetyoga.com
+                </a>
               </Row>
+
             </tbody>
           </table>
         </div>
