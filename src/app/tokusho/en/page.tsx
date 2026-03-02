@@ -130,6 +130,9 @@ export default async function TokushoEnPage() {
               <Row label="System Requirements">
                 A stable internet connection is required. A browser capable of video calls (latest Chrome recommended) and a device with a camera and microphone are needed.
               </Row>
+              <Row label="Disclaimer">
+                Reset Yoga is not liable for service interruptions caused by network failures, natural disasters, force majeure, or other circumstances beyond our control.
+              </Row>
               <Row label="Support Hours">
                 Email support: 24 hours a day<br />
                 Response time: typically within 2 business days<br />
