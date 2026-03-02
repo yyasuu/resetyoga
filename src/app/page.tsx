@@ -250,13 +250,13 @@ export default async function LandingPage() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {instructors.map((instructor: any) => (
                 <Link key={instructor.id} href={`/instructors/${instructor.id}`}>
-                  <div className="border border-gray-200 dark:border-navy-700 rounded-2xl p-6 hover:shadow-lg hover:border-navy-200 dark:hover:border-navy-500 transition-all cursor-pointer group bg-white dark:bg-navy-800">
-                    <div className="flex items-center gap-2 sm:gap-4 mb-4">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-navy-100 to-sage-100 dark:from-navy-700 dark:to-sage-900/40 flex items-center justify-center text-navy-600 dark:text-navy-200 text-xl font-bold flex-shrink-0">
+                  <div className="border border-gray-200 dark:border-navy-700 rounded-2xl p-4 sm:p-6 hover:shadow-lg hover:border-navy-200 dark:hover:border-navy-500 transition-all cursor-pointer group bg-white dark:bg-navy-800">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-navy-100 to-sage-100 dark:from-navy-700 dark:to-sage-900/40 flex items-center justify-center text-navy-600 dark:text-navy-200 text-lg font-bold flex-shrink-0">
                         {instructor.full_name?.charAt(0) || '?'}
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-bold text-gray-900 dark:text-gray-100 group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors truncate">
+                        <h3 className="font-bold text-gray-900 dark:text-gray-100 group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors break-words">
                           {instructor.full_name}
                         </h3>
                         <div className="flex items-center gap-1 text-sm">
@@ -271,7 +271,7 @@ export default async function LandingPage() {
                       </div>
                     </div>
                     {instructor.instructor_profiles?.bio && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2 leading-relaxed">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
                         {instructor.instructor_profiles.bio}
                       </p>
                     )}
