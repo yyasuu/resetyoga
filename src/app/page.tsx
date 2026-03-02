@@ -249,7 +249,7 @@ export default async function LandingPage() {
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {instructors.map((instructor: any) => (
-                <Link key={instructor.id} href={`/instructors/${instructor.id}`}>
+                <Link key={instructor.id} href={`/instructors/${instructor.id}`} className="block">
                   <div className="border border-gray-200 dark:border-navy-700 rounded-2xl p-4 sm:p-6 hover:shadow-lg hover:border-navy-200 dark:hover:border-navy-500 transition-all cursor-pointer group bg-white dark:bg-navy-800">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-navy-100 to-sage-100 dark:from-navy-700 dark:to-sage-900/40 flex items-center justify-center text-navy-600 dark:text-navy-200 text-lg font-bold flex-shrink-0">
