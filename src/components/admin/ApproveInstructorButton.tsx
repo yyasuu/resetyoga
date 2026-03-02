@@ -19,7 +19,7 @@ export function ApproveInstructorButton({ instructorId, instructorName, instruct
 
   if (approved) {
     return (
-      <span className="inline-flex items-center gap-1.5 text-green-600 font-medium text-sm">
+      <span className="inline-flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium text-sm">
         <CheckCircle className="h-4 w-4" />
         Approved
       </span>
@@ -38,15 +38,15 @@ export function ApproveInstructorButton({ instructorId, instructorName, instruct
       toast.error('Failed to approve instructor')
       setLoading(false)
     } else {
-      setApproved(true)   // hide button immediately — prevents double-click
+      setApproved(true)
       toast.success(`${instructorName} approved! Approval email sent.`)
-      router.refresh()    // reload server component to move card to Approved list
+      router.refresh()
     }
   }
 
   return (
     <Button
-      className="bg-green-600 hover:bg-green-700 whitespace-nowrap"
+      className="bg-green-600 hover:bg-green-700 text-white whitespace-nowrap"
       onClick={handleApprove}
       disabled={loading}
     >
