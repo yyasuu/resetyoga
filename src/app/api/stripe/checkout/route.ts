@@ -75,13 +75,39 @@ export async function POST(request: NextRequest) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
-    const session = await createCheckoutSession({
-      customerId: stripeCustomerId,
-      priceId: STRIPE_PRICE_ID,
-      successUrl: `${appUrl}/subscription?success=true`,
-      cancelUrl: `${appUrl}/subscription?cancelled=true`,
-      metadata: { userId: user.id },
-    })
+    let session
+    try {
+      session = await createCheckoutSession({
+        customerId: stripeCustomerId,
+        priceId: STRIPE_PRICE_ID,
+        successUrl: `${appUrl}/subscription?success=true`,
+        cancelUrl: `${appUrl}/subscription?cancelled=true`,
+        metadata: { userId: user.id },
+      })
+    } catch (stripeErr: unknown) {
+      const msg = stripeErr instanceof Error ? stripeErr.message : String(stripeErr)
+      // Customer exists in a different Stripe environment (e.g. test vs live) — create a new one
+      if (msg.includes('No such customer')) {
+        const newCustomer = await createStripeCustomer(
+          profile.email,
+          profile.full_name || profile.email
+        )
+        stripeCustomerId = newCustomer.id
+        await supabase
+          .from('student_subscriptions')
+          .update({ stripe_customer_id: stripeCustomerId })
+          .eq('student_id', user.id)
+        session = await createCheckoutSession({
+          customerId: stripeCustomerId,
+          priceId: STRIPE_PRICE_ID,
+          successUrl: `${appUrl}/subscription?success=true`,
+          cancelUrl: `${appUrl}/subscription?cancelled=true`,
+          metadata: { userId: user.id },
+        })
+      } else {
+        throw stripeErr
+      }
+    }
 
     return NextResponse.json({ url: session.url })
   } catch (err: unknown) {
