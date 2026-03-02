@@ -57,7 +57,8 @@ export default async function TokushoEnPage() {
                 Park Side Village Paddy 303
               </Row>
               <Row label="Phone Number">
-                +81-90-8094-4582
+                +81-90-8094-4582<br />
+                Phone hours: Weekdays 10:00–18:00 JST (closed weekends &amp; public holidays)
               </Row>
               <Row label="Email">
                 <a
@@ -99,6 +100,9 @@ export default async function TokushoEnPage() {
               <Row label="Service Availability">
                 Access is granted immediately upon successful payment.
               </Row>
+              <Row label="Application Deadline">
+                If monthly capacity is reached, enrollment may close. Please check the service site for current availability.
+              </Row>
               <Row label="How to Cancel">
                 Log in to your account and visit the Subscription page (
                 <a href="https://tryresetyoga.com/subscription" className="text-navy-600 dark:text-sage-400 underline">
@@ -134,11 +138,9 @@ export default async function TokushoEnPage() {
                 Reset Yoga is not liable for service interruptions caused by network failures, natural disasters, force majeure, or other circumstances beyond our control.
               </Row>
               <Row label="Support Hours">
-                Email support: 24 hours a day<br />
-                Response time: typically within 2 business days<br />
-                <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
-                  support@tryresetyoga.com
-                </a>
+                Phone: +81-90-8094-4582 (Weekdays 10:00–18:00 JST; closed weekends &amp; public holidays)<br />
+                Email: <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">support@tryresetyoga.com</a> (24 hours a day)<br />
+                Response time: typically within 2 business days
               </Row>
 
             </tbody>

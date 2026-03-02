@@ -53,7 +53,8 @@ export default async function TokushoJaPage() {
                 Park Side Village Paddy 303
               </Row>
               <Row label="電話番号">
-                090-8094-4582
+                090-8094-4582<br />
+                電話受付時間：平日 10:00〜18:00（土日祝日を除く）
               </Row>
               <Row label="メールアドレス">
                 <a
@@ -95,6 +96,9 @@ export default async function TokushoJaPage() {
               <Row label="役務の提供時期">
                 決済完了後、即時ご利用いただけます。
               </Row>
+              <Row label="申込有効期限">
+                各月の募集定員に達した場合、申込受付を終了することがあります。最新の空き状況はサービスサイトにてご確認ください。
+              </Row>
               <Row label="解約方法">
                 アカウントにログイン後、「サブスクリプション」ページ（
                 <a href="https://tryresetyoga.com/subscription" className="text-navy-600 dark:text-sage-400 underline">
@@ -130,11 +134,9 @@ export default async function TokushoJaPage() {
                 通信障害・天災・不可抗力その他当社の責に帰さない事由によりサービスが提供できない場合、当社は責任を負いかねます。
               </Row>
               <Row label="問い合わせ対応時間">
-                メール受付：24時間<br />
-                返信目安：通常2営業日以内<br />
-                <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
-                  support@tryresetyoga.com
-                </a>
+                電話：090-8094-4582（平日 10:00〜18:00、土日祝日を除く）<br />
+                メール：<a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">support@tryresetyoga.com</a>（24時間受付）<br />
+                返信目安：通常2営業日以内
               </Row>
 
             </tbody>
