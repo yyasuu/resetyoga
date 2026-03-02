@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { Profile } from '@/types'
@@ -27,6 +27,7 @@ export function Navbar({ user }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const router = useRouter()
+  const pathname = usePathname()
   const supabase = createClient()
 
   // Defer Radix DropdownMenus to client only to avoid React 19 useId() SSR mismatch
@@ -39,6 +40,12 @@ export function Navbar({ user }: NavbarProps) {
   }
 
   const handleLocaleChange = (locale: string) => {
+    // Pages with dedicated locale URLs — navigate instead of cookie reload
+    const isTokusho = pathname === '/tokusho' || pathname === '/tokusho/en'
+    if (isTokusho) {
+      router.push(locale === 'en' ? '/tokusho/en' : '/tokusho')
+      return
+    }
     document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000`
     window.location.reload()
   }

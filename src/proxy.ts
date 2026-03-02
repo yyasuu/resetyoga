@@ -12,6 +12,7 @@ const publicPaths = [
   '/auth',
   '/api',
   '/tokusho',
+  '/tokusho/en',
   '/terms',
   '/privacy',
   '/refund',
