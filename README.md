@@ -68,3 +68,4 @@ vercel --prod
 ```
 
 環境変数をVercel Dashboardで設定し、`NEXT_PUBLIC_APP_URL` を本番URLに更新。
+
