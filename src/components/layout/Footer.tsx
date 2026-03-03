@@ -7,6 +7,7 @@ export function Footer() {
   const t = useTranslations('footer')
   const nav = useTranslations('nav')
   const locale = useLocale()
+  const supportHref = locale === 'en' ? '/support/en' : '/support'
 
   return (
     <footer className="bg-navy-900 text-navy-300 pt-10 pb-6 px-4">
@@ -36,6 +37,9 @@ export function Footer() {
 
           {/* Legal links (no heading) */}
           <div className="flex flex-col gap-2 text-sm">
+            <Link href={supportHref} className="hover:text-white transition-colors">
+              {t('support')}
+            </Link>
             <Link href={locale === 'en' ? '/tokusho/en' : '/tokusho'} className="hover:text-white transition-colors">
               {t('tokusho')}
             </Link>
