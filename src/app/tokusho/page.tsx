@@ -40,13 +40,13 @@ export default async function TokushoJaPage() {
             <tbody className="divide-y divide-gray-100 dark:divide-navy-800">
 
               <Row label="販売業者">
-                雪吉愛里
+                雪吉靖彦
               </Row>
               <Row label="屋号">
                 Reset Yoga
               </Row>
               <Row label="代表者名">
-                雪吉愛里
+                雪吉靖彦
               </Row>
               <Row label="所在地">
                 〒997-0017 山形県鶴岡市大宝寺字日本国388-5<br />
