@@ -420,7 +420,7 @@ export default async function LandingPage() {
               alt="Airi Yukiyoshi – Yoga Instructor"
               width={1440}
               height={816}
-              className="w-full h-80 md:h-full object-cover object-top"
+              className="w-full h-80 md:h-full object-cover object-left-top"
             />
           </div>
           {/* Text */}
