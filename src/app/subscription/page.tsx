@@ -20,6 +20,7 @@ import { Profile, StudentSubscription } from '@/types'
 import { format } from 'date-fns'
 import { Suspense } from 'react'
 import Link from 'next/link'
+import { Footer } from '@/components/layout/Footer'
 
 function SubscriptionContent() {
   const t = useTranslations('subscription')
@@ -113,9 +114,9 @@ function SubscriptionContent() {
   // ── Instructor view ──────────────────────────────────────────────────────
   if (profile.role === 'instructor') {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-navy-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-navy-900 flex flex-col">
         <Navbar user={profile} />
-        <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('title')}</h1>
           <div className="bg-white dark:bg-navy-800 rounded-2xl border border-gray-200 dark:border-navy-700 p-10 text-center">
             <div className="w-16 h-16 bg-navy-100 dark:bg-navy-700 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -134,6 +135,7 @@ function SubscriptionContent() {
             </Link>
           </div>
         </div>
+        <Footer />
       </div>
     )
   }
@@ -141,9 +143,9 @@ function SubscriptionContent() {
   // ── Admin view ───────────────────────────────────────────────────────────
   if (profile.role === 'admin') {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-navy-900">
+      <div className="min-h-screen bg-gray-50 dark:bg-navy-900 flex flex-col">
         <Navbar user={profile} />
-        <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('title')}</h1>
           <div className="bg-white dark:bg-navy-800 rounded-2xl border border-gray-200 dark:border-navy-700 p-10 text-center">
             <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/40 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -162,6 +164,7 @@ function SubscriptionContent() {
             </Link>
           </div>
         </div>
+        <Footer />
       </div>
     )
   }
@@ -179,9 +182,9 @@ function SubscriptionContent() {
   const fromBooking = searchParams.get('add_card') === 'true'
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-navy-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-navy-900 flex flex-col">
       <Navbar user={profile} />
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">{t('title')}</h1>
 
         {/* ── Card-required banner ──────────────────────────────────────── */}
@@ -416,6 +419,7 @@ function SubscriptionContent() {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   )
 }

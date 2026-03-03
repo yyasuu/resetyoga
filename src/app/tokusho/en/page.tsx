@@ -42,13 +42,13 @@ export default async function TokushoEnPage() {
           <table className="w-full text-sm">
             <tbody className="divide-y divide-gray-100 dark:divide-navy-800">
 
-              <Row label="Business Owner">
+              <Row label="Seller (販売業者)">
                 Airi Yukiyoshi
               </Row>
-              <Row label="Trade Name">
+              <Row label="Trade Name (屋号)">
                 Reset Yoga
               </Row>
-              <Row label="Responsible Manager">
+              <Row label="Representative (代表者名)">
                 Airi Yukiyoshi
               </Row>
               <Row label="Address">

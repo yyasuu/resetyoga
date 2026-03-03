@@ -39,13 +39,13 @@ export default async function TokushoJaPage() {
           <table className="w-full text-sm">
             <tbody className="divide-y divide-gray-100 dark:divide-navy-800">
 
-              <Row label="事業者名（個人事業主）">
+              <Row label="販売業者">
                 雪吉愛里
               </Row>
               <Row label="屋号">
                 Reset Yoga
               </Row>
-              <Row label="運営統括責任者">
+              <Row label="代表者名">
                 雪吉愛里
               </Row>
               <Row label="所在地">
