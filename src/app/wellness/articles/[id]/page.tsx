@@ -105,7 +105,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
         {/* Content */}
         {content ? (
           <div className="prose prose-gray dark:prose-invert max-w-none">
-            {content.split('\n').map((paragraph, i) =>
+            {content.split('\n').map((paragraph: string, i: number) =>
               paragraph.trim() ? (
                 <p key={i} className="text-gray-700 dark:text-gray-200 leading-relaxed mb-4">
                   {paragraph}
