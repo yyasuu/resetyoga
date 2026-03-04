@@ -624,8 +624,15 @@ function OnboardingForm() {
               {t('step_payout_title')}
             </h2>
             <p className="text-gray-500 dark:text-navy-300 text-sm mb-2">{t('step_payout_desc')}</p>
-            <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-3 mb-6 text-sm text-blue-700 dark:text-blue-300">
+            <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-xl p-3 mb-3 text-sm text-blue-700 dark:text-blue-300">
               {t('payout_note')}
+            </div>
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-3 mb-6 text-sm text-indigo-800 dark:text-indigo-200">
+              <p className="font-semibold mb-1">⚡ Stripe Connect（推奨） / Stripe Connect (Recommended)</p>
+              <p className="text-xs leading-relaxed">
+                登録完了後、ダッシュボードから <strong>Stripe 振込設定</strong> を行うことで報酬の自動受取が可能になります。銀行情報はStripe未設定時の手動送金用として使用されます。<br />
+                <span className="text-indigo-600 dark:text-indigo-400">After registration, set up Stripe Connect from your dashboard for automated payouts. Bank info below is used as a manual fallback.</span>
+              </p>
             </div>
 
             <div className="space-y-4">
@@ -719,19 +726,33 @@ function OnboardingForm() {
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Instructor Terms &amp; Conditions</h2>
             <p className="text-gray-500 dark:text-navy-300 text-sm mb-4">Please read and agree to complete your application.</p>
 
-            <div className="bg-gray-50 dark:bg-navy-900 border border-gray-200 dark:border-navy-700 rounded-xl p-4 max-h-64 overflow-y-auto text-sm text-gray-700 dark:text-navy-200 space-y-3 mb-4">
-              <p className="font-semibold text-red-700 dark:text-red-400">⚠️ Non-Circumvention (Most Important)</p>
-              <p>You must not solicit or conduct sessions with students found through Reset Yoga <strong>outside the Platform</strong>. Exchanging personal contact info (LINE, WhatsApp, email, etc.) for private lessons is strictly prohibited. This applies during your membership and for <strong>12 months</strong> after your last session. Violation results in immediate account termination and you may be liable for damages.</p>
-              <p className="font-semibold text-gray-800 dark:text-navy-100 mt-2">Key Points:</p>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>Conduct all sessions exclusively through the Reset Yoga platform</li>
-                <li>You are an independent contractor, not an employee</li>
-                <li>Platform fees apply to all sessions booked through Reset Yoga</li>
-                <li>Keep all student data confidential</li>
-                <li>Maintain professional conduct; violations may result in termination</li>
+            <div className="bg-gray-50 dark:bg-navy-900 border border-gray-200 dark:border-navy-700 rounded-xl p-4 max-h-72 overflow-y-auto text-sm text-gray-700 dark:text-navy-200 space-y-3 mb-4">
+
+              <p className="font-semibold text-red-700 dark:text-red-400">
+                ⚠️ プラットフォーム外での活動禁止（最重要）/ Non-Circumvention (Most Important)
+              </p>
+              <p>
+                Reset Yogaを通じて出会った生徒と、<strong>プラットフォーム外</strong>でレッスンを行うこと・個人連絡先を交換することは固く禁じます。在籍中および最後のセッションから<strong>12ヶ月間</strong>有効。違反時は即時永久アカウント停止となります。
+              </p>
+              <p className="text-gray-500 dark:text-navy-400 text-xs">
+                You must not conduct sessions or exchange contact info with students outside the Platform. This applies for 12 months after your last session. Violation = immediate permanent termination.
+              </p>
+
+              <p className="font-semibold text-gray-800 dark:text-navy-100 mt-2">重要事項 / Key Points:</p>
+              <ul className="list-disc pl-5 space-y-1.5">
+                <li>すべてのセッションはReset Yoga経由のみ / All sessions exclusively through Reset Yoga</li>
+                <li>独立した業務委託者として活動（雇用関係なし）/ Independent contractor, not an employee</li>
+                <li>報酬はUSD建てで月次支払い（最低$20）/ Payouts in USD, monthly (min. $20)</li>
+                <li>
+                  <span className="text-indigo-700 dark:text-indigo-300 font-medium">登録後にStripe Connectを設定することで自動受取が可能 / Set up Stripe Connect after registration for automated payouts</span>
+                </li>
+                <li>Stripe Connect設定時はStripeの連結アカウント規約への同意が別途必要 / Stripe Connected Account Agreement required when connecting Stripe</li>
+                <li>報酬に関する税務申告はご自身の責任 / You are solely responsible for tax filings on your earnings</li>
+                <li>生徒の個人情報は厳秘として扱う / Keep all student data strictly confidential</li>
+                <li>プロとしての行動を維持すること。違反はアカウント停止の対象 / Maintain professional conduct at all times</li>
               </ul>
               <a href="/instructor-terms" target="_blank" className="text-navy-600 dark:text-sage-400 underline text-xs">
-                Read full Instructor Terms →
+                講師利用規約（全文）を読む / Read full Instructor Terms →
               </a>
             </div>
 
@@ -743,11 +764,15 @@ function OnboardingForm() {
                 className="mt-1 h-4 w-4 rounded border-gray-300 text-navy-600"
               />
               <span className="text-sm text-gray-700 dark:text-navy-200">
-                I have read and agree to the{' '}
-                <a href="/instructor-terms" target="_blank" className="text-navy-600 dark:text-sage-400 underline">
-                  Instructor Terms &amp; Conditions
-                </a>
-                , including the non-circumvention clause.
+                講師利用規約（非迂回条項・支払い条件を含む）を読み、同意します。
+                <br />
+                <span className="text-xs text-gray-500 dark:text-navy-400">
+                  I have read and agree to the{' '}
+                  <a href="/instructor-terms" target="_blank" className="text-navy-600 dark:text-sage-400 underline">
+                    Instructor Terms &amp; Conditions
+                  </a>
+                  , including the non-circumvention and payment clauses.
+                </span>
               </span>
             </label>
 

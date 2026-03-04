@@ -59,7 +59,7 @@ export default async function InstructorTermsPage() {
               </ul>
             </Section>
 
-            <Section title="第4条（収益配分・支払い）">
+            <Section title="第4条（収益配分・支払い金額）">
               <p className="text-sm">
                 Reset Yogaは透明性の高い収益配分モデルを採用しています。報酬はセッション種別に応じて以下のとおり計算されます：
               </p>
@@ -111,7 +111,41 @@ export default async function InstructorTermsPage() {
               </ul>
             </Section>
 
-            <Section title="第5条（コンテンツ・知的財産権）">
+            <Section title="第5条（支払い方法・Stripe Connect）">
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4 text-sm text-indigo-800 dark:text-indigo-200 mb-3">
+                <p className="font-semibold mb-1">⚡ Stripe Connect（推奨）</p>
+                <p>報酬の自動受取には、登録完了後に <strong>Stripe Connect</strong> アカウントの設定を強く推奨します。設定は <a href="/instructor/payout-setup" className="underline">講師ダッシュボード → Stripe 振込設定</a> から行えます。</p>
+              </div>
+              <ul className="list-disc pl-5 space-y-2 text-sm">
+                <li>
+                  <strong>Stripe Connect（自動送金）：</strong>
+                  Stripe Expressアカウントを接続することで、管理者が処理した報酬が自動的にご登録の銀行口座へ送金されます。
+                  Stripeアカウント設定時に、<a href="https://stripe.com/connect-account/legal" target="_blank" className="text-indigo-600 dark:text-indigo-400 underline">Stripe Connected Account Agreement</a>（Stripeの連結アカウント規約）への同意が別途必要です。
+                </li>
+                <li>
+                  <strong>KYC（本人確認）：</strong>
+                  Stripe Connect利用のため、政府発行の身分証明書・住所・生年月日等の本人確認が必要です。確認が完了するまで送金はできません。
+                </li>
+                <li>
+                  <strong>銀行振込・Wise（手動）：</strong>
+                  Stripe Connectを設定しない場合、登録いただいた銀行口座へ管理者が手動で国際送金（SWIFT/Wise経由）を行います。
+                </li>
+                <li>
+                  <strong>通貨・為替：</strong>
+                  報酬はすべて<strong>米ドル（USD）</strong>建てで計算・支払われます。ご自身の口座への着金時の為替変動リスクはご自身が負担します。
+                </li>
+                <li>
+                  <strong>送金手数料：</strong>
+                  Stripe Connect利用時の送金手数料はStripeの定める料金に従います。銀行振込の場合、受取銀行の手数料が発生することがあります。いずれもプラットフォーム側では負担しません。
+                </li>
+                <li>
+                  <strong>最低支払額：</strong>
+                  累計報酬が<strong>$20.00未満</strong>の場合、翌月に繰り越されます。
+                </li>
+              </ul>
+            </Section>
+
+            <Section title="第6条（コンテンツ・知的財産権）">
               <ul className="list-disc pl-5 space-y-1 text-sm">
                 <li>あなた自身の指導方法・オリジナルコンテンツの所有権はあなたに帰属します。</li>
                 <li>プロフィール写真や自己紹介文をアップロードすることにより、Reset Yogaが販促目的でプラットフォーム上に掲載する非独占的ライセンスを付与することに同意します。</li>
@@ -119,7 +153,7 @@ export default async function InstructorTermsPage() {
               </ul>
             </Section>
 
-            <Section title="第6条（アカウントの停止・解約）">
+            <Section title="第7条（アカウントの停止・解約）">
               <ul className="list-disc pl-5 space-y-1 text-sm">
                 <li>Reset Yogaは規約違反があった場合、いつでもアカウントを停止・解約することができます。</li>
                 <li>第2条（非迂回条項）の違反は、<strong>即時かつ永久のアカウント停止</strong>を招きます。</li>
@@ -128,20 +162,20 @@ export default async function InstructorTermsPage() {
               </ul>
             </Section>
 
-            <Section title="第7条（守秘義務）">
+            <Section title="第8条（守秘義務）">
               <p className="text-sm">
                 生徒の個人情報はすべて厳秘として扱い、プラットフォームを通じたセッション提供のみを目的として使用することに同意します。
                 生徒のデータを他の目的のために共有・販売・悪用することは禁止されています。
               </p>
             </Section>
 
-            <Section title="第8条（準拠法）">
+            <Section title="第9条（準拠法）">
               <p className="text-sm">
                 本規約は日本法に準拠します。紛争が生じた場合は、東京地方裁判所を専属的合意管轄裁判所とします。
               </p>
             </Section>
 
-            <Section title="第9条（お問い合わせ）">
+            <Section title="第10条（お問い合わせ）">
               <p className="text-sm">
                 本規約に関するご質問は、{' '}
                 <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
@@ -215,7 +249,7 @@ export default async function InstructorTermsPage() {
             </ul>
           </Section>
 
-          <Section title="4. Revenue Share & Payments">
+          <Section title="4. Revenue Share & Payout Amounts">
             <p className="text-sm">
               Reset Yoga operates a transparent revenue-share model. Your earnings are calculated
               based on the session type as follows:
@@ -269,7 +303,34 @@ export default async function InstructorTermsPage() {
             </ul>
           </Section>
 
-          <Section title="5. Content & Intellectual Property">
+          <Section title="5. Payment Methods & Stripe Connect">
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4 text-sm text-indigo-800 dark:text-indigo-200 mb-3">
+              <p className="font-semibold mb-1">⚡ Stripe Connect (Recommended)</p>
+              <p>To receive automated payouts, we strongly recommend setting up a <strong>Stripe Connect</strong> account after registration. You can do this from your <a href="/instructor/payout-setup" className="underline">Instructor Dashboard → Stripe Payout Setup</a>.</p>
+            </div>
+            <ul className="list-disc pl-5 space-y-2 text-sm">
+              <li>
+                <strong>Stripe Connect (Automated):</strong> By connecting a Stripe Express account, your earnings are automatically transferred to your registered bank account once the platform admin processes payouts. When setting up your Stripe account, you will separately agree to the <a href="https://stripe.com/connect-account/legal" target="_blank" className="text-indigo-600 dark:text-indigo-400 underline">Stripe Connected Account Agreement</a>.
+              </li>
+              <li>
+                <strong>KYC (Identity Verification):</strong> Stripe Connect requires government-issued ID, address, and date of birth verification. Payouts cannot be processed until verification is complete.
+              </li>
+              <li>
+                <strong>Bank Transfer / Wise (Manual):</strong> If you do not set up Stripe Connect, the platform admin will manually send international bank transfers (via SWIFT or Wise) to your registered account.
+              </li>
+              <li>
+                <strong>Currency & Exchange Rate:</strong> All payouts are calculated and paid in <strong>USD (US Dollars)</strong>. Any exchange rate fluctuations upon receipt in your local currency are your responsibility.
+              </li>
+              <li>
+                <strong>Transfer Fees:</strong> Stripe Connect transfer fees are governed by Stripe&apos;s pricing. For bank transfers, receiving bank fees may apply. The platform does not cover these fees.
+              </li>
+              <li>
+                <strong>Minimum Payout:</strong> Accumulated earnings below <strong>$20.00</strong> roll over to the following month.
+              </li>
+            </ul>
+          </Section>
+
+          <Section title="6. Content & Intellectual Property">
             <ul className="list-disc pl-5 space-y-1 text-sm">
               <li>You retain ownership of your own teaching methods and original content.</li>
               <li>By uploading a profile photo or bio, you grant Reset Yoga a non-exclusive license to display
@@ -278,7 +339,7 @@ export default async function InstructorTermsPage() {
             </ul>
           </Section>
 
-          <Section title="6. Account Suspension & Termination">
+          <Section title="7. Account Suspension & Termination">
             <ul className="list-disc pl-5 space-y-1 text-sm">
               <li>Reset Yoga may suspend or terminate your account at any time for violation of these Terms.</li>
               <li>Circumvention of the Platform (Section 2) will result in <strong>immediate and permanent termination</strong>.</li>
@@ -287,7 +348,7 @@ export default async function InstructorTermsPage() {
             </ul>
           </Section>
 
-          <Section title="7. Confidentiality">
+          <Section title="8. Confidentiality">
             <p className="text-sm">
               You agree to keep all student personal information confidential and to use it solely
               for delivering sessions through the Platform. You must not share, sell, or misuse
@@ -295,14 +356,14 @@ export default async function InstructorTermsPage() {
             </p>
           </Section>
 
-          <Section title="8. Governing Law">
+          <Section title="9. Governing Law">
             <p className="text-sm">
               These Terms are governed by the laws of Japan. Disputes shall be subject to the
               exclusive jurisdiction of the Tokyo District Court.
             </p>
           </Section>
 
-          <Section title="9. Contact">
+          <Section title="10. Contact">
             <p className="text-sm">
               For questions about these Terms, contact{' '}
               <a href="mailto:support@tryresetyoga.com" className="text-navy-600 dark:text-sage-400 underline">
