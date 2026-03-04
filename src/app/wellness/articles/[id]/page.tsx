@@ -36,6 +36,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   if (!article) notFound()
 
   const title = locale === 'ja' ? article.title_ja : article.title_en
+  const subtitle = locale === 'ja' ? article.subtitle_ja : article.subtitle_en
   const content = locale === 'ja' ? article.content_ja : article.content_en
   const category = CATEGORY_LABELS[article.category]
   const categoryLabel = locale === 'ja' ? (category?.ja ?? article.category) : (category?.en ?? article.category)
@@ -72,9 +73,16 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-snug mb-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-snug mb-2">
           {title}
         </h1>
+
+        {/* Subtitle */}
+        {subtitle && (
+          <p className="text-base text-gray-500 dark:text-navy-300 mb-4 leading-relaxed">
+            {subtitle}
+          </p>
+        )}
 
         {/* Author + Date */}
         <div className="flex items-center gap-2 mb-8 pb-8 border-b border-gray-100 dark:border-navy-700">

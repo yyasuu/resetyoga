@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 interface ArticleData {
   title_ja: string
   title_en: string
+  subtitle_ja: string
+  subtitle_en: string
   content_ja: string
   content_en: string
   category: string
@@ -26,20 +28,30 @@ const CATEGORIES = [
   { value: 'breathing', labelJa: '呼吸法', labelEn: 'Breathing' },
   { value: 'mindfulness', labelJa: 'マインドフルネス', labelEn: 'Mindfulness' },
   { value: 'yoga', labelJa: 'ヨガ理論', labelEn: 'Yoga Theory' },
+  { value: 'other', labelJa: 'その他（自由入力）', labelEn: 'Other (custom)' },
 ]
+
+const PRESET_VALUES = CATEGORIES.filter(c => c.value !== 'other').map(c => c.value)
 
 export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: ArticleEditorProps) {
   const router = useRouter()
   const [tab, setTab] = useState<'ja' | 'en'>('ja')
+
+  const initCategory = initialData?.category ?? 'ayurveda'
+  const initIsPreset = PRESET_VALUES.includes(initCategory)
+
   const [form, setForm] = useState<ArticleData>({
     title_ja: initialData?.title_ja ?? '',
     title_en: initialData?.title_en ?? '',
+    subtitle_ja: initialData?.subtitle_ja ?? '',
+    subtitle_en: initialData?.subtitle_en ?? '',
     content_ja: initialData?.content_ja ?? '',
     content_en: initialData?.content_en ?? '',
-    category: initialData?.category ?? 'ayurveda',
+    category: initIsPreset ? initCategory : 'other',
     cover_image_url: initialData?.cover_image_url ?? '',
     is_published: initialData?.is_published ?? false,
   })
+  const [customCategory, setCustomCategory] = useState(initIsPreset ? '' : initCategory)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -50,10 +62,18 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
       setError(locale === 'ja' ? 'タイトル（日英）は必須です' : 'Title in both languages is required')
       return
     }
+    if (form.category === 'other' && !customCategory.trim()) {
+      setError(locale === 'ja' ? 'カテゴリ名を入力してください' : 'Please enter a custom category name')
+      return
+    }
     setSaving(true)
     setError('')
     try {
-      const payload = { ...form, is_published: publish }
+      const payload = {
+        ...form,
+        category: form.category === 'other' ? customCategory.trim() : form.category,
+        is_published: publish,
+      }
       let res: Response
       if (isEdit) {
         res = await fetch(`/api/wellness/articles/${initialData.id}`, {
@@ -106,8 +126,8 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
       </div>
 
       {/* Category */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {locale === 'ja' ? 'カテゴリ' : 'Category'}
         </label>
         <select
@@ -121,6 +141,16 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
             </option>
           ))}
         </select>
+
+        {/* Custom category input */}
+        {form.category === 'other' && (
+          <input
+            value={customCategory}
+            onChange={e => setCustomCategory(e.target.value)}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sage-400"
+            placeholder={locale === 'ja' ? 'カテゴリ名を入力（例：ライフスタイル）' : 'Enter category name (e.g. Lifestyle)'}
+          />
+        )}
       </div>
 
       {/* Title */}
@@ -137,7 +167,27 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
               : setForm({ ...form, title_en: e.target.value })
           }
           className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white text-base focus:outline-none focus:ring-2 focus:ring-sage-400"
-          placeholder={tab === 'ja' ? '体質（ドーシャ）とヨガスタイルの選び方' : 'Finding Your Yoga Style by Dosha Type'}
+          placeholder={tab === 'ja' ? '例：体質（ドーシャ）とヨガスタイルの選び方' : 'e.g. Finding Your Yoga Style by Dosha Type'}
+        />
+      </div>
+
+      {/* Subtitle */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {tab === 'ja' ? 'サブタイトル（日本語）' : 'Subtitle (English)'}
+          <span className="text-xs text-gray-400 dark:text-navy-400 ml-2">
+            {locale === 'ja' ? '任意' : 'optional'}
+          </span>
+        </label>
+        <input
+          value={tab === 'ja' ? form.subtitle_ja : form.subtitle_en}
+          onChange={e =>
+            tab === 'ja'
+              ? setForm({ ...form, subtitle_ja: e.target.value })
+              : setForm({ ...form, subtitle_en: e.target.value })
+          }
+          className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-sage-400"
+          placeholder={tab === 'ja' ? '例：自分に合ったスタイルを見つけるための第一歩' : 'e.g. The first step to finding your perfect practice'}
         />
       </div>
 
