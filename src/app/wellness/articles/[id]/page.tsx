@@ -102,13 +102,36 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
           </div>
         </div>
 
-        {/* Cover image */}
-        {article.cover_image_url && (
-          <div className="mb-8 rounded-2xl overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={article.cover_image_url} alt={title} className="w-full h-56 object-cover" />
-          </div>
-        )}
+        {/* Images */}
+        {(() => {
+          const imgs: string[] = [
+            ...((article.image_urls as string[] | null) ?? []),
+            ...(article.cover_image_url && !(article.image_urls as string[] | null)?.includes(article.cover_image_url)
+              ? [article.cover_image_url]
+              : []),
+          ].filter(Boolean)
+          if (imgs.length === 0) return null
+          return (
+            <div className="mb-8 space-y-3">
+              {/* First image: full width */}
+              <div className="rounded-2xl overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={imgs[0]} alt={title} className="w-full h-64 object-cover" />
+              </div>
+              {/* Remaining images: side by side */}
+              {imgs.length > 1 && (
+                <div className={`grid gap-3 ${imgs.length === 2 ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                  {imgs.slice(1).map((url, i) => (
+                    <div key={i} className="rounded-xl overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt="" className="w-full h-48 object-cover" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })()}
 
         {/* Content */}
         {content ? (

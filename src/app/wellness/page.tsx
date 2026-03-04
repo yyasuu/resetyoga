@@ -207,28 +207,43 @@ export default async function WellnessPage() {
 
           <div className="grid sm:grid-cols-3 gap-5">
             {hasDbArticles
-              ? dbArticles.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/wellness/articles/${article.id}`}
-                    className="bg-white dark:bg-navy-800 rounded-2xl p-6 border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow block group"
-                  >
-                    <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wider">
-                      {article.category}
-                    </span>
-                    <h3 className="font-bold text-gray-900 dark:text-white mt-2 mb-3 leading-snug group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
-                      {locale === 'ja' ? article.title_ja : article.title_en}
-                    </h3>
-                    <p className="text-sm text-gray-500 dark:text-navy-300 leading-relaxed line-clamp-3">
-                      {locale === 'ja'
-                        ? (article.content_ja ?? '')
-                        : (article.content_en ?? '')}
-                    </p>
-                    <p className="text-xs text-navy-500 dark:text-sage-400 mt-4 font-medium">
-                      {(article.profiles as any)?.full_name ?? 'Reset Yoga'} →
-                    </p>
-                  </Link>
-                ))
+              ? dbArticles.map((article) => {
+                  const coverImage = (article.image_urls as string[] | null)?.[0] ?? article.cover_image_url ?? null
+                  return (
+                    <Link
+                      key={article.id}
+                      href={`/wellness/articles/${article.id}`}
+                      className="bg-white dark:bg-navy-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow block group"
+                    >
+                      {coverImage && (
+                        <div className="h-40 overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={coverImage}
+                            alt={locale === 'ja' ? article.title_ja : article.title_en}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                      )}
+                      <div className="p-6">
+                        <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wider">
+                          {article.category}
+                        </span>
+                        <h3 className="font-bold text-gray-900 dark:text-white mt-2 mb-3 leading-snug group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
+                          {locale === 'ja' ? article.title_ja : article.title_en}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-navy-300 leading-relaxed line-clamp-3">
+                          {locale === 'ja'
+                            ? (article.content_ja ?? '')
+                            : (article.content_en ?? '')}
+                        </p>
+                        <p className="text-xs text-navy-500 dark:text-sage-400 mt-4 font-medium">
+                          {(article.profiles as any)?.full_name ?? 'Reset Yoga'} →
+                        </p>
+                      </div>
+                    </Link>
+                  )
+                })
               : STATIC_ARTICLES.map((col) => (
                   <div
                     key={col.id}
