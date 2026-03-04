@@ -1,7 +1,7 @@
 import Stripe from 'stripe'
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? 'sk_placeholder_build', {
-  apiVersion: '2026-01-28.clover',
+  apiVersion: '2026-02-25.clover',
   typescript: true,
 })
 
@@ -56,6 +56,77 @@ export async function createPortalSession(customerId: string, returnUrl: string)
  * mode='setup'.  Our webhook stores the stripe_customer_id on the student's
  * subscription row, which the booking API checks as proof of card-on-file.
  */
+// ── Stripe Connect (instructor payouts) — v2 API ──────────────────────────────
+
+export async function createConnectAccount(email: string, country: string) {
+  return stripe.v2.core.accounts.create({
+    display_name: email,
+    contact_email: email,
+    dashboard: 'express',
+    defaults: {
+      responsibilities: {
+        fees_collector: 'application',
+        losses_collector: 'application',
+      },
+    },
+    identity: {
+      country,
+      entity_type: 'individual',
+    },
+    configuration: {
+      recipient: {
+        capabilities: {
+          stripe_balance: {
+            stripe_transfers: { requested: true },
+          },
+        },
+      },
+    },
+  } as Parameters<typeof stripe.v2.core.accounts.create>[0])
+}
+
+export async function createAccountLink(
+  accountId: string,
+  refreshUrl: string,
+  returnUrl: string,
+) {
+  return stripe.v2.core.accountLinks.create({
+    account: accountId,
+    use_case: {
+      type: 'account_onboarding',
+      account_onboarding: {
+        configurations: ['recipient'],
+        refresh_url: refreshUrl,
+        return_url: returnUrl,
+      },
+    },
+  } as Parameters<typeof stripe.v2.core.accountLinks.create>[0])
+}
+
+export async function getConnectedAccount(accountId: string) {
+  return stripe.v2.core.accounts.retrieve(accountId) as Promise<any>
+}
+
+/** Extract Connect readiness from a v2 account object */
+export function isConnectComplete(account: any): boolean {
+  const transferStatus =
+    account?.configuration?.recipient?.capabilities?.stripe_balance?.stripe_transfers?.status
+  return transferStatus === 'active'
+}
+
+export async function createTransfer(
+  amountUsd: number,
+  destination: string,
+  metadata?: Record<string, string>,
+) {
+  return stripe.transfers.create({
+    amount: Math.round(amountUsd * 100), // cents
+    currency: 'usd',
+    destination,
+    metadata: metadata ?? {},
+  })
+}
+
 export async function createSetupSession({
   customerId,
   successUrl,

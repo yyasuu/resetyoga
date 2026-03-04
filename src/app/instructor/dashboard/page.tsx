@@ -297,6 +297,15 @@ export default async function InstructorDashboardPage() {
                   {locale === 'ja' ? '報酬履歴はまだありません' : 'No payment history yet'}
                 </p>
               )}
+
+              <div className="mt-4 pt-4 border-t border-gray-100 dark:border-navy-700">
+                <Link href="/instructor/payout-setup">
+                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700">
+                    <DollarSign className="h-4 w-4 text-sage-500" />
+                    {locale === 'ja' ? 'Stripe 振込設定' : 'Stripe Payout Setup'}
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

@@ -11,8 +11,7 @@ import {
   Clock,
   CheckCircle,
   Building2,
-  Globe,
-  ChevronRight,
+  Zap,
   RefreshCw,
   Settings,
   ArrowLeft,
@@ -29,6 +28,8 @@ interface PayoutInfo {
   account_holder_name: string | null
   bank_branch: string | null
   account_holder_kana: string | null
+  stripe_account_id: string | null
+  stripe_onboarding_complete: boolean
 }
 
 interface PendingPayout {
@@ -63,6 +64,7 @@ interface FormState {
 }
 
 const METHOD_LABELS: Record<string, string> = {
+  stripe: 'Stripe (自動)',
   wise: 'Wise',
   bank_transfer: '銀行振込 / Bank Transfer',
   other: 'その他 / Other',
@@ -148,7 +150,7 @@ export default function AdminPayoutsPage() {
     setSavingRate(null)
   }
 
-  const handlePay = async (instructorId: string, bookingIds: string[]) => {
+  const handlePay = async (instructorId: string, bookingIds: string[], useStripe = false) => {
     const form = forms[instructorId]
     if (!form?.amount || parseFloat(form.amount) <= 0) {
       toast.error('金額を入力してください / Please enter an amount')
@@ -165,10 +167,16 @@ export default function AdminPayoutsPage() {
         payment_method: form.method,
         payment_reference: form.reference || null,
         notes: form.notes || null,
+        use_stripe: useStripe,
       }),
     })
     if (res.ok) {
-      toast.success('Payment recorded!')
+      const data = await res.json()
+      if (useStripe && data.stripe_transfer_id) {
+        toast.success(`Stripe送金完了 / Transfer sent · ${data.stripe_transfer_id}`)
+      } else {
+        toast.success('Payment recorded!')
+      }
       await loadData()
     } else {
       const data = await res.json()
@@ -351,6 +359,39 @@ export default function AdminPayoutsPage() {
                             <DollarSign className="h-3.5 w-3.5" /> Record Payment
                           </h3>
                           <div className="space-y-3">
+                            {/* Stripe automated transfer */}
+                            {inst.payout_info?.stripe_account_id && inst.payout_info?.stripe_onboarding_complete && (
+                              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-200 dark:border-indigo-700 p-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Zap className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                                  <p className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">Stripe Connect</p>
+                                  <span className="text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full">Connected</span>
+                                </div>
+                                <p className="text-xs text-indigo-600 dark:text-indigo-400 mb-3">
+                                  金額を入力後、Stripe で自動送金します。
+                                </p>
+                                <Button
+                                  className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+                                  onClick={() => handlePay(inst.instructor_id, inst.booking_ids, true)}
+                                  disabled={isSubmitting || !form.amount}
+                                >
+                                  {isSubmitting ? (
+                                    <><RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Sending…</>
+                                  ) : (
+                                    <><Zap className="h-4 w-4 mr-2" /> Stripe で自動送金{form.amount ? ` · $${parseFloat(form.amount || '0').toFixed(2)}` : ''}</>
+                                  )}
+                                </Button>
+                              </div>
+                            )}
+
+                            {inst.payout_info?.stripe_account_id && inst.payout_info?.stripe_onboarding_complete && (
+                              <div className="flex items-center gap-3">
+                                <div className="flex-1 h-px bg-gray-200 dark:bg-navy-600" />
+                                <span className="text-xs text-gray-400 dark:text-navy-500">または手動で記録</span>
+                                <div className="flex-1 h-px bg-gray-200 dark:bg-navy-600" />
+                              </div>
+                            )}
+
                             {/* Amount */}
                             <div>
                               <label className="text-xs text-gray-500 dark:text-navy-400 mb-1 block">Amount (USD) *</label>

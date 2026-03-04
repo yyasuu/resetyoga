@@ -117,6 +117,73 @@ export async function POST(request: NextRequest) {
           .eq('stripe_subscription_id', sub.id)
         break
       }
+
+      // ── refund.created ──────────────────────────────────────────────────────
+      // Replaces charge.refunded in API 2024-10-28+
+      // Full refund → cancel subscription + future bookings
+      case 'refund.created': {
+        const refund = event.data.object as Stripe.Refund
+        const chargeId = refund.charge as string | null
+        if (!chargeId) break
+
+        const chargeObj = await stripe.charges.retrieve(chargeId)
+        const customerId = chargeObj.customer as string | null
+        if (!customerId) break
+
+        // Only act on full refunds
+        if (chargeObj.amount_refunded < chargeObj.amount) break
+
+        const studentId = await getStudentByCustomerId(supabaseAdmin, customerId)
+        if (!studentId) break
+
+        await supabaseAdmin
+          .from('student_subscriptions')
+          .update({ status: 'canceled' })
+          .eq('stripe_customer_id', customerId)
+
+        await cancelFutureBookings(supabaseAdmin, studentId)
+        console.log(`[webhook] Full refund processed for customer ${customerId}`)
+        break
+      }
+
+      // ── charge.dispute.created ──────────────────────────────────────────────
+      // Chargeback filed → freeze subscription + cancel future bookings
+      case 'charge.dispute.created': {
+        const dispute = event.data.object as Stripe.Dispute
+        const chargeObj = await stripe.charges.retrieve(dispute.charge as string)
+        const customerId = chargeObj.customer as string | null
+        if (!customerId) break
+
+        const studentId = await getStudentByCustomerId(supabaseAdmin, customerId)
+        if (!studentId) break
+
+        await supabaseAdmin
+          .from('student_subscriptions')
+          .update({ status: 'disputed' })
+          .eq('stripe_customer_id', customerId)
+
+        await cancelFutureBookings(supabaseAdmin, studentId)
+        console.error(`[webhook] Dispute created: ${dispute.id} for customer ${customerId}`)
+        break
+      }
+
+      // ── charge.dispute.closed ───────────────────────────────────────────────
+      // Dispute resolved: won → restore active / lost → keep canceled
+      case 'charge.dispute.closed': {
+        const dispute = event.data.object as Stripe.Dispute
+        const chargeObj = await stripe.charges.retrieve(dispute.charge as string)
+        const customerId = chargeObj.customer as string | null
+        if (!customerId) break
+
+        const newStatus = dispute.status === 'won' ? 'active' : 'canceled'
+        await supabaseAdmin
+          .from('student_subscriptions')
+          .update({ status: newStatus })
+          .eq('stripe_customer_id', customerId)
+
+        console.log(`[webhook] Dispute ${dispute.id} closed as ${dispute.status} → subscription ${newStatus}`)
+        break
+      }
     }
   } catch (err) {
     console.error('Webhook processing error:', err)
@@ -124,4 +191,37 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ received: true })
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+
+async function getStudentByCustomerId(
+  admin: any,
+  customerId: string,
+): Promise<string | null> {
+  const { data } = await admin
+    .from('student_subscriptions')
+    .select('student_id')
+    .eq('stripe_customer_id', customerId)
+    .single()
+  return data?.student_id ?? null
+}
+
+async function cancelFutureBookings(
+  admin: any,
+  studentId: string,
+): Promise<void> {
+  const { data: bookings } = await admin
+    .from('bookings')
+    .select('id, time_slots!slot_id(start_time)')
+    .eq('student_id', studentId)
+    .eq('status', 'confirmed')
+
+  const futureIds = (bookings ?? [])
+    .filter((b: any) => b.time_slots && new Date(b.time_slots.start_time) > new Date())
+    .map((b: any) => b.id)
+
+  if (futureIds.length > 0) {
+    await admin.from('bookings').update({ status: 'canceled' }).in('id', futureIds)
+  }
 }

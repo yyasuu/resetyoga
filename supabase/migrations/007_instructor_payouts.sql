@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS instructor_payouts (
   session_count     int           NOT NULL DEFAULT 0,
   amount_usd        numeric(10,2) NOT NULL,
   payment_method    text          NOT NULL DEFAULT 'bank_transfer'
-                                  CHECK (payment_method IN ('wise', 'bank_transfer', 'other')),
+                                  CHECK (payment_method IN ('stripe', 'wise', 'bank_transfer', 'other')),
   payment_reference text,         -- transfer ID / transaction reference
   notes             text,
   paid_at           timestamptz   NOT NULL DEFAULT now(),

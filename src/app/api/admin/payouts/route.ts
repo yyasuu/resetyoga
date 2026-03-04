@@ -1,4 +1,5 @@
 import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { createTransfer } from '@/lib/stripe'
 import { NextRequest, NextResponse } from 'next/server'
 
 async function verifyAdmin() {
@@ -42,7 +43,7 @@ export async function GET() {
 
     const { data: payoutInfos } = await admin
       .from('instructor_payout_info')
-      .select('id, bank_name, bank_country, swift_code, account_number, account_holder_name, bank_branch, account_holder_kana')
+      .select('id, bank_name, bank_country, swift_code, account_number, account_holder_name, bank_branch, account_holder_kana, stripe_account_id, stripe_onboarding_complete')
       .in('id', instructorIds)
 
     pending = instructorIds.map(instructorId => {
@@ -83,24 +84,62 @@ export async function POST(request: NextRequest) {
   const { user, admin } = auth
 
   const body = await request.json()
-  const { instructor_id, booking_ids, amount_usd, payment_method, payment_reference, notes } = body
+  const {
+    instructor_id,
+    booking_ids,
+    amount_usd,
+    payment_method,   // 'stripe' | 'wise' | 'bank_transfer' | 'other'
+    payment_reference,
+    notes,
+    use_stripe,       // boolean: execute Stripe transfer automatically
+  } = body
 
   if (!instructor_id || !Array.isArray(booking_ids) || !booking_ids.length || !amount_usd) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
-  // Mark sessions as completed
+  let stripeTransferId: string | null = null
+
+  // ── Automated Stripe transfer ──────────────────────────────────────────────
+  if (use_stripe) {
+    const { data: payoutInfo } = await admin
+      .from('instructor_payout_info')
+      .select('stripe_account_id, stripe_onboarding_complete')
+      .eq('id', instructor_id)
+      .single()
+
+    if (!payoutInfo?.stripe_account_id || !payoutInfo?.stripe_onboarding_complete) {
+      return NextResponse.json(
+        { error: 'Instructor has not completed Stripe onboarding.' },
+        { status: 400 },
+      )
+    }
+
+    try {
+      const transfer = await createTransfer(
+        parseFloat(amount_usd),
+        payoutInfo.stripe_account_id,
+        { instructor_id, admin_id: user.id },
+      )
+      stripeTransferId = transfer.id
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      return NextResponse.json({ error: `Stripe transfer failed: ${msg}` }, { status: 500 })
+    }
+  }
+
+  // ── Mark sessions as completed ─────────────────────────────────────────────
   const { error: updateErr } = await admin
     .from('bookings')
     .update({ status: 'completed' })
     .in('id', booking_ids)
-    .eq('instructor_id', instructor_id) // safety: only their own
+    .eq('instructor_id', instructor_id)
 
   if (updateErr) {
     return NextResponse.json({ error: updateErr.message }, { status: 500 })
   }
 
-  // Record the payout
+  // ── Record the payout ──────────────────────────────────────────────────────
   const { error: insertErr } = await admin
     .from('instructor_payouts')
     .insert({
@@ -108,8 +147,8 @@ export async function POST(request: NextRequest) {
       booking_ids,
       session_count: booking_ids.length,
       amount_usd: parseFloat(amount_usd),
-      payment_method: payment_method ?? 'bank_transfer',
-      payment_reference: payment_reference || null,
+      payment_method: use_stripe ? 'stripe' : (payment_method ?? 'bank_transfer'),
+      payment_reference: stripeTransferId ?? payment_reference ?? null,
       notes: notes || null,
       paid_by: user.id,
     })
@@ -118,7 +157,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: insertErr.message }, { status: 500 })
   }
 
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ success: true, stripe_transfer_id: stripeTransferId })
 }
 
 // ── PATCH: update instructor's default payout rate ────────────────────────────
