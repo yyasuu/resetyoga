@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Upload, X, ImageIcon } from 'lucide-react'
+import { RichTextEditor } from './RichTextEditor'
 
 interface ArticleData {
   title_ja: string
@@ -318,20 +319,16 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {tab === 'ja' ? '本文（日本語）' : 'Content (English)'}
         </label>
-        <textarea
+        <RichTextEditor
+          key={tab}
           value={tab === 'ja' ? form.content_ja : form.content_en}
-          onChange={e =>
+          onChange={html =>
             tab === 'ja'
-              ? setForm({ ...form, content_ja: e.target.value })
-              : setForm({ ...form, content_en: e.target.value })
+              ? setForm({ ...form, content_ja: html })
+              : setForm({ ...form, content_en: html })
           }
-          rows={14}
-          className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-sage-400 resize-y"
           placeholder={tab === 'ja' ? 'コラムの本文を入力してください...' : 'Write your article content here...'}
         />
-        <p className="text-xs text-gray-400 dark:text-navy-400 mt-1">
-          {tab === 'ja' ? form.content_ja.length : form.content_en.length} {locale === 'ja' ? '文字' : 'characters'}
-        </p>
       </div>
 
       {error && (

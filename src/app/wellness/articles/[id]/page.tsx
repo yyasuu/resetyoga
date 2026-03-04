@@ -135,17 +135,18 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
         {/* Content */}
         {content ? (
-          <div className="prose prose-gray dark:prose-invert max-w-none">
-            {content.split('\n').map((paragraph: string, i: number) =>
-              paragraph.trim() ? (
-                <p key={i} className="text-gray-700 dark:text-gray-200 leading-relaxed mb-4">
-                  {paragraph}
-                </p>
-              ) : (
-                <br key={i} />
-              )
-            )}
-          </div>
+          <div
+            className="prose prose-gray dark:prose-invert max-w-none
+              prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white
+              prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg
+              prose-p:text-gray-700 dark:prose-p:text-gray-200 prose-p:leading-relaxed
+              prose-strong:text-gray-900 dark:prose-strong:text-white
+              prose-em:text-gray-700 dark:prose-em:text-gray-200
+              prose-ul:text-gray-700 dark:prose-ul:text-gray-200
+              prose-ol:text-gray-700 dark:prose-ol:text-gray-200
+              prose-hr:border-gray-200 dark:prose-hr:border-navy-600"
+            dangerouslySetInnerHTML={{ __html: content }}
+          />
         ) : (
           <p className="text-gray-400 dark:text-navy-400 italic">
             {locale === 'ja' ? '（本文は近日公開予定）' : '(Content coming soon)'}

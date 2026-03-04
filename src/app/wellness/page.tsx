@@ -233,9 +233,10 @@ export default async function WellnessPage() {
                           {locale === 'ja' ? article.title_ja : article.title_en}
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-navy-300 leading-relaxed line-clamp-3">
-                          {locale === 'ja'
-                            ? (article.content_ja ?? '')
-                            : (article.content_en ?? '')}
+                          {(locale === 'ja' ? (article.content_ja ?? '') : (article.content_en ?? ''))
+                            .replace(/<[^>]*>/g, ' ')
+                            .replace(/\s+/g, ' ')
+                            .trim()}
                         </p>
                         <p className="text-xs text-navy-500 dark:text-sage-400 mt-4 font-medium">
                           {(article.profiles as any)?.full_name ?? 'Reset Yoga'} →
