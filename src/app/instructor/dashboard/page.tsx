@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { cookies } from 'next/headers'
 import { format } from 'date-fns'
-import { Calendar, Users, Star, Video, ChevronRight, FileText } from 'lucide-react'
+import { Calendar, Users, Star, Video, ChevronRight, FileText, DollarSign } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { AccountCancelButton } from '@/components/account/AccountCancelButton'
@@ -31,6 +31,26 @@ export default async function InstructorDashboardPage() {
     .select('*')
     .eq('id', user.id)
     .single()
+
+  // Recent payouts (instructor can see their own via RLS)
+  const supabaseAdmin = await import('@/lib/supabase/server').then(m => m.createAdminClient())
+  const { data: recentPayouts } = await (await supabaseAdmin)
+    .from('instructor_payouts')
+    .select('id, session_count, amount_usd, payment_method, paid_at')
+    .eq('instructor_id', user.id)
+    .order('paid_at', { ascending: false })
+    .limit(3)
+
+  const { data: pendingSessionsData } = await supabase
+    .from('bookings')
+    .select('id, time_slots!slot_id(end_time)')
+    .eq('instructor_id', user.id)
+    .eq('status', 'confirmed')
+
+  const pendingSessions = (pendingSessionsData ?? []).filter((b: any) => {
+    const slot = b.time_slots
+    return slot && new Date(slot.end_time) < new Date()
+  })
 
   // Upcoming bookings
   const { data: upcomingBookings } = await supabase
@@ -236,6 +256,47 @@ export default async function InstructorDashboardPage() {
               <p className="text-navy-600 dark:text-navy-300 text-sm">
                 {locale === 'ja' ? '今後の空き枠' : 'upcoming open slots'}
               </p>
+            </div>
+
+            {/* Earnings widget */}
+            <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-6">
+              <h2 className="text-base font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-sage-500" />
+                {locale === 'ja' ? '報酬' : 'Earnings'}
+              </h2>
+
+              {pendingSessions.length > 0 && (
+                <div className="mb-3 px-3 py-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                  <p className="text-xs font-semibold text-yellow-700 dark:text-yellow-400">
+                    {pendingSessions.length} {locale === 'ja' ? 'セッション 支払い待ち' : 'session(s) awaiting payment'}
+                  </p>
+                </div>
+              )}
+
+              {recentPayouts && recentPayouts.length > 0 ? (
+                <div className="space-y-2">
+                  {recentPayouts.map((p: any) => (
+                    <div key={p.id} className="flex items-center justify-between text-sm">
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          ${Number(p.amount_usd).toFixed(2)}
+                        </p>
+                        <p className="text-xs text-gray-400 dark:text-navy-400">
+                          {p.session_count} {locale === 'ja' ? 'セッション' : 'sessions'} ·{' '}
+                          {new Date(p.paid_at).toLocaleDateString(locale === 'ja' ? 'ja-JP' : 'en-US', { month: 'short', day: 'numeric' })}
+                        </p>
+                      </div>
+                      <span className="text-xs bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full font-medium">
+                        {locale === 'ja' ? '支払済' : 'Paid'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400 dark:text-navy-400">
+                  {locale === 'ja' ? '報酬履歴はまだありません' : 'No payment history yet'}
+                </p>
+              )}
             </div>
           </div>
         </div>

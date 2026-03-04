@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { ApproveInstructorButton } from '@/components/admin/ApproveInstructorButton'
-import { Users, Calendar, BookOpen, Star, FileText } from 'lucide-react'
+import { Users, Calendar, BookOpen, Star, FileText, DollarSign } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 
@@ -94,6 +95,28 @@ export default async function AdminDashboardPage() {
             </div>
             <p className="text-3xl font-bold text-gray-900 dark:text-white">{totalBookings || 0}</p>
           </div>
+        </div>
+
+        {/* Payouts shortcut */}
+        <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-5 mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-sage-100 dark:bg-sage-900/40 rounded-lg flex items-center justify-center">
+              <DollarSign className="h-5 w-5 text-sage-600 dark:text-sage-400" />
+            </div>
+            <div>
+              <p className="font-bold text-gray-900 dark:text-white">
+                {locale === 'ja' ? '講師報酬の管理' : 'Instructor Payouts'}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-navy-300">
+                {locale === 'ja' ? '完了セッションの確認と報酬の記録' : 'Review completed sessions and record payments'}
+              </p>
+            </div>
+          </div>
+          <Link href="/admin/payouts">
+            <Button className="bg-sage-500 hover:bg-sage-600 text-white flex-shrink-0">
+              {locale === 'ja' ? '報酬管理' : 'Manage Payouts'}
+            </Button>
+          </Link>
         </div>
 
         {/* Pending Approvals */}
