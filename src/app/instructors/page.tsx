@@ -53,7 +53,7 @@ export default async function InstructorsPage({
   const { data: instructors } = await query.order('created_at', { ascending: false })
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-navy-950">
+    <div className="min-h-screen bg-linen-50 dark:bg-navy-900">
       <Navbar user={profile} />
 
       <div className="max-w-6xl mx-auto px-4 py-8">

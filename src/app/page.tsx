@@ -458,7 +458,7 @@ export default async function LandingPage() {
       <section className="relative z-10 py-24 px-4 bg-navy-700 dark:bg-navy-900">
         <div className="max-w-2xl mx-auto text-center">
           <Sparkles className="h-10 w-10 text-sage-300 mx-auto mb-6" />
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 leading-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4 leading-tight break-keep">
             {t('final_cta_title')}
           </h2>
           <p className="text-navy-200 text-lg mb-10">

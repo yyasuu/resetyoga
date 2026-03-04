@@ -46,12 +46,8 @@ export function Navbar({ user }: NavbarProps) {
       router.push(locale === 'en' ? '/tokusho/en' : '/tokusho')
       return
     }
-    if (locale === 'ja') {
-      window.location.href = '/jp'
-      return
-    }
-    // Switch to English
-    document.cookie = `NEXT_LOCALE=en;path=/;max-age=31536000`
+    // Cookie-based locale switch for all other pages
+    document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000`
     window.location.reload()
   }
 
@@ -100,7 +96,7 @@ export function Navbar({ user }: NavbarProps) {
                     <span className="text-sm">EN / JA</span>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="dark:bg-navy-800 dark:border-navy-700">
+                <DropdownMenuContent align="end" className="z-[200] dark:bg-navy-800 dark:border-navy-700">
                   <DropdownMenuItem
                     onClick={() => handleLocaleChange('en')}
                     className="dark:text-gray-200 dark:hover:bg-navy-700"
@@ -136,7 +132,7 @@ export function Navbar({ user }: NavbarProps) {
                       </span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 dark:bg-navy-800 dark:border-navy-700">
+                  <DropdownMenuContent align="end" className="z-[200] w-48 dark:bg-navy-800 dark:border-navy-700">
                     <DropdownMenuItem asChild className="dark:text-gray-200 dark:hover:bg-navy-700">
                       <Link href={getDashboardLink()}>{t('dashboard')}</Link>
                     </DropdownMenuItem>
