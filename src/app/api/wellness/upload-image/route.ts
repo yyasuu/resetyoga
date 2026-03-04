@@ -1,7 +1,9 @@
-import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
+  // Auth check with SSR client
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -28,13 +30,21 @@ export async function POST(request: Request) {
   const arrayBuffer = await file.arrayBuffer()
   const buffer = Buffer.from(arrayBuffer)
 
-  const admin = await createAdminClient()
-  const { error } = await admin.storage
+  // Use standard supabase-js client (not SSR) for storage — SSR client doesn't support uploads
+  const storageClient = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  const { error } = await storageClient.storage
     .from('wellness-images')
     .upload(fileName, buffer, { contentType: file.type, upsert: false })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  const { data: { publicUrl } } = admin.storage.from('wellness-images').getPublicUrl(fileName)
+  const { data: { publicUrl } } = storageClient.storage
+    .from('wellness-images')
+    .getPublicUrl(fileName)
+
   return NextResponse.json({ url: publicUrl })
 }
