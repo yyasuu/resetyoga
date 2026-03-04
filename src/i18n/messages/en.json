@@ -94,7 +94,22 @@
     "instructor_cta_desc": "Join Reset Yoga and reach students worldwide. Set your own availability.",
     "instructor_cta_btn": "Apply as Instructor",
     "manifesto_line1": "Reset is more than a word.",
-    "manifesto_line2": "It's the quiet 45 minutes you carve out of a busy day — just for yourself."
+    "manifesto_line2": "It's the quiet 45 minutes you carve out of a busy day — just for yourself.",
+    "free_content_label": "Free Member Benefits",
+    "free_content_title": "More than yoga — resources for your whole well-being",
+    "free_content_subtitle": "No credit card needed. Access these resources with any free account.",
+    "free_meditation_title": "Guided Meditation Videos",
+    "free_meditation_desc": "Short 5–10 minute guided meditations to reset your mind at any time of day.",
+    "free_meditation_1": "Morning Reset (5 min)",
+    "free_meditation_2": "Breathe to Center (7 min)",
+    "free_meditation_3": "Sleep Preparation (10 min)",
+    "free_column_title": "Wellness Columns",
+    "free_column_desc": "Expert articles on Ayurveda, nutrition, and breathwork to support your practice.",
+    "free_column_1": "Ayurveda & your yoga style",
+    "free_column_2": "What to eat before & after yoga",
+    "free_column_3": "Introduction to pranayama",
+    "free_content_view": "Wellness Library →",
+    "free_content_cta": "Sign up free →"
   },
   "auth": {
     "login_title": "Welcome back",

@@ -6,7 +6,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { Profile } from '@/types'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, Star, Video, Clock, Heart, Sparkles, Globe } from 'lucide-react'
+import { CheckCircle, Star, Video, Clock, Heart, Sparkles, Globe, Play, BookOpen } from 'lucide-react'
 
 export default async function LandingPage() {
   const t = await getTranslations('landing')
@@ -122,7 +122,7 @@ export default async function LandingPage() {
       <section className="relative z-10 py-20 px-4 bg-sage-50 dark:bg-navy-900">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest mb-4">{t('pain_label')}</p>
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10 break-keep">
             {t('pain_title')}
           </h2>
           <div className="divide-y divide-sage-100 dark:divide-navy-800 max-w-lg mx-auto mt-10">
@@ -207,6 +207,61 @@ export default async function LandingPage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400">{detail}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Free Member Content ──────────────────────────────────────── */}
+      <section className="relative z-10 py-20 px-4 bg-sage-50 dark:bg-navy-800">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('free_content_label')}</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-4">
+            {t('free_content_title')}
+          </h2>
+          <p className="text-center text-gray-500 dark:text-navy-400 mb-12">{t('free_content_subtitle')}</p>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Meditation Videos */}
+            <div className="bg-white dark:bg-navy-900 rounded-2xl p-8 border border-sage-100 dark:border-navy-700 shadow-sm">
+              <div className="w-12 h-12 bg-sage-100 dark:bg-sage-900/40 rounded-xl flex items-center justify-center mb-5">
+                <Play className="h-6 w-6 text-sage-600 dark:text-sage-400" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{t('free_meditation_title')}</h3>
+              <p className="text-gray-500 dark:text-navy-300 text-sm mb-5 leading-relaxed">{t('free_meditation_desc')}</p>
+              <ul className="space-y-2.5">
+                {[t('free_meditation_1'), t('free_meditation_2'), t('free_meditation_3')].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-sage-400 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Wellness Columns */}
+            <div className="bg-white dark:bg-navy-900 rounded-2xl p-8 border border-sage-100 dark:border-navy-700 shadow-sm">
+              <div className="w-12 h-12 bg-linen-200 dark:bg-navy-700 rounded-xl flex items-center justify-center mb-5">
+                <BookOpen className="h-6 w-6 text-navy-600 dark:text-navy-300" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{t('free_column_title')}</h3>
+              <p className="text-gray-500 dark:text-navy-300 text-sm mb-5 leading-relaxed">{t('free_column_desc')}</p>
+              <ul className="space-y-2.5">
+                {[t('free_column_1'), t('free_column_2'), t('free_column_3')].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                    <div className="w-1.5 h-1.5 rounded-full bg-navy-400 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="text-center mt-10">
+            <Link href={user ? '/wellness' : '/register'}>
+              <Button size="lg" className="bg-sage-500 hover:bg-sage-600 text-white px-10 py-4 h-auto rounded-full shadow-md">
+                {user ? t('free_content_view') : t('free_content_cta')}
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

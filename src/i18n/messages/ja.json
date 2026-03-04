@@ -94,7 +94,22 @@
     "instructor_cta_desc": "Reset Yogaに参加して世界中の生徒に教えましょう。スケジュールは自由に設定できます。",
     "instructor_cta_btn": "講師として応募する",
     "manifesto_line1": "「リセット」は、言葉ではなく瞬間のこと。",
-    "manifesto_line2": "忙しい一日の中で、あなただけのために刻む、静かな45分。"
+    "manifesto_line2": "忙しい一日の中で、あなただけのために刻む、静かな45分。",
+    "free_content_label": "無料会員特典",
+    "free_content_title": "ヨガ以外にも、あなたを整えるコンテンツを",
+    "free_content_subtitle": "クレジットカード不要 · メールアドレスのみで登録",
+    "free_meditation_title": "瞑想ガイド動画",
+    "free_meditation_desc": "5〜10分の短いガイド付き瞑想動画。朝・昼・就寝前、いつでも視聴できます。",
+    "free_meditation_1": "朝のリセット瞑想（5分）",
+    "free_meditation_2": "呼吸で心を整える（7分）",
+    "free_meditation_3": "眠りへの準備瞑想（10分）",
+    "free_column_title": "ウェルネスコラム",
+    "free_column_desc": "アーユルヴェーダ、食事、呼吸法の専門コラムをお届けします。",
+    "free_column_1": "アーユルヴェーダとヨガスタイルの選び方",
+    "free_column_2": "ヨガ前後の食事ガイド",
+    "free_column_3": "プラナヤマ（呼吸法）入門",
+    "free_content_view": "ウェルネスライブラリへ →",
+    "free_content_cta": "無料で登録する →"
   },
   "auth": {
     "login_title": "おかえりなさい",
