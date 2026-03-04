@@ -49,8 +49,7 @@ export default async function TokushoJaPage() {
                 雪吉靖彦
               </Row>
               <Row label="所在地">
-                〒997-0017 山形県鶴岡市大宝寺字日本国388-5<br />
-                Park Side Village Paddy 303
+                請求があった場合には速やかに開示いたします。
               </Row>
               <Row label="電話番号">
                 090-8094-4582<br />

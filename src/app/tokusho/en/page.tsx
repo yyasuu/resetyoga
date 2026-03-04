@@ -42,19 +42,17 @@ export default async function TokushoEnPage() {
           <table className="w-full text-sm">
             <tbody className="divide-y divide-gray-100 dark:divide-navy-800">
 
-              <Row label="Seller (販売業者)">
+              <Row label="Seller">
                 Yasuhiko Yukiyoshi
               </Row>
-              <Row label="Trade Name (屋号)">
+              <Row label="Trade Name">
                 Reset Yoga
               </Row>
-              <Row label="Representative (代表者名)">
+              <Row label="Representative">
                 Yasuhiko Yukiyoshi
               </Row>
               <Row label="Address">
-                〒997-0017<br />
-                388-5 Taihojiaza Nihonkoku, Tsuruoka-shi, Yamagata, Japan<br />
-                Park Side Village Paddy 303
+                Will be disclosed promptly upon request.
               </Row>
               <Row label="Phone Number">
                 +81-90-8094-4582<br />
