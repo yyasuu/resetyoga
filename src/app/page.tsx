@@ -104,6 +104,20 @@ export default async function LandingPage() {
         </div>
       </section>
 
+      {/* ── Manifesto ────────────────────────────────────────────────── */}
+      <section className="py-24 px-4 bg-white dark:bg-navy-900">
+        <div className="max-w-xl mx-auto text-center">
+          <div className="w-px h-16 bg-sage-200 dark:bg-sage-800 mx-auto mb-16" />
+          <p className="text-2xl sm:text-3xl text-navy-700 dark:text-linen-100 leading-loose font-light">
+            {t('manifesto_line1')}
+          </p>
+          <p className="text-xl sm:text-2xl text-sage-600 dark:text-sage-400 leading-loose font-light mt-3">
+            {t('manifesto_line2')}
+          </p>
+          <div className="w-px h-16 bg-sage-200 dark:bg-sage-800 mx-auto mt-16" />
+        </div>
+      </section>
+
       {/* ── Pain Points ──────────────────────────────────────────────── */}
       <section className="py-20 px-4 bg-white dark:bg-navy-900">
         <div className="max-w-3xl mx-auto text-center">
@@ -111,16 +125,11 @@ export default async function LandingPage() {
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10">
             {t('pain_title')}
           </h2>
-          <div className="grid sm:grid-cols-2 gap-4 text-left">
-            {[
-              { icon: '😔', text: t('pain_1') },
-              { icon: '👶', text: t('pain_2') },
-              { icon: '🏃', text: t('pain_3') },
-              { icon: '🌫️', text: t('pain_4') },
-            ].map(({ icon, text }) => (
-              <div key={text} className="flex items-start gap-3 bg-gray-50 dark:bg-navy-800 rounded-xl p-4 border border-gray-100 dark:border-navy-700">
-                <span className="text-2xl leading-none mt-0.5">{icon}</span>
-                <p className="text-gray-700 dark:text-gray-300 font-medium">{text}</p>
+          <div className="divide-y divide-gray-100 dark:divide-navy-800 max-w-lg mx-auto mt-10">
+            {[t('pain_1'), t('pain_2'), t('pain_3'), t('pain_4')].map((text) => (
+              <div key={text} className="flex items-center gap-5 py-5">
+                <div className="w-1.5 h-1.5 rounded-full bg-sage-400 dark:bg-sage-500 flex-shrink-0" />
+                <p className="text-gray-700 dark:text-gray-300 text-base leading-relaxed">{text}</p>
               </div>
             ))}
           </div>
@@ -191,7 +200,7 @@ export default async function LandingPage() {
               { step: t('how_4'), detail: t('how_detail_4') },
             ].map(({ step, detail }, i) => (
               <div key={i} className="flex flex-col items-center text-center group">
-                <div className="w-14 h-14 bg-navy-600 dark:bg-navy-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4 group-hover:scale-110 transition-transform shadow-md">
+                <div className="w-14 h-14 border border-sage-300 dark:border-sage-700 text-sage-600 dark:text-sage-400 rounded-full flex items-center justify-center text-xl font-light mb-4 group-hover:scale-105 transition-transform">
                   {i + 1}
                 </div>
                 <p className="text-gray-800 dark:text-gray-200 font-bold mb-1">{step}</p>
@@ -215,7 +224,8 @@ export default async function LandingPage() {
               { quote: t('t2_quote'), name: t('t2_name'), role: t('t2_role'), stars: 5 },
               { quote: t('t3_quote'), name: t('t3_name'), role: t('t3_role'), stars: 5 },
             ].map(({ quote, name, role, stars }) => (
-              <div key={name} className="bg-white dark:bg-navy-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-navy-700">
+              <div key={name} className="bg-white dark:bg-navy-800 rounded-2xl p-8 shadow-sm border border-gray-100 dark:border-navy-700">
+                <div className="text-5xl text-sage-100 dark:text-sage-900 font-serif leading-none mb-3 select-none">"</div>
                 <div className="flex gap-0.5 mb-4">
                   {Array.from({ length: stars }).map((_, i) => (
                     <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />

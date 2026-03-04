@@ -92,7 +92,9 @@
     "final_cta_btn": "無料で体験する →",
     "instructor_cta_title": "ヨガ講師の方へ",
     "instructor_cta_desc": "Reset Yogaに参加して世界中の生徒に教えましょう。スケジュールは自由に設定できます。",
-    "instructor_cta_btn": "講師として応募する"
+    "instructor_cta_btn": "講師として応募する",
+    "manifesto_line1": "「リセット」は、言葉ではなく瞬間のこと。",
+    "manifesto_line2": "忙しい一日の中で、あなただけのために刻む、静かな45分。"
   },
   "auth": {
     "login_title": "おかえりなさい",

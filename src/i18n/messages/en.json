@@ -92,7 +92,9 @@
     "final_cta_btn": "Start Free Trial →",
     "instructor_cta_title": "Are you a Yoga Instructor?",
     "instructor_cta_desc": "Join Reset Yoga and reach students worldwide. Set your own availability.",
-    "instructor_cta_btn": "Apply as Instructor"
+    "instructor_cta_btn": "Apply as Instructor",
+    "manifesto_line1": "Reset is more than a word.",
+    "manifesto_line2": "It's the quiet 45 minutes you carve out of a busy day — just for yourself."
   },
   "auth": {
     "login_title": "Welcome back",
