@@ -82,8 +82,7 @@ export default async function LandingPage() {
           <Link href="/instructors">
             <Button
               size="lg"
-              variant="outline"
-              className="border-white/70 text-white hover:bg-white/15 px-10 py-4 text-lg h-auto rounded-full backdrop-blur-sm"
+              className="border border-white/70 text-white bg-transparent hover:bg-white/15 px-10 py-4 text-lg h-auto rounded-full backdrop-blur-sm shadow-none"
             >
               {t('cta_browse')}
             </Button>
@@ -106,7 +105,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Manifesto ────────────────────────────────────────────────── */}
-      <section className="relative z-10 py-24 px-4 bg-white dark:bg-navy-900">
+      <section className="relative z-10 py-24 px-4 bg-linen-50 dark:bg-navy-900">
         <div className="max-w-xl mx-auto text-center">
           <div className="w-px h-16 bg-sage-200 dark:bg-sage-800 mx-auto mb-16" />
           <p className="text-2xl sm:text-3xl text-navy-700 dark:text-linen-100 leading-loose font-light">
@@ -120,13 +119,13 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Pain Points ──────────────────────────────────────────────── */}
-      <section className="relative z-10 py-20 px-4 bg-white dark:bg-navy-900">
+      <section className="relative z-10 py-20 px-4 bg-sage-50 dark:bg-navy-900">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest mb-4">{t('pain_label')}</p>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10">
             {t('pain_title')}
           </h2>
-          <div className="divide-y divide-gray-100 dark:divide-navy-800 max-w-lg mx-auto mt-10">
+          <div className="divide-y divide-sage-100 dark:divide-navy-800 max-w-lg mx-auto mt-10">
             {[t('pain_1'), t('pain_2'), t('pain_3'), t('pain_4')].map((text) => (
               <div key={text} className="flex items-center gap-5 py-5">
                 <div className="w-1.5 h-1.5 rounded-full bg-sage-400 dark:bg-sage-500 flex-shrink-0" />
@@ -186,7 +185,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── How It Works ─────────────────────────────────────────────── */}
-      <section className="relative z-10 py-20 px-4 bg-white dark:bg-navy-900">
+      <section className="relative z-10 py-20 px-4 bg-linen-100 dark:bg-navy-900">
         <div className="max-w-4xl mx-auto">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('how_label')}</p>
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-4">
@@ -252,7 +251,7 @@ export default async function LandingPage() {
 
       {/* ── Featured Instructors ─────────────────────────────────────── */}
       {instructors.length > 0 && (
-        <section className="relative z-10 py-20 px-4 bg-white dark:bg-navy-900">
+        <section className="relative z-10 py-20 px-4 bg-sage-50 dark:bg-navy-900">
           <div className="max-w-6xl mx-auto">
             <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('instructors_label')}</p>
             <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">
@@ -422,7 +421,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Instructor CTA ───────────────────────────────────────────── */}
-      <section className="relative z-10 py-0 bg-white dark:bg-navy-900 border-t border-gray-100 dark:border-navy-800 overflow-hidden">
+      <section className="relative z-10 py-0 bg-linen-50 dark:bg-navy-900 border-t border-sage-100 dark:border-navy-800 overflow-hidden">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center">
           {/* Image */}
           <div className="w-full md:w-1/2 flex-shrink-0">
