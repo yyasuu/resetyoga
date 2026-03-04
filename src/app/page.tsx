@@ -37,75 +37,76 @@ export default async function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-navy-900">
+    <div className="min-h-screen">
       <Navbar user={profile} />
 
+      {/* ── Fixed hero background (shows only behind hero section) ───── */}
+      <div className="fixed top-0 left-0 w-full h-screen -z-10">
+        <Image
+          src="/toppage_hero.png"
+          alt="Woman practicing yoga online at home"
+          fill
+          className="object-cover object-center"
+          priority
+        />
+        <div className="absolute inset-0 bg-navy-900/35" />
+      </div>
+
       {/* ── Hero ─────────────────────────────────────────────────────── */}
-      <section className="relative bg-gradient-to-br from-linen-200 via-sage-50 to-navy-50 dark:from-navy-900 dark:via-navy-800 dark:to-navy-900 pt-24 pb-32 px-4 overflow-hidden">
-        {/* Background circles */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-sage-100/40 dark:bg-sage-900/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-linen-300/40 dark:bg-navy-700/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl pointer-events-none" />
+      <section className="relative min-h-[calc(100svh-72px)] flex flex-col items-center justify-center px-4 text-center">
+        {/* Eyebrow */}
+        <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/30 text-white px-4 py-2 rounded-full text-sm font-medium mb-8">
+          <Heart className="h-4 w-4 fill-rose-300 text-rose-300" />
+          {t('eyebrow')}
+        </div>
 
-        <div className="max-w-4xl mx-auto text-center relative">
-          {/* Eyebrow */}
-          <div className="inline-flex items-center gap-2 bg-white/70 dark:bg-navy-800/70 backdrop-blur-sm border border-sage-200 dark:border-sage-800 text-sage-700 dark:text-sage-300 px-4 py-2 rounded-full text-sm font-medium mb-8 shadow-sm">
-            <Heart className="h-4 w-4 fill-rose-400 text-rose-400" />
-            {t('eyebrow')}
-          </div>
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6 drop-shadow-lg">
+          {t('hero_title')}
+        </h1>
+        <p className="text-xl text-white/90 mb-4 max-w-2xl mx-auto leading-relaxed drop-shadow">
+          {t('hero_subtitle')}
+        </p>
+        <p className="text-base text-white/75 mb-10">
+          {t('hero_tagline')}
+        </p>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-navy-700 dark:text-linen-100 leading-tight mb-6">
-            {t('hero_title')}
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 mb-4 max-w-2xl mx-auto leading-relaxed">
-            {t('hero_subtitle')}
-          </p>
-          <p className="text-base text-gray-500 dark:text-gray-400 mb-10">
-            {t('hero_tagline')}
-          </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <Link href={user ? '/instructors' : '/register'}>
+            <Button
+              size="lg"
+              className="bg-white text-navy-700 hover:bg-linen-100 px-10 py-4 text-lg h-auto rounded-full shadow-lg hover:shadow-xl transition-all font-bold"
+            >
+              {t('cta_start')} →
+            </Button>
+          </Link>
+          <Link href="/instructors">
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-white/70 text-white hover:bg-white/15 px-10 py-4 text-lg h-auto rounded-full backdrop-blur-sm"
+            >
+              {t('cta_browse')}
+            </Button>
+          </Link>
+        </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Link href={user ? '/instructors' : '/register'}>
-              <Button
-                size="lg"
-                className="bg-navy-600 hover:bg-navy-700 dark:bg-navy-500 dark:hover:bg-navy-400 text-white px-10 py-4 text-lg h-auto rounded-full shadow-lg hover:shadow-xl transition-all"
-              >
-                {t('cta_start')} →
-              </Button>
-            </Link>
-            <Link href="/instructors">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-navy-300 dark:border-navy-500 text-navy-700 dark:text-navy-200 px-10 py-4 text-lg h-auto rounded-full hover:bg-navy-50 dark:hover:bg-navy-800"
-              >
-                {t('cta_browse')}
-              </Button>
-            </Link>
-          </div>
+        {/* Trust bar */}
+        <div className="flex flex-wrap justify-center gap-6 text-sm text-white/80">
+          <span className="flex items-center gap-1.5"><Star className="h-4 w-4 text-yellow-300 fill-yellow-300" /> {t('trust_rating')}</span>
+          <span className="flex items-center gap-1.5"><CheckCircle className="h-4 w-4 text-sage-300" /> {t('trust_certified')}</span>
+          <span className="flex items-center gap-1.5"><Globe className="h-4 w-4 text-white/70" /> {t('trust_global')}</span>
+        </div>
 
-          {/* Trust bar */}
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-gray-500 dark:text-gray-400">
-            <span className="flex items-center gap-1.5"><Star className="h-4 w-4 text-yellow-400 fill-yellow-400" /> {t('trust_rating')}</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="h-4 w-4 text-sage-500" /> {t('trust_certified')}</span>
-            <span className="flex items-center gap-1.5"><Globe className="h-4 w-4 text-navy-400" /> {t('trust_global')}</span>
-          </div>
-
-          {/* Hero image */}
-          <div className="mt-14 relative rounded-3xl overflow-hidden shadow-2xl max-w-3xl mx-auto">
-            <Image
-              src="/yogastudent.png"
-              alt="Woman practicing yoga at home"
-              width={1440}
-              height={816}
-              className="w-full object-cover"
-              priority
-            />
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/50 animate-bounce">
+          <div className="w-5 h-8 border border-white/40 rounded-full flex items-start justify-center pt-1.5">
+            <div className="w-0.5 h-1.5 bg-white/60 rounded-full" />
           </div>
         </div>
       </section>
 
       {/* ── Manifesto ────────────────────────────────────────────────── */}
-      <section className="py-24 px-4 bg-white dark:bg-navy-900">
+      <section className="relative z-10 py-24 px-4 bg-white dark:bg-navy-900">
         <div className="max-w-xl mx-auto text-center">
           <div className="w-px h-16 bg-sage-200 dark:bg-sage-800 mx-auto mb-16" />
           <p className="text-2xl sm:text-3xl text-navy-700 dark:text-linen-100 leading-loose font-light">
@@ -119,7 +120,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Pain Points ──────────────────────────────────────────────── */}
-      <section className="py-20 px-4 bg-white dark:bg-navy-900">
+      <section className="relative z-10 py-20 px-4 bg-white dark:bg-navy-900">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest mb-4">{t('pain_label')}</p>
           <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10">
@@ -152,7 +153,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Features ─────────────────────────────────────────────────── */}
-      <section className="py-20 px-4 bg-linen-50 dark:bg-navy-800">
+      <section className="relative z-10 py-20 px-4 bg-linen-50 dark:bg-navy-800">
         <div className="max-w-6xl mx-auto">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('features_label')}</p>
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">
@@ -185,7 +186,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── How It Works ─────────────────────────────────────────────── */}
-      <section className="py-20 px-4 bg-white dark:bg-navy-900">
+      <section className="relative z-10 py-20 px-4 bg-white dark:bg-navy-900">
         <div className="max-w-4xl mx-auto">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('how_label')}</p>
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-4">
@@ -212,7 +213,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Testimonials ─────────────────────────────────────────────── */}
-      <section className="py-20 px-4 bg-gradient-to-br from-sage-50 to-linen-100 dark:from-navy-800 dark:to-navy-900">
+      <section className="relative z-10 py-20 px-4 bg-gradient-to-br from-sage-50 to-linen-100 dark:from-navy-800 dark:to-navy-900">
         <div className="max-w-5xl mx-auto">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('testimonials_label')}</p>
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">
@@ -251,7 +252,7 @@ export default async function LandingPage() {
 
       {/* ── Featured Instructors ─────────────────────────────────────── */}
       {instructors.length > 0 && (
-        <section className="py-20 px-4 bg-white dark:bg-navy-900">
+        <section className="relative z-10 py-20 px-4 bg-white dark:bg-navy-900">
           <div className="max-w-6xl mx-auto">
             <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('instructors_label')}</p>
             <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">
@@ -317,7 +318,7 @@ export default async function LandingPage() {
       )}
 
       {/* ── Pricing ──────────────────────────────────────────────────── */}
-      <section className="py-20 px-4 bg-gradient-to-br from-linen-200 to-sage-50 dark:from-navy-800 dark:to-navy-900">
+      <section className="relative z-10 py-20 px-4 bg-gradient-to-br from-linen-200 to-sage-50 dark:from-navy-800 dark:to-navy-900">
         <div className="max-w-5xl mx-auto">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('pricing_label')}</p>
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-4">
@@ -400,7 +401,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Final CTA ────────────────────────────────────────────────── */}
-      <section className="py-24 px-4 bg-navy-700 dark:bg-navy-900">
+      <section className="relative z-10 py-24 px-4 bg-navy-700 dark:bg-navy-900">
         <div className="max-w-2xl mx-auto text-center">
           <Sparkles className="h-10 w-10 text-sage-300 mx-auto mb-6" />
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 leading-tight">
@@ -421,7 +422,7 @@ export default async function LandingPage() {
       </section>
 
       {/* ── Instructor CTA ───────────────────────────────────────────── */}
-      <section className="py-0 bg-white dark:bg-navy-900 border-t border-gray-100 dark:border-navy-800 overflow-hidden">
+      <section className="relative z-10 py-0 bg-white dark:bg-navy-900 border-t border-gray-100 dark:border-navy-800 overflow-hidden">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center">
           {/* Image */}
           <div className="w-full md:w-1/2 flex-shrink-0">

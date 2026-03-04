@@ -10,7 +10,7 @@ export function Footer() {
   const supportHref = locale === 'en' ? '/support/en' : '/support'
 
   return (
-    <footer className="bg-navy-900 text-navy-300 pt-10 pb-6 px-4">
+    <footer className="relative z-10 bg-navy-900 text-navy-300 pt-10 pb-6 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Top row */}
         <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
