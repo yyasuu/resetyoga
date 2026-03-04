@@ -9,10 +9,9 @@ import { CheckCircle } from 'lucide-react'
 interface Props {
   instructorId: string
   instructorName: string
-  instructorEmail: string
 }
 
-export function ApproveInstructorButton({ instructorId, instructorName, instructorEmail }: Props) {
+export function ApproveInstructorButton({ instructorId, instructorName }: Props) {
   const [loading, setLoading] = useState(false)
   const [approved, setApproved] = useState(false)
   const router = useRouter()
@@ -31,7 +30,7 @@ export function ApproveInstructorButton({ instructorId, instructorName, instruct
     const res = await fetch('/api/admin/approve-instructor', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ instructorId, instructorName, instructorEmail }),
+      body: JSON.stringify({ instructorId }),  // name/email fetched server-side
     })
 
     if (!res.ok) {

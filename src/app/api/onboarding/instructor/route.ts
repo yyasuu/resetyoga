@@ -1,6 +1,28 @@
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendInstructorApplicationEmail, sendInstructorTermsEmail } from '@/lib/email'
+import { z } from 'zod'
+
+const ALLOWED_YOGA_STYLES = ['Hatha','Vinyasa','Ashtanga','Yin','Restorative','Kundalini','Bikram','Power','Prenatal','Kids','Chair','Aerial','Meditation','Breathwork','Other']
+const ALLOWED_LANGUAGES   = ['English','Japanese','Hindi','Spanish','French','German','Portuguese','Korean','Chinese','Indonesian','Thai','Vietnamese','Other']
+const URL_PATTERN = /^https?:\/\/(www\.)?(instagram\.com|youtube\.com|youtu\.be)\//
+
+const InstructorOnboardingSchema = z.object({
+  tagline:           z.string().max(60).optional().nullable(),
+  bio:               z.string().max(3000).optional().nullable(),
+  yogaStyles:        z.array(z.string()).refine(arr => arr.every(s => ALLOWED_YOGA_STYLES.includes(s)), { message: 'Invalid yoga style' }),
+  languages:         z.array(z.string()).refine(arr => arr.every(l => ALLOWED_LANGUAGES.includes(l)), { message: 'Invalid language' }),
+  yearsExperience:   z.number().int().min(0).max(60).default(1),
+  certifications:    z.array(z.string().max(100)).max(20).default([]),
+  careerHistory:     z.string().max(3000).optional().nullable(),
+  instagramUrl:      z.string().max(200).regex(URL_PATTERN, 'Must be an Instagram URL').optional().nullable().or(z.literal('')),
+  youtubeUrl:        z.string().max(200).regex(URL_PATTERN, 'Must be a YouTube URL').optional().nullable().or(z.literal('')),
+  bankCountry:       z.string().max(50).optional().nullable(),
+  bankName:          z.string().max(100).optional().nullable(),
+  swiftCode:         z.string().max(11).regex(/^[A-Z0-9]{8,11}$/).optional().nullable().or(z.literal('')),
+  accountNumber:     z.string().max(50).optional().nullable(),
+  accountHolderName: z.string().max(100).optional().nullable(),
+})
 
 /**
  * POST /api/onboarding/instructor
@@ -22,23 +44,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
+    const raw = await request.json()
+    const parsed = InstructorOnboardingSchema.safeParse(raw)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 })
+    }
     const {
-      tagline,
-      bio,
-      yogaStyles,
-      languages,
-      yearsExperience,
-      certifications,
-      careerHistory,
-      instagramUrl,
-      youtubeUrl,
-      bankCountry,
-      bankName,
-      swiftCode,
-      accountNumber,
-      accountHolderName,
-    } = body
+      tagline, bio, yogaStyles, languages, yearsExperience,
+      certifications, careerHistory, instagramUrl, youtubeUrl,
+      bankCountry, bankName, swiftCode, accountNumber, accountHolderName,
+    } = parsed.data
 
     const adminSupabase = await createAdminClient()
 

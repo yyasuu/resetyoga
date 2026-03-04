@@ -144,6 +144,15 @@ function OnboardingForm() {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error('JPG / PNG / WebP のみ対応しています')
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('ファイルサイズは5MB以下にしてください')
+      return
+    }
     setAvatarFile(file)
     setAvatarPreview(URL.createObjectURL(file))
   }

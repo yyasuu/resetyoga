@@ -97,6 +97,10 @@ export async function POST(request: NextRequest) {
   if (!instructor_id || !Array.isArray(booking_ids) || !booking_ids.length || !amount_usd) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
+  const amountNum = parseFloat(amount_usd)
+  if (isNaN(amountNum) || amountNum <= 0 || amountNum > 10000) {
+    return NextResponse.json({ error: 'Invalid amount: must be between $0.01 and $10,000' }, { status: 400 })
+  }
 
   let stripeTransferId: string | null = null
 

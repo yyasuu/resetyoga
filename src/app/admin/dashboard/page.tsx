@@ -158,7 +158,6 @@ export default async function AdminDashboardPage() {
                   <ApproveInstructorButton
                     instructorId={instructor.id}
                     instructorName={instructor.full_name || ''}
-                    instructorEmail={instructor.email}
                   />
                 </div>
               ))}

@@ -13,9 +13,23 @@ export async function POST(request: NextRequest) {
   const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
   if (profile?.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const { instructorId, instructorName, instructorEmail } = await request.json()
+  const { instructorId } = await request.json()
+  if (!instructorId || typeof instructorId !== 'string') {
+    return NextResponse.json({ error: 'Missing instructorId' }, { status: 400 })
+  }
 
   const adminSupabase = await createAdminClient()
+
+  // Fetch instructor details from DB (never trust client-supplied name/email)
+  const { data: instructorProfile } = await adminSupabase
+    .from('profiles')
+    .select('full_name, email')
+    .eq('id', instructorId)
+    .single()
+
+  if (!instructorProfile) {
+    return NextResponse.json({ error: 'Instructor not found' }, { status: 404 })
+  }
 
   // Guard: check current approval status to prevent double-approval
   const { data: current } = await adminSupabase
@@ -25,7 +39,6 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (current?.is_approved) {
-    // Already approved — return success silently (idempotent)
     return NextResponse.json({ success: true, alreadyApproved: true })
   }
 
@@ -41,10 +54,12 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    await sendInstructorApprovalEmail({ to: instructorEmail, name: instructorName })
+    await sendInstructorApprovalEmail({
+      to: instructorProfile.email,
+      name: instructorProfile.full_name || 'Instructor',
+    })
   } catch (err) {
     console.error('Failed to send approval email:', err)
-    // Non-fatal: DB was updated, email failed
   }
 
   return NextResponse.json({ success: true })
