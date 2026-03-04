@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { cookies } from 'next/headers'
 import { format } from 'date-fns'
-import { Calendar, Users, Star, Video, ChevronRight, FileText, DollarSign } from 'lucide-react'
+import { Calendar, Users, Star, Video, ChevronRight, FileText, DollarSign, BookOpen } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { AccountCancelButton } from '@/components/account/AccountCancelButton'
@@ -235,6 +235,12 @@ export default async function InstructorDashboardPage() {
                   <Button variant="outline" className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700">
                     <Users className="h-4 w-4 text-green-600 dark:text-green-400" />
                     {locale === 'ja' ? 'プロフィール編集' : 'Edit Profile'}
+                  </Button>
+                </Link>
+                <Link href="/instructor/articles">
+                  <Button variant="outline" className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700">
+                    <BookOpen className="h-4 w-4 text-sage-500 dark:text-sage-400" />
+                    {locale === 'ja' ? 'ウェルネスコラム' : 'Wellness Articles'}
                   </Button>
                 </Link>
                 <Link href="/instructor-terms" target="_blank">

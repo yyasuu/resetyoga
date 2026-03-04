@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
-import { Calendar, Search, Video, AlertCircle, FileText } from 'lucide-react'
+import { Calendar, Search, Video, AlertCircle, FileText, BookOpen } from 'lucide-react'
 import { cookies } from 'next/headers'
 import { StudentSubscription } from '@/types'
 import { AccountCancelButton } from '@/components/account/AccountCancelButton'
@@ -226,6 +226,12 @@ export default async function StudentDashboardPage() {
                   <Button variant="outline" className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700">
                     <Video className="h-4 w-4 text-green-600 dark:text-green-400" />
                     {t('subscription')}
+                  </Button>
+                </Link>
+                <Link href="/wellness">
+                  <Button variant="outline" className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700">
+                    <BookOpen className="h-4 w-4 text-sage-500 dark:text-sage-400" />
+                    {locale === 'ja' ? 'ウェルネスライブラリ' : 'Wellness Library'}
                   </Button>
                 </Link>
                 <Link href="/student-terms" target="_blank">

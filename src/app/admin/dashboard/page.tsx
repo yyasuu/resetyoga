@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { ApproveInstructorButton } from '@/components/admin/ApproveInstructorButton'
-import { Users, Calendar, BookOpen, Star, FileText, DollarSign } from 'lucide-react'
+import { Users, Calendar, BookOpen, Star, FileText, DollarSign, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
@@ -115,6 +115,28 @@ export default async function AdminDashboardPage() {
           <Link href="/admin/payouts">
             <Button className="bg-sage-500 hover:bg-sage-600 text-white flex-shrink-0">
               {locale === 'ja' ? '報酬管理' : 'Manage Payouts'}
+            </Button>
+          </Link>
+        </div>
+
+        {/* Wellness Content Management */}
+        <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-5 mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-sage-100 dark:bg-sage-900/40 rounded-lg flex items-center justify-center">
+              <Play className="h-5 w-5 text-sage-600 dark:text-sage-400" />
+            </div>
+            <div>
+              <p className="font-bold text-gray-900 dark:text-white">
+                {locale === 'ja' ? 'ウェルネスコンテンツ管理' : 'Wellness Content'}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-navy-300">
+                {locale === 'ja' ? '瞑想動画のアップロードとコラムの管理' : 'Upload videos and manage wellness articles'}
+              </p>
+            </div>
+          </div>
+          <Link href="/admin/wellness">
+            <Button className="bg-sage-500 hover:bg-sage-600 text-white flex-shrink-0">
+              {locale === 'ja' ? '管理する' : 'Manage'}
             </Button>
           </Link>
         </div>
