@@ -66,6 +66,7 @@ export default function InstructorProfilePage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
 
   // Instructor profile
+  const [isApproved, setIsApproved] = useState(false)
   const [tagline, setTagline] = useState('')
   const [bio, setBio] = useState('')
   const [yogaStyles, setYogaStyles] = useState<string[]>([])
@@ -106,6 +107,7 @@ export default function InstructorProfilePage() {
       }
       if (ip) {
         const i = ip as InstructorProfile
+        setIsApproved(i.is_approved ?? false)
         setTagline(i.tagline || '')
         setBio(i.bio || '')
         setYogaStyles(i.yoga_styles || [])
@@ -174,7 +176,8 @@ export default function InstructorProfilePage() {
       avatar_url: avatarUrl,
     }).eq('id', user.id)
 
-    await supabase.from('instructor_profiles').update({
+    const { error: ipError } = await supabase.from('instructor_profiles').upsert({
+      id: user.id,
       tagline,
       bio,
       yoga_styles: yogaStyles,
@@ -184,7 +187,15 @@ export default function InstructorProfilePage() {
       career_history: careerHistory,
       instagram_url: instagramUrl || null,
       youtube_url: youtubeUrl || null,
-    }).eq('id', user.id)
+      is_approved: isApproved,
+    }, { onConflict: 'id' })
+
+    if (ipError) {
+      console.error('instructor_profiles upsert error:', ipError)
+      toast.error('プロフィールの保存に失敗しました: ' + ipError.message)
+      setSaving(false)
+      return
+    }
 
     await supabase.from('instructor_payout_info').upsert({
       id: user.id,

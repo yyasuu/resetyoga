@@ -39,12 +39,23 @@ export default async function AdminDashboardPage() {
     .from('bookings')
     .select('*', { count: 'exact', head: true })
 
-  // Pending instructor approvals
+  // Pending instructor approvals (have instructor_profiles row, not yet approved)
   const { data: pendingInstructors } = await adminSupabase
     .from('profiles')
     .select('*, instructor_profiles!inner(*)')
     .eq('role', 'instructor')
     .eq('instructor_profiles.is_approved', false)
+
+  // Instructors who have role=instructor but no instructor_profiles row yet
+  const { data: allInstructorProfiles } = await adminSupabase
+    .from('instructor_profiles')
+    .select('id')
+  const profileIds = new Set((allInstructorProfiles ?? []).map((r: any) => r.id))
+  const { data: allInstructorUsers } = await adminSupabase
+    .from('profiles')
+    .select('*')
+    .eq('role', 'instructor')
+  const noProfileInstructors = (allInstructorUsers ?? []).filter((u: any) => !profileIds.has(u.id))
 
   // Approved instructors
   const { data: approvedInstructors } = await adminSupabase
@@ -152,6 +163,31 @@ export default async function AdminDashboardPage() {
             )}
           </h2>
 
+          {/* Instructors with no instructor_profiles row (incomplete onboarding) */}
+          {noProfileInstructors.length > 0 && (
+            <div className="mb-4 space-y-3">
+              <p className="text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider">
+                {locale === 'ja' ? '⚠ オンボーディング未完了' : '⚠ Onboarding not completed'}
+              </p>
+              {noProfileInstructors.map((instructor: any) => (
+                <div
+                  key={instructor.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-xl border border-orange-200 dark:border-orange-800"
+                >
+                  <div>
+                    <p className="font-semibold text-gray-900 dark:text-white">{instructor.full_name || '(名前未設定)'}</p>
+                    <p className="text-sm text-gray-500 dark:text-navy-300">{instructor.email}</p>
+                    <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                      {locale === 'ja'
+                        ? 'プロフィールが未作成です。講師がプロフィールを保存すると承認できます。'
+                        : 'No instructor profile yet. Once they save their profile, it can be approved.'}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {pendingInstructors && pendingInstructors.length > 0 ? (
             <div className="space-y-4">
               {pendingInstructors.map((instructor: any) => (
@@ -184,11 +220,11 @@ export default async function AdminDashboardPage() {
                 </div>
               ))}
             </div>
-          ) : (
+          ) : noProfileInstructors.length === 0 ? (
             <p className="text-gray-400 dark:text-navy-400">
               {locale === 'ja' ? '承認待ちの講師はいません' : 'No pending approvals'}
             </p>
-          )}
+          ) : null}
         </div>
 
         {/* Legal Documents */}
