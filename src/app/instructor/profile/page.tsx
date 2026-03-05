@@ -85,6 +85,7 @@ export default function InstructorProfilePage() {
   const [bankCountry, setBankCountry] = useState('Japan')
   const [bankName, setBankName] = useState('')
   const [swiftCode, setSwiftCode] = useState('')
+  const [ifscCode, setIfscCode] = useState('')
   const [accountNumber, setAccountNumber] = useState('')
   const [accountHolderName, setAccountHolderName] = useState('')
 
@@ -120,6 +121,7 @@ export default function InstructorProfilePage() {
         setBankCountry(po.bank_country || 'Japan')
         setBankName(po.bank_name || '')
         setSwiftCode(po.swift_code || '')
+        setIfscCode(po.ifsc_code || '')
         setAccountNumber(po.account_number || '')
         setAccountHolderName(po.account_holder_name || po.account_holder_kana || '')
       }
@@ -189,6 +191,7 @@ export default function InstructorProfilePage() {
       bank_country: bankCountry || 'Japan',
       bank_name: bankName || null,
       swift_code: swiftCode || null,
+      ifsc_code: ifscCode || null,
       account_number: accountNumber || null,
       account_holder_name: accountHolderName || null,
     })
@@ -407,6 +410,24 @@ export default function InstructorProfilePage() {
             </Label>
             <Input value={swiftCode} onChange={(e) => setSwiftCode(e.target.value.toUpperCase())} placeholder={tOnb('swift_code_placeholder')} className="mt-1" />
           </div>
+
+          {bankCountry === 'India' && (
+            <div>
+              <Label className="dark:text-navy-200">
+                IFSC Code
+                <span className="text-gray-400 dark:text-navy-500 text-xs font-normal ml-1">
+                  (Indian Financial System Code · 11 characters)
+                </span>
+              </Label>
+              <Input
+                value={ifscCode}
+                onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
+                placeholder="e.g. SBIN0001234"
+                maxLength={11}
+                className="mt-1 font-mono tracking-wide"
+              />
+            </div>
+          )}
 
           <div>
             <Label className="dark:text-navy-200">{tOnb('account_number')}</Label>
