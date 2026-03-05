@@ -3,8 +3,9 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Upload, X, ImageIcon } from 'lucide-react'
+import { Upload, X, ImageIcon, Sparkles } from 'lucide-react'
 import { RichTextEditor } from './RichTextEditor'
+import { CONCERNS } from '@/lib/concerns'
 
 interface ArticleData {
   title_ja: string
@@ -16,6 +17,7 @@ interface ArticleData {
   category: string
   cover_image_url: string
   image_urls: string[]
+  concerns: string[]
   is_published: boolean
 }
 
@@ -53,11 +55,13 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     category: initIsPreset ? initCategory : 'other',
     cover_image_url: initialData?.cover_image_url ?? '',
     image_urls: initialData?.image_urls ?? [],
+    concerns: (initialData as any)?.concerns ?? [],
     is_published: initialData?.is_published ?? false,
   })
   const [customCategory, setCustomCategory] = useState(initIsPreset ? '' : initCategory)
   const [uploading, setUploading] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
+  const [suggesting, setSuggesting] = useState(false)
   const [error, setError] = useState('')
 
   const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)]
@@ -97,6 +101,40 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     const newImages = [...form.image_urls]
     newImages.splice(index, 1)
     setForm({ ...form, image_urls: newImages })
+  }
+
+  const toggleConcern = (id: string) => {
+    const current = form.concerns
+    const next = current.includes(id) ? current.filter(c => c !== id) : [...current, id]
+    setForm({ ...form, concerns: next })
+  }
+
+  const suggestConcerns = async () => {
+    setSuggesting(true)
+    setError('')
+    try {
+      const res = await fetch('/api/wellness/suggest-concerns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title_ja: form.title_ja,
+          title_en: form.title_en,
+          content_ja: form.content_ja,
+          content_en: form.content_en,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error)
+      if (json.concerns?.length > 0) {
+        setForm({ ...form, concerns: json.concerns })
+      } else {
+        setError(locale === 'ja' ? 'AIが判定できませんでした。手動で選択してください。' : 'AI could not detect concerns. Please select manually.')
+      }
+    } catch (err: any) {
+      setError(err.message || 'AI判定に失敗しました')
+    } finally {
+      setSuggesting(false)
+    }
   }
 
   const handleSubmit = async (publish: boolean) => {
@@ -191,6 +229,49 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
             placeholder={locale === 'ja' ? 'カテゴリ名を入力（例：ライフスタイル）' : 'Enter category name (e.g. Lifestyle)'}
           />
         )}
+      </div>
+
+      {/* Concerns */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {locale === 'ja' ? 'お悩みタグ' : 'Concern tags'}
+            <span className="text-xs text-gray-400 dark:text-navy-400 ml-2">
+              {locale === 'ja' ? '当てはまるものを選択（複数可）' : 'Select all that apply'}
+            </span>
+          </label>
+          <button
+            type="button"
+            onClick={suggestConcerns}
+            disabled={suggesting || (!form.title_ja && !form.title_en)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-sage-50 dark:bg-sage-900/30 text-sage-700 dark:text-sage-400 border border-sage-200 dark:border-sage-800 hover:bg-sage-100 dark:hover:bg-sage-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            {suggesting
+              ? (locale === 'ja' ? 'AI判定中...' : 'Analyzing...')
+              : (locale === 'ja' ? 'AI自動判定' : 'Auto-detect')}
+          </button>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+          {CONCERNS.map(c => {
+            const selected = form.concerns.includes(c.id)
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => toggleConcern(c.id)}
+                className={`flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl border text-center transition-all duration-150 text-xs ${
+                  selected
+                    ? 'bg-navy-600 border-navy-600 text-white shadow-sm'
+                    : 'bg-white dark:bg-navy-800 border-gray-200 dark:border-navy-600 text-gray-600 dark:text-gray-300 hover:border-sage-400 hover:bg-sage-50 dark:hover:bg-navy-700'
+                }`}
+              >
+                <span className="text-base leading-none">{c.icon}</span>
+                <span className="font-medium leading-snug">{locale === 'ja' ? c.ja : c.en}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Title */}

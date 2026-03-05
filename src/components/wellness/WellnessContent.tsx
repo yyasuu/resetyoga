@@ -28,6 +28,7 @@ interface Article {
   category: string
   cover_image_url: string | null
   image_urls: string[] | null
+  concerns: string[] | null
   profiles: { full_name: string | null } | null
 }
 
@@ -86,8 +87,12 @@ export function WellnessContent({
     : dbVideos
 
   // Filter articles by concern
+  // Primary: use concern tags on article; fallback to category-based matching for untagged articles
   const filteredArticles = concern
-    ? dbArticles.filter((a) => concern.articleCategories.includes(a.category))
+    ? dbArticles.filter((a) => {
+        if (a.concerns && a.concerns.length > 0) return a.concerns.includes(concern.id)
+        return concern.articleCategories.includes(a.category)
+      })
     : dbArticles
 
   const hasVideos = filteredVideos.length > 0
