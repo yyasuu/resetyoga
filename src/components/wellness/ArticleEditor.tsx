@@ -3,9 +3,10 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Upload, X, ImageIcon, Sparkles } from 'lucide-react'
+import { Upload, X, ImageIcon, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react'
 import { RichTextEditor } from './RichTextEditor'
 import { CONCERNS } from '@/lib/concerns'
+import { ARTICLE_PRESETS } from '@/lib/article-presets'
 
 interface ArticleData {
   title_ja: string
@@ -41,6 +42,9 @@ const PRESET_VALUES = CATEGORIES.filter(c => c.value !== 'other').map(c => c.val
 export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: ArticleEditorProps) {
   const router = useRouter()
   const [tab, setTab] = useState<'ja' | 'en'>('ja')
+  const [showPresets, setShowPresets] = useState(!initialData?.id)
+  const [presetFilter, setPresetFilter] = useState<string | null>(null)
+  const [appliedPresetId, setAppliedPresetId] = useState<string | null>(null)
 
   const initCategory = initialData?.category ?? 'ayurveda'
   const initIsPreset = PRESET_VALUES.includes(initCategory)
@@ -61,12 +65,34 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
   const [customCategory, setCustomCategory] = useState(initIsPreset ? '' : initCategory)
   const [uploading, setUploading] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
-  const [suggesting, setSuggesting] = useState(false)
   const [error, setError] = useState('')
 
   const fileInputRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)]
 
   const isEdit = !!initialData?.id
+
+  // Apply a preset: fill titles, category, and auto-check concerns
+  const applyPreset = (presetId: string) => {
+    const preset = ARTICLE_PRESETS.find(p => p.id === presetId)
+    if (!preset) return
+    const isPresetCat = PRESET_VALUES.includes(preset.category)
+    setForm(prev => ({
+      ...prev,
+      title_ja: preset.title_ja,
+      title_en: preset.title_en,
+      category: isPresetCat ? preset.category : 'other',
+      concerns: preset.concerns,
+    }))
+    if (!isPresetCat) setCustomCategory(preset.category)
+    setAppliedPresetId(presetId)
+    setShowPresets(false)
+  }
+
+  const toggleConcern = (id: string) => {
+    const current = form.concerns
+    const next = current.includes(id) ? current.filter(c => c !== id) : [...current, id]
+    setForm({ ...form, concerns: next })
+  }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0]
@@ -83,16 +109,12 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
 
       const newImages = [...form.image_urls]
       newImages[index] = json.url
-      // Remove trailing empty slots
-      while (newImages.length > 0 && !newImages[newImages.length - 1]) {
-        newImages.pop()
-      }
+      while (newImages.length > 0 && !newImages[newImages.length - 1]) newImages.pop()
       setForm({ ...form, image_urls: newImages })
     } catch (err: any) {
       setError(err.message || 'アップロードに失敗しました')
     } finally {
       setUploading(null)
-      // Reset the input so the same file can be re-selected
       if (fileInputRefs[index].current) fileInputRefs[index].current!.value = ''
     }
   }
@@ -101,40 +123,6 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     const newImages = [...form.image_urls]
     newImages.splice(index, 1)
     setForm({ ...form, image_urls: newImages })
-  }
-
-  const toggleConcern = (id: string) => {
-    const current = form.concerns
-    const next = current.includes(id) ? current.filter(c => c !== id) : [...current, id]
-    setForm({ ...form, concerns: next })
-  }
-
-  const suggestConcerns = async () => {
-    setSuggesting(true)
-    setError('')
-    try {
-      const res = await fetch('/api/wellness/suggest-concerns', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title_ja: form.title_ja,
-          title_en: form.title_en,
-          content_ja: form.content_ja,
-          content_en: form.content_en,
-        }),
-      })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error)
-      if (json.concerns?.length > 0) {
-        setForm({ ...form, concerns: json.concerns })
-      } else {
-        setError(locale === 'ja' ? 'AIが判定できませんでした。手動で選択してください。' : 'AI could not detect concerns. Please select manually.')
-      }
-    } catch (err: any) {
-      setError(err.message || 'AI判定に失敗しました')
-    } finally {
-      setSuggesting(false)
-    }
   }
 
   const handleSubmit = async (publish: boolean) => {
@@ -179,9 +167,116 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     }
   }
 
+  const filteredPresets = presetFilter
+    ? ARTICLE_PRESETS.filter(p => p.concerns.includes(presetFilter))
+    : ARTICLE_PRESETS
+
   return (
     <div className="space-y-6">
-      {/* Language Tabs */}
+
+      {/* ── Preset picker ─────────────────────────────────── */}
+      <div className="border border-sage-200 dark:border-navy-600 rounded-2xl overflow-hidden">
+        <button
+          type="button"
+          onClick={() => setShowPresets(!showPresets)}
+          className="w-full flex items-center justify-between px-5 py-3.5 bg-sage-50 dark:bg-navy-800 text-left"
+        >
+          <div>
+            <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+              {locale === 'ja' ? 'テンプレートから選ぶ' : 'Choose from a template'}
+            </span>
+            {appliedPresetId && !showPresets && (
+              <span className="ml-2 text-xs text-sage-600 dark:text-sage-400 font-medium">
+                <CheckCircle2 className="inline h-3.5 w-3.5 mr-0.5 -mt-0.5" />
+                {locale === 'ja' ? '適用済み' : 'Applied'}
+              </span>
+            )}
+            <p className="text-xs text-gray-400 dark:text-navy-400 mt-0.5">
+              {locale === 'ja'
+                ? 'タイトルを選ぶとお悩みタグが自動で入力されます'
+                : 'Select a title to auto-fill concern tags'}
+            </p>
+          </div>
+          {showPresets
+            ? <ChevronUp className="h-4 w-4 text-gray-400 shrink-0" />
+            : <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />}
+        </button>
+
+        {showPresets && (
+          <div className="p-5 space-y-4 bg-white dark:bg-navy-900/40">
+            {/* Concern filter chips */}
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => setPresetFilter(null)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                  !presetFilter
+                    ? 'bg-navy-600 text-white border-navy-600'
+                    : 'bg-white dark:bg-navy-800 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-navy-600 hover:border-sage-400'
+                }`}
+              >
+                {locale === 'ja' ? 'すべて' : 'All'}
+              </button>
+              {CONCERNS.map(c => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setPresetFilter(presetFilter === c.id ? null : c.id)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${
+                    presetFilter === c.id
+                      ? 'bg-navy-600 text-white border-navy-600'
+                      : 'bg-white dark:bg-navy-800 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-navy-600 hover:border-sage-400'
+                  }`}
+                >
+                  <span>{c.icon}</span>
+                  <span>{locale === 'ja' ? c.ja : c.en}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Preset list */}
+            <div className="grid sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
+              {filteredPresets.map(p => {
+                const isApplied = appliedPresetId === p.id
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => applyPreset(p.id)}
+                    className={`text-left px-4 py-3 rounded-xl border transition-all ${
+                      isApplied
+                        ? 'bg-navy-50 dark:bg-navy-700 border-navy-300 dark:border-navy-500'
+                        : 'bg-white dark:bg-navy-800 border-gray-200 dark:border-navy-600 hover:border-sage-400 hover:bg-sage-50 dark:hover:bg-navy-700'
+                    }`}
+                  >
+                    <p className="text-sm font-medium text-gray-900 dark:text-white leading-snug mb-1.5">
+                      {locale === 'ja' ? p.title_ja : p.title_en}
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {p.concerns.map(cid => {
+                        const concern = CONCERNS.find(c => c.id === cid)
+                        return concern ? (
+                          <span key={cid} className="text-[10px] bg-sage-100 dark:bg-sage-900/40 text-sage-700 dark:text-sage-400 px-1.5 py-0.5 rounded-full">
+                            {concern.icon} {locale === 'ja' ? concern.ja : concern.en}
+                          </span>
+                        ) : null
+                      })}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            <p className="text-xs text-gray-400 dark:text-navy-400">
+              {locale === 'ja'
+                ? '選択後もタイトルやタグは自由に編集できます'
+                : 'You can freely edit the title and tags after selecting'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* ── Language Tabs ─────────────────────────────────── */}
       <div className="flex gap-1 p-1 bg-gray-100 dark:bg-navy-700 rounded-lg w-fit">
         <button
           onClick={() => setTab('ja')}
@@ -205,7 +300,7 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
         </button>
       </div>
 
-      {/* Category */}
+      {/* ── Category ─────────────────────────────────── */}
       <div className="space-y-2">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {locale === 'ja' ? 'カテゴリ' : 'Category'}
@@ -231,27 +326,14 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
         )}
       </div>
 
-      {/* Concerns */}
+      {/* ── Concern tags ─────────────────────────────────── */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            {locale === 'ja' ? 'お悩みタグ' : 'Concern tags'}
-            <span className="text-xs text-gray-400 dark:text-navy-400 ml-2">
-              {locale === 'ja' ? '当てはまるものを選択（複数可）' : 'Select all that apply'}
-            </span>
-          </label>
-          <button
-            type="button"
-            onClick={suggestConcerns}
-            disabled={suggesting || (!form.title_ja && !form.title_en)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-sage-50 dark:bg-sage-900/30 text-sage-700 dark:text-sage-400 border border-sage-200 dark:border-sage-800 hover:bg-sage-100 dark:hover:bg-sage-900/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            {suggesting
-              ? (locale === 'ja' ? 'AI判定中...' : 'Analyzing...')
-              : (locale === 'ja' ? 'AI自動判定' : 'Auto-detect')}
-          </button>
-        </div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          {locale === 'ja' ? 'お悩みタグ' : 'Concern tags'}
+          <span className="text-xs text-gray-400 dark:text-navy-400 ml-2">
+            {locale === 'ja' ? '複数選択可・公開前に確認してください' : 'Multiple allowed · review before publishing'}
+          </span>
+        </label>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
           {CONCERNS.map(c => {
             const selected = form.concerns.includes(c.id)
@@ -262,7 +344,7 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
                 onClick={() => toggleConcern(c.id)}
                 className={`flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl border text-center transition-all duration-150 text-xs ${
                   selected
-                    ? 'bg-navy-600 border-navy-600 text-white shadow-sm'
+                    ? 'bg-navy-600 border-navy-600 text-white shadow-sm ring-2 ring-navy-300 dark:ring-navy-500'
                     : 'bg-white dark:bg-navy-800 border-gray-200 dark:border-navy-600 text-gray-600 dark:text-gray-300 hover:border-sage-400 hover:bg-sage-50 dark:hover:bg-navy-700'
                 }`}
               >
@@ -272,9 +354,16 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
             )
           })}
         </div>
+        {form.concerns.length > 0 && (
+          <p className="text-xs text-sage-600 dark:text-sage-400">
+            {locale === 'ja'
+              ? `${form.concerns.length}件のお悩みタグが設定されています`
+              : `${form.concerns.length} concern tag${form.concerns.length > 1 ? 's' : ''} selected`}
+          </p>
+        )}
       </div>
 
-      {/* Title */}
+      {/* ── Title ─────────────────────────────────── */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {tab === 'ja' ? 'タイトル（日本語）' : 'Title (English)'}
@@ -292,7 +381,7 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
         />
       </div>
 
-      {/* Subtitle */}
+      {/* ── Subtitle ─────────────────────────────────── */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {tab === 'ja' ? 'サブタイトル（日本語）' : 'Subtitle (English)'}
@@ -312,7 +401,7 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
         />
       </div>
 
-      {/* Images */}
+      {/* ── Images ─────────────────────────────────── */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {locale === 'ja' ? '画像（最大3枚）' : 'Images (up to 3)'}
@@ -328,7 +417,6 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
             const isUploading = uploading === i
             return (
               <div key={i} className="relative">
-                {/* Hidden file input */}
                 <input
                   ref={fileInputRefs[i]}
                   type="file"
@@ -336,13 +424,10 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
                   className="hidden"
                   onChange={e => handleImageUpload(e, i)}
                 />
-
                 {url ? (
-                  /* Image preview */
                   <div className="relative aspect-square rounded-xl overflow-hidden border border-gray-200 dark:border-navy-600 group">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={url} alt="" className="w-full h-full object-cover" />
-                    {/* Overlay on hover */}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                       <button
                         type="button"
@@ -368,7 +453,6 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
                     )}
                   </div>
                 ) : (
-                  /* Upload slot */
                   <button
                     type="button"
                     onClick={() => fileInputRefs[i].current?.click()}
@@ -395,7 +479,7 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
         </div>
       </div>
 
-      {/* Content */}
+      {/* ── Content ─────────────────────────────────── */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           {tab === 'ja' ? '本文（日本語）' : 'Content (English)'}
@@ -418,7 +502,7 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
         </p>
       )}
 
-      {/* Actions */}
+      {/* ── Actions ─────────────────────────────────── */}
       <div className="flex items-center gap-3 pt-2">
         <Button
           onClick={() => handleSubmit(true)}
