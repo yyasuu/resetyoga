@@ -15,11 +15,14 @@ const InstructorOnboardingSchema = z.object({
   yearsExperience:   z.number().int().min(0).max(60).default(1),
   certifications:    z.array(z.string().max(100)).max(20).default([]),
   careerHistory:     z.string().max(3000).optional().nullable(),
-  instagramUrl:      z.string().max(200).regex(URL_PATTERN, 'Must be an Instagram URL').optional().nullable().or(z.literal('')),
-  youtubeUrl:        z.string().max(200).regex(URL_PATTERN, 'Must be a YouTube URL').optional().nullable().or(z.literal('')),
+  // URL validation: accept any http/https URL or empty string (removed strict domain check)
+  instagramUrl:      z.string().max(200).optional().nullable().or(z.literal('')),
+  youtubeUrl:        z.string().max(200).optional().nullable().or(z.literal('')),
   bankCountry:       z.string().max(50).optional().nullable(),
   bankName:          z.string().max(100).optional().nullable(),
-  swiftCode:         z.string().max(11).regex(/^[A-Z0-9]{8,11}$/).optional().nullable().or(z.literal('')),
+  // SWIFT: 8–11 uppercase alphanumeric, or empty/null (lenient: skip validation if blank)
+  swiftCode:         z.string().max(11).optional().nullable().or(z.literal('')),
+  ifscCode:          z.string().max(11).optional().nullable().or(z.literal('')),
   accountNumber:     z.string().max(50).optional().nullable(),
   accountHolderName: z.string().max(100).optional().nullable(),
 })
@@ -52,7 +55,7 @@ export async function POST(request: NextRequest) {
     const {
       tagline, bio, yogaStyles, languages, yearsExperience,
       certifications, careerHistory, instagramUrl, youtubeUrl,
-      bankCountry, bankName, swiftCode, accountNumber, accountHolderName,
+      bankCountry, bankName, swiftCode, ifscCode, accountNumber, accountHolderName,
     } = parsed.data
 
     const adminSupabase = await createAdminClient()
@@ -91,6 +94,7 @@ export async function POST(request: NextRequest) {
           bank_country: bankCountry || 'Japan',
           bank_name: bankName || null,
           swift_code: swiftCode || null,
+          ifsc_code: ifscCode || null,
           account_number: accountNumber || null,
           account_holder_name: accountHolderName || null,
         }, { onConflict: 'id' })

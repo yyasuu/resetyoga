@@ -124,6 +124,7 @@ function OnboardingForm() {
   const [bankCountry, setBankCountry] = useState('Japan')
   const [bankName, setBankName] = useState('')
   const [swiftCode, setSwiftCode] = useState('')
+  const [ifscCode, setIfscCode] = useState('')
   const [accountNumber, setAccountNumber] = useState('')
   const [accountHolderName, setAccountHolderName] = useState('')
 
@@ -159,91 +160,104 @@ function OnboardingForm() {
 
   const handleSubmit = async () => {
     setLoading(true)
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) {
-      router.push('/login')
-      return
-    }
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) {
+        router.push('/login')
+        return
+      }
 
-    // Upload avatar if selected
-    let avatarUrl: string | null = null
-    if (avatarFile) {
-      const ext = avatarFile.name.split('.').pop()
-      const path = `${user.id}/avatar.${ext}`
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(path, avatarFile, { upsert: true })
-      if (uploadError) {
-        console.error('Avatar upload error:', uploadError)
-        toast.error('Photo upload failed: ' + uploadError.message)
+      // Upload avatar if selected
+      let avatarUrl: string | null = null
+      if (avatarFile) {
+        const ext = avatarFile.name.split('.').pop()
+        const path = `${user.id}/avatar.${ext}`
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(path, avatarFile, { upsert: true })
+        if (uploadError) {
+          console.error('Avatar upload error:', uploadError)
+          toast.error('Photo upload failed: ' + uploadError.message)
+        } else {
+          const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
+          avatarUrl = urlData.publicUrl
+        }
+      }
+
+      // Update profiles
+      const profileUpdate: Record<string, unknown> = { role, timezone }
+      if (fullName) profileUpdate.full_name = fullName
+      if (avatarUrl) profileUpdate.avatar_url = avatarUrl
+
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update(profileUpdate)
+        .eq('id', user.id)
+
+      if (profileError) {
+        toast.error(t('error_profile') + ': ' + profileError.message)
+        setLoading(false)
+        return
+      }
+
+      if (role === 'instructor') {
+        // Use server API route (admin client) to bypass RLS and handle new columns safely
+        const res = await fetch('/api/onboarding/instructor', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            tagline,
+            bio,
+            yogaStyles,
+            languages,
+            yearsExperience,
+            certifications,
+            careerHistory,
+            instagramUrl,
+            youtubeUrl,
+            bankCountry,
+            bankName,
+            swiftCode,
+            ifscCode,
+            accountNumber,
+            accountHolderName,
+          }),
+        })
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          console.error('[onboarding] instructor API error:', data)
+          // Show specific validation errors if available
+          const fieldErrors = data?.details?.fieldErrors
+          if (fieldErrors) {
+            const fields = Object.keys(fieldErrors).join(', ')
+            toast.error(`入力内容を確認してください: ${fields}`)
+          } else {
+            toast.error((data?.error || t('error_instructor')) + ' — Please check your input and try again.')
+          }
+          setLoading(false)
+          return
+        }
+
+        setDone(true)
       } else {
-        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
-        avatarUrl = urlData.publicUrl
+        const res = await fetch('/api/onboarding/student', { method: 'POST' })
+        if (!res.ok) {
+          toast.error(t('error_init'))
+          setLoading(false)
+          return
+        }
+        router.push('/dashboard')
+        router.refresh()
       }
-    }
-
-    // Update profiles
-    const profileUpdate: Record<string, unknown> = { role, timezone }
-    if (fullName) profileUpdate.full_name = fullName
-    if (avatarUrl) profileUpdate.avatar_url = avatarUrl
-
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .update(profileUpdate)
-      .eq('id', user.id)
-
-    if (profileError) {
-      toast.error(t('error_profile'))
+    } catch (err: any) {
+      console.error('[onboarding] unexpected error:', err)
+      toast.error('予期しないエラーが発生しました。もう一度お試しください。 / An unexpected error occurred. Please try again.')
+    } finally {
       setLoading(false)
-      return
     }
-
-    if (role === 'instructor') {
-      // Use server API route (admin client) to bypass RLS and handle new columns safely
-      const res = await fetch('/api/onboarding/instructor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tagline,
-          bio,
-          yogaStyles,
-          languages,
-          yearsExperience,
-          certifications,
-          careerHistory,
-          instagramUrl,
-          youtubeUrl,
-          bankCountry,
-          bankName,
-          swiftCode,
-          accountNumber,
-          accountHolderName,
-        }),
-      })
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        console.error('[onboarding] instructor API error:', data)
-        toast.error(t('error_instructor'))
-        setLoading(false)
-        return
-      }
-
-      setDone(true)
-    } else {
-      const res = await fetch('/api/onboarding/student', { method: 'POST' })
-      if (!res.ok) {
-        toast.error(t('error_init'))
-        setLoading(false)
-        return
-      }
-      router.push('/dashboard')
-      router.refresh()
-    }
-
-    setLoading(false)
   }
 
   // ── Complete screen ─────────────────────────────────────────────────────────
@@ -685,6 +699,24 @@ function OnboardingForm() {
                   className="mt-1"
                 />
               </div>
+
+              {bankCountry === 'India' && (
+                <div>
+                  <Label className="dark:text-navy-200">
+                    IFSC Code
+                    <span className="text-gray-400 dark:text-navy-500 text-xs font-normal ml-1">
+                      (Indian Financial System Code · 11 characters)
+                    </span>
+                  </Label>
+                  <Input
+                    value={ifscCode}
+                    onChange={(e) => setIfscCode(e.target.value.toUpperCase())}
+                    placeholder="e.g. SBIN0001234"
+                    maxLength={11}
+                    className="mt-1 font-mono tracking-wide"
+                  />
+                </div>
+              )}
 
               <div>
                 <Label className="dark:text-navy-200">{t('account_number')}</Label>
