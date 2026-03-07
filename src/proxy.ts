@@ -9,6 +9,7 @@ const publicPaths = [
   '/forgot-password',
   '/onboarding',
   '/instructors',
+  '/wellness',
   '/auth',
   '/api',
   '/jp',

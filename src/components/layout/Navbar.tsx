@@ -145,15 +145,21 @@ export function Navbar({ user }: NavbarProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="z-[200] w-48 dark:bg-navy-800 dark:border-navy-700">
-                    <DropdownMenuItem asChild className="dark:text-gray-200 dark:hover:bg-navy-700">
-                      <Link href={getDashboardLink()}>{t('dashboard')}</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="dark:text-gray-200 dark:hover:bg-navy-700">
-                      <Link href={getWellnessLink()}>Wellness Library</Link>
+                    <DropdownMenuItem
+                      onSelect={() => router.push(getDashboardLink())}
+                      className="dark:text-gray-200 dark:hover:bg-navy-700 cursor-pointer"
+                    >
+                      {t('dashboard')}
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={handleLogout}
-                      className="text-red-600 dark:text-red-400"
+                      onSelect={() => router.push(getWellnessLink())}
+                      className="dark:text-gray-200 dark:hover:bg-navy-700 cursor-pointer"
+                    >
+                      Wellness Library
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={handleLogout}
+                      className="text-red-600 dark:text-red-400 cursor-pointer"
                     >
                       {t('logout')}
                     </DropdownMenuItem>
