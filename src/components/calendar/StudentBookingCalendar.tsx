@@ -25,11 +25,13 @@ import { Video, AlertCircle } from 'lucide-react'
 interface StudentBookingCalendarProps {
   instructorId: string
   instructorName: string
+  studentTimezone?: string
 }
 
 export function StudentBookingCalendar({
   instructorId,
   instructorName,
+  studentTimezone = 'local',
 }: StudentBookingCalendarProps) {
   const t = useTranslations('instructors')
   const tBook = useTranslations('booking')
@@ -213,14 +215,20 @@ export function StudentBookingCalendar({
       )}
 
       <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <div className="mb-3 flex items-center gap-2 text-sm text-gray-600">
-          <div className="w-4 h-4 rounded bg-green-500" />
+        <div className="mb-3 flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+          <div className="w-4 h-4 rounded bg-green-500 flex-shrink-0" />
           <span>Available 45-min slot — click to book</span>
+          {studentTimezone !== 'local' && (
+            <span className="ml-auto flex items-center gap-1.5 text-xs text-navy-600 bg-navy-50 border border-navy-200 rounded-full px-3 py-1">
+              🌏 {studentTimezone}
+            </span>
+          )}
         </div>
 
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView="timeGridWeek"
+          timeZone={studentTimezone}
           headerToolbar={{
             left: 'prev,next today',
             center: 'title',

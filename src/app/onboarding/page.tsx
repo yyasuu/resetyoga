@@ -19,9 +19,10 @@ import { YOGA_STYLES, LANGUAGES, TIMEZONES } from '@/types'
 import {
   GraduationCap, BookOpen, CheckCircle, Camera, Plus, X,
   ChevronLeft, ChevronRight, Instagram, Youtube, Landmark,
-  HelpCircle, Info, AlertCircle, BookMarked,
+  HelpCircle, Info, AlertCircle, BookMarked, Loader2,
 } from 'lucide-react'
 import Image from 'next/image'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 // ─────────────────────────────────────────────────────────────
 // Tooltip — hover/focus to show helper text
@@ -322,6 +323,8 @@ function OnboardingForm() {
   const [instagramUrl, setInstagramUrl] = useState('')
   const [youtubeUrl, setYoutubeUrl] = useState('')
 
+  const [stripeConnecting, setStripeConnecting] = useState(false)
+
   // Step 5
   const [bankCountry, setBankCountry] = useState('Japan')
   const [bankName, setBankName] = useState('')
@@ -341,6 +344,23 @@ function OnboardingForm() {
     if (v && !certifications.includes(v)) {
       setCertifications([...certifications, v])
       setCertInput('')
+    }
+  }
+
+  const handleStripeConnect = async () => {
+    setStripeConnecting(true)
+    try {
+      const res = await fetch('/api/instructor/stripe-connect', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data.error ?? 'Stripe Connect failed. Please try from your dashboard after approval.')
+        setStripeConnecting(false)
+      }
+    } catch {
+      toast.error('Connection error. Please try again.')
+      setStripeConnecting(false)
     }
   }
 
@@ -372,6 +392,23 @@ function OnboardingForm() {
     if (s === 3) {
       if (yogaStyles.length === 0) errs.yogaStyles = 'Select at least one style / 1つ以上選択してください'
       if (languages.length === 0) errs.languages = 'Select at least one language / 1つ以上選択してください'
+    }
+    if (s === 5) {
+      const bankPartiallyFilled = bankName || swiftCode || accountNumber || accountHolderName
+      if (bankPartiallyFilled) {
+        if (swiftCode && swiftCode.length !== 8 && swiftCode.length !== 11) {
+          errs.swiftCode = 'SWIFT code must be 8 or 11 characters / SWIFTコードは8〜11文字'
+        }
+        if (bankCountry === 'India' && ifscCode && ifscCode.length !== 11) {
+          errs.ifscCode = 'IFSC code must be exactly 11 characters / IFSCコードは11文字'
+        }
+        if (accountNumber && !accountHolderName.trim()) {
+          errs.accountHolderName = 'Account holder name required / 口座名義人を入力してください'
+        }
+        if (accountHolderName.trim() && !accountNumber) {
+          errs.accountNumber = 'Account number required / 口座番号を入力してください'
+        }
+      }
     }
     setErrors(errs)
     return Object.keys(errs).length === 0
@@ -487,6 +524,11 @@ function OnboardingForm() {
         />
       )}
 
+      {/* Theme toggle */}
+      <div className="fixed top-4 right-4 z-40 bg-white/80 dark:bg-navy-800/80 backdrop-blur rounded-full shadow">
+        <ThemeToggle />
+      </div>
+
       {/* Floating guide button (instructor only) */}
       {role === 'instructor' && step > 1 && (
         <button
@@ -574,7 +616,7 @@ function OnboardingForm() {
             )}
 
             <Button
-              className="w-full bg-navy-600 hover:bg-navy-700 rounded-full"
+              className="w-full bg-navy-600 hover:bg-navy-700 text-white rounded-full"
               onClick={() => { setTermsAgreed(false); setStep(2) }}
               disabled={loading}
             >
@@ -616,7 +658,7 @@ function OnboardingForm() {
               <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(1)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full" onClick={handleSubmit} disabled={!termsAgreed || loading}>
+              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 text-white rounded-full" onClick={handleSubmit} disabled={!termsAgreed || loading}>
                 {loading ? 'Setting up...' : 'Start My Trial 🎉'}
               </Button>
             </div>
@@ -676,7 +718,7 @@ function OnboardingForm() {
               <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(1)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full" onClick={() => goNext(2)}>
+              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 text-white rounded-full" onClick={() => goNext(2)}>
                 Next: Specialty <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -785,7 +827,7 @@ function OnboardingForm() {
               <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(2)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full" onClick={() => goNext(3)}>
+              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 text-white rounded-full" onClick={() => goNext(3)}>
                 Next: Experience <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -913,7 +955,7 @@ function OnboardingForm() {
               <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(3)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full" onClick={() => goNext(4)}>
+              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 text-white rounded-full" onClick={() => goNext(4)}>
                 Next: Payout <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -932,16 +974,27 @@ function OnboardingForm() {
               <br /><span className="text-xs text-gray-400">後でダッシュボードから設定することもできます。</span>
             </p>
 
-            {/* Stripe recommended banner */}
-            <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4 mb-4">
+            {/* Stripe recommended banner — clickable */}
+            <button
+              type="button"
+              onClick={handleStripeConnect}
+              disabled={stripeConnecting}
+              className="w-full text-left bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4 mb-4 hover:bg-indigo-100 dark:hover:bg-indigo-800/40 transition-colors disabled:opacity-70"
+            >
               <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200 mb-1 flex items-center gap-1">
                 ⚡ Stripe Connect — Recommended / 推奨
+                {stripeConnecting
+                  ? <Loader2 className="h-3.5 w-3.5 ml-auto animate-spin text-indigo-600 dark:text-indigo-400" />
+                  : <ChevronRight className="h-3.5 w-3.5 ml-auto text-indigo-500 dark:text-indigo-400" />
+                }
               </p>
               <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">
-                After approval, connect your Stripe account from the dashboard for <strong>automatic monthly payouts in USD</strong>. Supported in 40+ countries including India, Japan, US, UK, and more.
-                <br /><span className="text-indigo-500 dark:text-indigo-400">承認後ダッシュボードでStripe設定 → USD自動支払い。インド・日本・米国・英国など40カ国以上対応。</span>
+                {stripeConnecting
+                  ? 'Redirecting to Stripe… / Stripeへ移動中…'
+                  : <><strong>Click here</strong> to connect your Stripe account for automatic monthly payouts in USD. Supported in 40+ countries including India, Japan, US, UK, and more.<br /><span className="text-indigo-500 dark:text-indigo-400">ここをクリックしてStripe Connect設定 → USD自動支払い。インド・日本・米国・英国など40カ国以上対応。</span></>
+                }
               </p>
-            </div>
+            </button>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-3 mb-5 text-xs text-blue-700 dark:text-blue-300">
               Bank details below are for <strong>manual transfer only</strong> (used if Stripe is not set up). All fields are optional.
@@ -974,58 +1027,74 @@ function OnboardingForm() {
                   placeholder={bankCountry === 'India' ? 'e.g. State Bank of India, HDFC Bank' : 'e.g. Mizuho Bank, HSBC'} className="mt-1" />
               </div>
 
-              <div>
+              <div data-error={!!errors.swiftCode || undefined}>
                 <FieldLabel
                   label="SWIFT / BIC Code"
                   htmlFor="swift"
+                  error={errors.swiftCode}
                   tooltip="8 or 11-character international bank identifier code. Found on your bank's website, mobile app, or bank statement. Examples: 'SBININBB' (SBI India), 'HDFCINBB' (HDFC India), 'MHCBJPJT' (Mizuho Japan). Leave blank if unsure."
                 />
                 <Input id="swift" value={swiftCode}
-                  onChange={e => setSwiftCode(e.target.value.toUpperCase())}
+                  onChange={e => { setSwiftCode(e.target.value.toUpperCase()); clearError('swiftCode') }}
                   placeholder={bankCountry === 'India' ? 'e.g. SBININBB or HDFCINBB' : 'e.g. MHCBJPJT'}
-                  className="mt-1 font-mono tracking-wide" maxLength={11} />
-                <p className="text-xs text-gray-400 dark:text-navy-500 mt-1">8 or 11 characters · 8〜11文字</p>
+                  className={`mt-1 font-mono tracking-wide ${errors.swiftCode ? 'border-red-400 focus:ring-red-300 bg-red-50 dark:bg-red-900/10' : ''}`} maxLength={11} />
+                {errors.swiftCode
+                  ? <p className="flex items-center gap-1 text-red-500 text-xs mt-1"><AlertCircle className="h-3.5 w-3.5" /> {errors.swiftCode}</p>
+                  : <p className="text-xs text-gray-400 dark:text-navy-500 mt-1">8 or 11 characters · 8〜11文字</p>
+                }
               </div>
 
               {bankCountry === 'India' && (
                 <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-xl p-4">
-                  <FieldLabel
-                    label="IFSC Code (India only)"
-                    htmlFor="ifsc"
-                    tooltip="Indian Financial System Code — 11 characters identifying your specific bank branch. Found on your cheque book, passbook, or online banking portal. Format: First 4 letters = Bank code, 5th = 0, Last 6 = Branch code. e.g. 'SBIN0001234' (SBI), 'HDFC0001234' (HDFC)"
-                  />
-                  <Input id="ifsc" value={ifscCode}
-                    onChange={e => setIfscCode(e.target.value.toUpperCase())}
-                    placeholder="e.g. SBIN0001234 or HDFC0001234"
-                    maxLength={11} className="mt-1 font-mono tracking-widest" />
-                  <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                    11 characters · Found on cheque book or net banking · 通帳またはネットバンキングで確認
-                  </p>
+                  <div data-error={!!errors.ifscCode || undefined}>
+                    <FieldLabel
+                      label="IFSC Code (India only)"
+                      htmlFor="ifsc"
+                      error={errors.ifscCode}
+                      tooltip="Indian Financial System Code — 11 characters identifying your specific bank branch. Found on your cheque book, passbook, or online banking portal. Format: First 4 letters = Bank code, 5th = 0, Last 6 = Branch code. e.g. 'SBIN0001234' (SBI), 'HDFC0001234' (HDFC)"
+                    />
+                    <Input id="ifsc" value={ifscCode}
+                      onChange={e => { setIfscCode(e.target.value.toUpperCase()); clearError('ifscCode') }}
+                      placeholder="e.g. SBIN0001234 or HDFC0001234"
+                      maxLength={11} className={`mt-1 font-mono tracking-widest ${errors.ifscCode ? 'border-red-400 focus:ring-red-300 bg-red-50 dark:bg-red-900/10' : ''}`} />
+                    {errors.ifscCode
+                      ? <p className="flex items-center gap-1 text-red-500 text-xs mt-1"><AlertCircle className="h-3.5 w-3.5" /> {errors.ifscCode}</p>
+                      : <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">11 characters · Found on cheque book or net banking · 通帳またはネットバンキングで確認</p>
+                    }
+                  </div>
                 </div>
               )}
 
-              <div>
+              <div data-error={!!errors.accountNumber || undefined}>
                 <FieldLabel
                   label="Account Number / 口座番号"
                   htmlFor="accountNum"
+                  error={errors.accountNumber}
                   tooltip="Your bank account number. Enter digits only, no spaces or dashes. For Indian banks, this is typically 11-16 digits."
                 />
                 <Input id="accountNum" value={accountNumber}
-                  onChange={e => setAccountNumber(e.target.value)}
+                  onChange={e => { setAccountNumber(e.target.value); clearError('accountNumber') }}
                   placeholder={bankCountry === 'India' ? 'e.g. 12345678901 (11–16 digits)' : 'e.g. 1234567890'}
-                  className="mt-1 font-mono tracking-wide" />
+                  className={`mt-1 font-mono tracking-wide ${errors.accountNumber ? 'border-red-400 focus:ring-red-300 bg-red-50 dark:bg-red-900/10' : ''}`} />
+                {errors.accountNumber && (
+                  <p className="flex items-center gap-1 text-red-500 text-xs mt-1"><AlertCircle className="h-3.5 w-3.5" /> {errors.accountNumber}</p>
+                )}
               </div>
 
-              <div>
+              <div data-error={!!errors.accountHolderName || undefined}>
                 <FieldLabel
                   label="Account Holder Name / 口座名義人"
                   htmlFor="holderName"
+                  error={errors.accountHolderName}
                   tooltip="Full name exactly as it appears on your bank account. This must match your bank records. e.g. 'PRIYA SHARMA' or 'TANAKA YUKI'"
                 />
                 <Input id="holderName" value={accountHolderName}
-                  onChange={e => setAccountHolderName(e.target.value)}
+                  onChange={e => { setAccountHolderName(e.target.value); clearError('accountHolderName') }}
                   placeholder="e.g. PRIYA SHARMA (as on bank account)"
-                  className="mt-1 uppercase" />
+                  className={`mt-1 uppercase ${errors.accountHolderName ? 'border-red-400 focus:ring-red-300 bg-red-50 dark:bg-red-900/10' : ''}`} />
+                {errors.accountHolderName && (
+                  <p className="flex items-center gap-1 text-red-500 text-xs mt-1"><AlertCircle className="h-3.5 w-3.5" /> {errors.accountHolderName}</p>
+                )}
               </div>
             </div>
 
@@ -1033,12 +1102,12 @@ function OnboardingForm() {
               <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(4)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 rounded-full" onClick={() => { setTermsAgreed(false); setStep(6) }}>
+              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 text-white rounded-full" onClick={() => { setTermsAgreed(false); goNext(5) }}>
                 Next: Terms <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
             <button type="button" className="w-full text-sm text-gray-400 dark:text-navy-400 hover:text-gray-600 mt-3"
-              onClick={() => { setTermsAgreed(false); setStep(6) }}>
+              onClick={() => { setErrors({}); setTermsAgreed(false); setStep(6) }}>
               Skip for now — set up payout later / スキップして後で設定
             </button>
           </>

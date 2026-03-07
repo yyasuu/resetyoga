@@ -21,9 +21,10 @@ import { addMinutes, format } from 'date-fns'
 
 interface InstructorCalendarProps {
   instructorId: string
+  timezone?: string
 }
 
-export function InstructorCalendar({ instructorId }: InstructorCalendarProps) {
+export function InstructorCalendar({ instructorId, timezone = 'local' }: InstructorCalendarProps) {
   const t = useTranslations('instructor')
   const supabase = createClient()
   const calendarRef = useRef<FullCalendar>(null)
@@ -146,12 +147,18 @@ export function InstructorCalendar({ instructorId }: InstructorCalendarProps) {
           <div className="w-4 h-4 rounded border-2 border-dashed border-gray-300" />
           <span className="text-gray-600">Click empty time to add 45-min slot</span>
         </div>
+        {timezone !== 'local' && (
+          <div className="ml-auto flex items-center gap-1.5 text-xs text-navy-600 bg-navy-50 border border-navy-200 rounded-full px-3 py-1">
+            🌏 {timezone}
+          </div>
+        )}
       </div>
 
       <FullCalendar
         ref={calendarRef}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         initialView="timeGridWeek"
+        timeZone={timezone}
         headerToolbar={{
           left: 'prev,next today',
           center: 'title',
