@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
 import { Suspense } from 'react'
+import { MailCheck } from 'lucide-react'
 
 function RegisterForm() {
   const t = useTranslations('auth')
@@ -23,17 +24,19 @@ function RegisterForm() {
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [loading, setLoading] = useState(false)
+  const [registered, setRegistered] = useState(false)
+  const [registeredEmail, setRegisteredEmail] = useState('')
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?role=${defaultRole}`,
       },
     })
 
@@ -43,7 +46,16 @@ function RegisterForm() {
       return
     }
 
-    // Redirect to onboarding with the chosen role
+    if (!data.session) {
+      // Email confirmation required — show check-email screen to prevent
+      // repeated signUp calls that trigger Supabase rate limits
+      setRegisteredEmail(email)
+      setRegistered(true)
+      setLoading(false)
+      return
+    }
+
+    // No email confirmation (instant session) — go straight to onboarding
     router.push(`/onboarding?role=${defaultRole}`)
     router.refresh()
     setLoading(false)
@@ -56,6 +68,28 @@ function RegisterForm() {
         redirectTo: `${window.location.origin}/auth/callback?role=${defaultRole}`,
       },
     })
+  }
+
+  if (registered) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-linen-200 via-sage-50 to-navy-50 dark:from-navy-900 dark:via-navy-800 dark:to-navy-900 flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-navy-800 rounded-2xl shadow-lg p-8 w-full max-w-md text-center">
+          <MailCheck className="h-14 w-14 text-sage-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            {t('register_check_email_title')}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 mb-2">
+            {t('register_check_email_desc', { email: registeredEmail })}
+          </p>
+          <p className="text-sm text-gray-400 dark:text-gray-500 mb-6">
+            {t('register_check_email_note')}
+          </p>
+          <Link href="/login" className="text-navy-600 dark:text-sage-400 font-medium hover:underline text-sm">
+            {t('have_account')} {t('sign_in')}
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (

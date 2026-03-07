@@ -154,7 +154,11 @@
     "reset_step_3": "Set your new password on the page that opens",
     "reset_step_4": "Sign in with your new password",
     "reset_spam_note": "Can't find the email? Check your Spam or Junk folder. Hotmail / Outlook users: also check Focused vs Other inbox.",
-    "reset_resend": "Resend the email"
+    "reset_resend": "Resend the email",
+    "register_check_email_title": "Check your email",
+    "register_check_email_desc": "We sent a confirmation link to {email}. Click the link in the email to activate your account.",
+    "register_check_email_note": "Didn't receive it? Check your spam folder, or use Google Sign-In instead.",
+    "login_error_not_confirmed": "Your email address hasn't been confirmed yet. Check your inbox for the confirmation link, or reset your password below (this also confirms your email)."
   },
   "onboarding": {
     "title": "Tell us about yourself",

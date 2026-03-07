@@ -154,7 +154,11 @@
     "reset_step_3": "表示されたページで新しいパスワードを設定",
     "reset_step_4": "新しいパスワードでサインイン",
     "reset_spam_note": "メールが届かない場合は、迷惑メールフォルダをご確認ください。Hotmail / Outlook をお使いの方は「フォーカス済み」と「その他」両方のフォルダを確認してください。",
-    "reset_resend": "メールを再送する"
+    "reset_resend": "メールを再送する",
+    "register_check_email_title": "メールを確認してください",
+    "register_check_email_desc": "{email} に確認リンクを送信しました。メール内のリンクをクリックしてアカウントを有効化してください。",
+    "register_check_email_note": "届いていない場合は迷惑メールフォルダを確認するか、Googleでサインインをお試しください。",
+    "login_error_not_confirmed": "メールアドレスの確認がまだ完了していません。受信トレイの確認リンクをクリックするか、以下からパスワードを再設定してください（再設定でメール確認も完了します）。"
   },
   "onboarding": {
     "title": "あなたについて教えてください",

@@ -59,8 +59,8 @@ function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  // 'none' | 'password'
-  const [loginError, setLoginError] = useState<'none' | 'password'>('none')
+  // 'none' | 'password' | 'not_confirmed'
+  const [loginError, setLoginError] = useState<'none' | 'password' | 'not_confirmed'>('none')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,7 +70,10 @@ function LoginForm() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     if (error) {
-      setLoginError('password')
+      const isNotConfirmed =
+        error.message?.toLowerCase().includes('email not confirmed') ||
+        (error as any).code === 'email_not_confirmed'
+      setLoginError(isNotConfirmed ? 'not_confirmed' : 'password')
       setLoading(false)
       return
     }
@@ -167,6 +170,26 @@ function LoginForm() {
                     {t('reset_password_link')}
                   </Link>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Email-not-confirmed banner */}
+        {loginError === 'not_confirmed' && (
+          <div className="mb-5 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="space-y-2 text-sm">
+                <p className="text-blue-800 dark:text-blue-200">
+                  {t('login_error_not_confirmed')}
+                </p>
+                <Link
+                  href={`/forgot-password${email ? `?email=${encodeURIComponent(email)}` : ''}`}
+                  className="inline-block mt-1 font-semibold text-navy-700 dark:text-sage-400 underline underline-offset-2 hover:opacity-80"
+                >
+                  {t('reset_password_link')}
+                </Link>
               </div>
             </div>
           </div>
