@@ -41,9 +41,30 @@ export async function POST(request: Request) {
 
   const body = await request.json()
   const admin = await createAdminClient()
+
+  // Explicitly whitelist fields to avoid schema-cache errors when a column
+  // hasn't been applied yet; safe to include is_premium once migration runs.
+  const payload: Record<string, unknown> = {
+    author_id: auth.user.id,
+    title_ja:       body.title_ja,
+    title_en:       body.title_en,
+    subtitle_ja:    body.subtitle_ja,
+    subtitle_en:    body.subtitle_en,
+    content_ja:     body.content_ja,
+    content_en:     body.content_en,
+    category:       body.category,
+    cover_image_url: body.cover_image_url,
+    image_urls:     body.image_urls,
+    concerns:       body.concerns,
+    movement_type:  body.movement_type,
+    difficulty_level: body.difficulty_level,
+    is_published:   body.is_published ?? false,
+  }
+  if (body.is_premium !== undefined) payload.is_premium = body.is_premium
+
   const { data, error } = await admin
     .from('wellness_articles')
-    .insert({ ...body, author_id: auth.user.id })
+    .insert(payload)
     .select()
     .single()
 
