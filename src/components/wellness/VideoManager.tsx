@@ -80,11 +80,15 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  // File upload state
+  // Video file upload state
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploading, setUploading] = useState(false)
+
+  // Thumbnail upload state
+  const thumbnailInputRef = useRef<HTMLInputElement>(null)
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false)
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -214,6 +218,26 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
     if (!confirm('この動画を削除しますか？')) return
     setVideos(videos.filter(v => v.id !== id))
     await fetch(`/api/wellness/videos/${id}`, { method: 'DELETE' })
+  }
+
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingThumbnail(true)
+    setError('')
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/wellness/upload-image', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error)
+      setForm(f => ({ ...f, thumbnail_url: json.url }))
+    } catch (err: any) {
+      setError(err.message || 'サムネイルのアップロードに失敗しました')
+    } finally {
+      setUploadingThumbnail(false)
+      if (thumbnailInputRef.current) thumbnailInputRef.current.value = ''
+    }
   }
 
   const toggleMovementType = (val: string) => {
@@ -454,15 +478,48 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
             )}
           </div>
 
-          {/* Thumbnail URL */}
+          {/* Thumbnail upload */}
           <div>
-            <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">サムネイルURL（任意）</label>
+            <label className="block text-xs text-gray-500 dark:text-navy-300 mb-2">サムネイル画像（任意）</label>
             <input
-              value={form.thumbnail_url}
-              onChange={e => setForm({ ...form, thumbnail_url: e.target.value })}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
-              placeholder="https://..."
+              ref={thumbnailInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleThumbnailUpload}
             />
+            {form.thumbnail_url ? (
+              <div className="relative w-40 h-24 rounded-lg overflow-hidden border border-gray-200 dark:border-navy-600 group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={form.thumbnail_url} alt="thumbnail" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => thumbnailInputRef.current?.click()}
+                    className="text-[10px] bg-white/90 text-gray-800 px-2 py-1 rounded font-medium"
+                  >
+                    変更
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, thumbnail_url: '' }))}
+                    className="text-[10px] bg-red-500 text-white px-2 py-1 rounded font-medium"
+                  >
+                    削除
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => thumbnailInputRef.current?.click()}
+                disabled={uploadingThumbnail}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 border-dashed border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 hover:border-sage-400 transition-colors text-sm text-gray-500 dark:text-navy-300 disabled:opacity-50"
+              >
+                <Upload className="h-4 w-4" />
+                {uploadingThumbnail ? 'アップロード中...' : '画像をアップロード（JPG / PNG · 5MBまで）'}
+              </button>
+            )}
           </div>
 
           {/* Descriptions */}
