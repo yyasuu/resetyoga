@@ -4,7 +4,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Library, ArrowRight } from 'lucide-react'
 
 function getEmbedUrl(url: string): string | null {
   const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)
@@ -86,10 +86,46 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
         </div>
 
         {description && (
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-base">
+          <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-base mb-12">
             {description}
           </p>
         )}
+
+        {/* Wellness Library Banner */}
+        <Link href="/wellness" className="block group mt-12">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-sage-500 to-navy-700 dark:from-sage-600 dark:to-navy-800 p-8 sm:p-10 shadow-xl hover:shadow-2xl transition-all hover:scale-[1.01]">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/3 translate-x-1/3 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/3 -translate-x-1/3 pointer-events-none" />
+
+            <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-6">
+              {/* Big icon */}
+              <div className="flex-shrink-0 w-20 h-20 bg-white/15 backdrop-blur rounded-2xl flex items-center justify-center group-hover:bg-white/25 transition-colors">
+                <Library className="h-10 w-10 text-white" />
+              </div>
+
+              {/* Text */}
+              <div className="flex-1 text-center sm:text-left">
+                <p className="text-white/70 text-xs font-semibold uppercase tracking-widest mb-1">
+                  {locale === 'ja' ? 'コンテンツをもっと見る' : 'Explore More Content'}
+                </p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">
+                  {locale === 'ja' ? 'ウェルネスライブラリ' : 'Wellness Library'}
+                </h2>
+                <p className="text-white/75 text-sm leading-relaxed">
+                  {locale === 'ja'
+                    ? '瞑想動画・ヨガ動画・ウェルネスコラムなど、豊富なコンテンツが揃っています。'
+                    : 'Explore meditation videos, yoga sessions, and wellness articles — all in one place.'}
+                </p>
+              </div>
+
+              {/* Arrow */}
+              <div className="flex-shrink-0 w-12 h-12 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 group-hover:translate-x-1 transition-all">
+                <ArrowRight className="h-5 w-5 text-white" />
+              </div>
+            </div>
+          </div>
+        </Link>
       </main>
 
       <Footer />
