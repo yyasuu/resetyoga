@@ -18,6 +18,8 @@ interface Video {
   duration_label: string | null
   category: string
   concerns: string[] | null
+  movement_type: string[] | null
+  difficulty_level: string | null
   is_published: boolean
 }
 
@@ -31,8 +33,26 @@ interface Article {
   cover_image_url: string | null
   image_urls: string[] | null
   concerns: string[] | null
+  movement_type: string[] | null
+  difficulty_level: string | null
   profiles: { full_name: string | null } | null
 }
+
+const MOVEMENT_TYPE_OPTIONS = [
+  { value: 'flow',       ja: 'フロー',       en: 'Flow' },
+  { value: 'static',     ja: 'スタティック',  en: 'Static' },
+  { value: 'dynamic',    ja: 'ダイナミック',  en: 'Dynamic' },
+  { value: 'breathing',  ja: '呼吸法',       en: 'Breathing' },
+  { value: 'meditation', ja: '瞑想',         en: 'Meditation' },
+  { value: 'stretching', ja: 'ストレッチ',    en: 'Stretching' },
+]
+
+const DIFFICULTY_OPTIONS = [
+  { value: 'all_levels',   ja: 'すべてのレベル', en: 'All Levels' },
+  { value: 'beginner',     ja: '初心者',         en: 'Beginner' },
+  { value: 'intermediate', ja: '中級者',         en: 'Intermediate' },
+  { value: 'advanced',     ja: '上級者',         en: 'Advanced' },
+]
 
 interface StaticVideo {
   id: string
@@ -82,32 +102,42 @@ export function WellnessContent({
   isLoggedIn,
 }: WellnessContentProps) {
   const [selectedConcern, setSelectedConcern] = useState<string | null>(null)
+  const [selectedMovement, setSelectedMovement] = useState<string>('')
+  const [selectedLevel, setSelectedLevel] = useState<string>('')
   const router = useRouter()
 
   const concern = selectedConcern ? CONCERNS.find((c) => c.id === selectedConcern) : null
 
-  // Filter videos by concern
-  // Primary: use concerns[] tags on video; fallback to category-based matching for untagged videos
-  const filteredVideos = concern
-    ? dbVideos.filter((v) => {
-        if (v.concerns && v.concerns.length > 0) return v.concerns.includes(concern.id)
-        return concern.videoCategories.includes(v.category)
-      })
-    : dbVideos
+  // Filter videos: concern → movement_type → difficulty_level
+  const filteredVideos = dbVideos.filter((v) => {
+    if (concern) {
+      const pass = (v.concerns && v.concerns.length > 0)
+        ? v.concerns.includes(concern.id)
+        : concern.videoCategories.includes(v.category)
+      if (!pass) return false
+    }
+    if (selectedMovement && !(v.movement_type ?? []).includes(selectedMovement)) return false
+    if (selectedLevel && v.difficulty_level !== selectedLevel) return false
+    return true
+  })
 
-  // Filter articles by concern
-  // Primary: use concern tags on article; fallback to category-based matching for untagged articles
-  const filteredArticles = concern
-    ? dbArticles.filter((a) => {
-        if (a.concerns && a.concerns.length > 0) return a.concerns.includes(concern.id)
-        return concern.articleCategories.includes(a.category)
-      })
-    : dbArticles
+  // Filter articles: concern → movement_type → difficulty_level
+  const filteredArticles = dbArticles.filter((a) => {
+    if (concern) {
+      const pass = (a.concerns && a.concerns.length > 0)
+        ? a.concerns.includes(concern.id)
+        : concern.articleCategories.includes(a.category)
+      if (!pass) return false
+    }
+    if (selectedMovement && !(a.movement_type ?? []).includes(selectedMovement)) return false
+    if (selectedLevel && a.difficulty_level !== selectedLevel) return false
+    return true
+  })
 
   const hasVideos = filteredVideos.length > 0
   const hasArticles = filteredArticles.length > 0
-  const showStaticVideos = !concern && dbVideos.length === 0
-  const showStaticArticles = !concern && dbArticles.length === 0
+  const showStaticVideos = !concern && !selectedMovement && !selectedLevel && dbVideos.length === 0
+  const showStaticArticles = !concern && !selectedMovement && !selectedLevel && dbArticles.length === 0
 
   return (
     <div>
@@ -158,6 +188,48 @@ export function WellnessContent({
             )}
           </div>
         )}
+
+        {/* Movement type + Level dropdowns */}
+        <div className="flex flex-wrap items-center gap-3 mt-5">
+          <select
+            value={selectedMovement}
+            onChange={e => setSelectedMovement(e.target.value)}
+            className={`px-3 py-2 text-sm rounded-lg border bg-white dark:bg-navy-800 text-gray-700 dark:text-gray-200 transition-colors cursor-pointer ${
+              selectedMovement
+                ? 'border-navy-600 dark:border-sage-400 text-navy-700 dark:text-sage-300 font-medium'
+                : 'border-gray-200 dark:border-navy-600'
+            }`}
+          >
+            <option value="">{locale === 'ja' ? '動き別（すべて）' : 'Movement (all)'}</option>
+            {MOVEMENT_TYPE_OPTIONS.map(m => (
+              <option key={m.value} value={m.value}>{locale === 'ja' ? m.ja : m.en}</option>
+            ))}
+          </select>
+
+          <select
+            value={selectedLevel}
+            onChange={e => setSelectedLevel(e.target.value)}
+            className={`px-3 py-2 text-sm rounded-lg border bg-white dark:bg-navy-800 text-gray-700 dark:text-gray-200 transition-colors cursor-pointer ${
+              selectedLevel
+                ? 'border-navy-600 dark:border-sage-400 text-navy-700 dark:text-sage-300 font-medium'
+                : 'border-gray-200 dark:border-navy-600'
+            }`}
+          >
+            <option value="">{locale === 'ja' ? 'レベル別（すべて）' : 'Level (all)'}</option>
+            {DIFFICULTY_OPTIONS.map(d => (
+              <option key={d.value} value={d.value}>{locale === 'ja' ? d.ja : d.en}</option>
+            ))}
+          </select>
+
+          {(selectedMovement || selectedLevel) && (
+            <button
+              onClick={() => { setSelectedMovement(''); setSelectedLevel('') }}
+              className="text-xs text-gray-400 dark:text-navy-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+            >
+              {locale === 'ja' ? 'リセット' : 'Reset'}
+            </button>
+          )}
+        </div>
       </section>
 
       {/* Meditation Videos */}
