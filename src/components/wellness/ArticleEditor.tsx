@@ -22,6 +22,7 @@ interface ArticleData {
   movement_type: string[]
   difficulty_level: string
   is_published: boolean
+  is_premium: boolean
 }
 
 interface ArticleEditorProps {
@@ -82,6 +83,7 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     movement_type: (initialData as any)?.movement_type ?? [],
     difficulty_level: (initialData as any)?.difficulty_level ?? '',
     is_published: initialData?.is_published ?? false,
+    is_premium: (initialData as any)?.is_premium ?? false,
   })
   const [customCategory, setCustomCategory] = useState(initIsPreset ? '' : initCategory)
   const [uploading, setUploading] = useState<number | null>(null)
@@ -572,6 +574,69 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
           }
           placeholder={tab === 'ja' ? 'コラムの本文を入力してください...' : 'Write your article content here...'}
         />
+      </div>
+
+      {/* ── Access tier ─────────────────────────────────── */}
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          {locale === 'ja' ? 'アクセス設定' : 'Access Setting'}
+        </label>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setForm({ ...form, is_premium: false })}
+            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
+              !form.is_premium
+                ? 'border-sage-500 bg-sage-50 dark:bg-sage-900/20'
+                : 'border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 hover:border-sage-300'
+            }`}
+          >
+            <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
+              !form.is_premium
+                ? 'border-sage-500 bg-sage-500'
+                : 'border-gray-300 dark:border-navy-500'
+            }`}>
+              {!form.is_premium && <div className="w-2 h-2 bg-white rounded-full m-auto mt-[2px]" />}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                {locale === 'ja' ? '無料' : 'Free'}
+              </p>
+              <p className="text-xs text-gray-400 dark:text-navy-400">
+                {locale === 'ja' ? '会員全員が閲覧できます' : 'All registered members can read'}
+              </p>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setForm({ ...form, is_premium: true })}
+            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
+              form.is_premium
+                ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
+                : 'border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 hover:border-amber-300'
+            }`}
+          >
+            <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
+              form.is_premium
+                ? 'border-amber-500 bg-amber-500'
+                : 'border-gray-300 dark:border-navy-500'
+            }`}>
+              {form.is_premium && <div className="w-2 h-2 bg-white rounded-full m-auto mt-[2px]" />}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
+                {locale === 'ja' ? '有料（プレミアム）' : 'Premium (Paid)'}
+                <span className="text-[10px] bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded-full font-bold">
+                  $19.99/mo
+                </span>
+              </p>
+              <p className="text-xs text-gray-400 dark:text-navy-400">
+                {locale === 'ja' ? 'サブスク会員のみ閲覧可能' : 'Subscribers only ($19.99/month)'}
+              </p>
+            </div>
+          </button>
+        </div>
       </div>
 
       {error && (

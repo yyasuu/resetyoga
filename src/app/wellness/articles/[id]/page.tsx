@@ -4,7 +4,8 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { ChevronLeft, BookOpen, Pencil, Library, ArrowRight } from 'lucide-react'
+import { ChevronLeft, BookOpen, Pencil, Library, ArrowRight, Sparkles } from 'lucide-react'
+import { PremiumPaywall } from '@/components/wellness/PremiumPaywall'
 
 const CATEGORY_LABELS: Record<string, { ja: string; en: string }> = {
   ayurveda: { ja: 'アーユルヴェーダ', en: 'Ayurveda' },
@@ -47,6 +48,29 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
   const editHref = `/wellness/articles/${id}/edit`
 
+  // ── Premium / paywall check ───────────────────────────────────────────────
+  const isPremium = !!(article as any).is_premium
+  const canAccessPremium = profile.role === 'admin' || profile.role === 'instructor'
+
+  let hasActiveSubscription = false
+  if (isPremium && !canAccessPremium) {
+    const { data: sub } = await supabase
+      .from('student_subscriptions')
+      .select('status')
+      .eq('student_id', user.id)
+      .single()
+    hasActiveSubscription = sub?.status === 'active'
+  }
+
+  const showPaywall = isPremium && !canAccessPremium && !hasActiveSubscription
+
+  // Strip HTML tags for paywall preview (first ~250 chars)
+  const contentPlain = (content ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const contentPreview = contentPlain.slice(0, 250) + (contentPlain.length > 250 ? '…' : '')
+
   return (
     <div className="min-h-screen bg-linen-50 dark:bg-navy-900 flex flex-col">
       <Navbar user={profile} />
@@ -60,10 +84,18 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
 
         {/* Category badge */}
         <div className="flex items-center justify-between mb-4">
-          <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wider flex items-center gap-1.5">
-            <BookOpen className="h-3.5 w-3.5" />
-            {categoryLabel}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wider flex items-center gap-1.5">
+              <BookOpen className="h-3.5 w-3.5" />
+              {categoryLabel}
+            </span>
+            {isPremium && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">
+                <Sparkles className="h-3 w-3" />
+                {locale === 'ja' ? 'プレミアム' : 'Premium'}
+              </span>
+            )}
+          </div>
           {canEdit && (
             <Link href={editHref} className="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-navy-600 dark:hover:text-sage-400">
               <Pencil className="h-3.5 w-3.5" />
@@ -133,8 +165,10 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
           )
         })()}
 
-        {/* Content */}
-        {content ? (
+        {/* Content — gated behind paywall for premium articles */}
+        {showPaywall ? (
+          <PremiumPaywall locale={locale} contentPreview={contentPreview || null} />
+        ) : content ? (
           <div
             className="prose prose-gray dark:prose-invert max-w-none
               prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white
