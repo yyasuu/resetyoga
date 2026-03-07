@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Eye, EyeOff, Play, Link2, Upload } from 'lucide-react'
+import { CONCERNS } from '@/lib/concerns'
 
 interface WellnessVideo {
   id: string
@@ -14,15 +15,44 @@ interface WellnessVideo {
   thumbnail_url: string | null
   duration_label: string | null
   category: string
+  concerns: string[]
+  movement_type: string | null
+  difficulty_level: string | null
   is_published: boolean
   created_at: string
 }
 
 const CATEGORIES = [
-  { value: 'meditation', label: '瞑想 / Meditation' },
-  { value: 'breathwork', label: '呼吸法 / Breathwork' },
-  { value: 'morning', label: '朝のルーティン / Morning' },
-  { value: 'evening', label: '夜のリラックス / Evening' },
+  { value: 'meditation',   label: '瞑想 / Meditation' },
+  { value: 'breathwork',   label: '呼吸法 / Breathwork' },
+  { value: 'morning',      label: '朝のルーティン / Morning Routine' },
+  { value: 'evening',      label: '夜のリラックス / Evening Relax' },
+  { value: 'stress',       label: 'ストレス解消 / Stress Relief' },
+  { value: 'sleep',        label: '睡眠改善 / Better Sleep' },
+  { value: 'shoulder',     label: '肩こり改善 / Shoulder Relief' },
+  { value: 'flexibility',  label: '柔軟性UP / Flexibility' },
+  { value: 'core',         label: '体幹強化 / Core Strength' },
+  { value: 'balance',      label: 'バランス / Balance' },
+  { value: 'arm_balance',  label: 'アームバランス / Arm Balance' },
+  { value: 'beginner',     label: '初心者向け / Beginner' },
+]
+
+const MOVEMENT_TYPES = [
+  { value: '',          label: '-- 動き別 / Movement type --' },
+  { value: 'flow',      label: 'フロー / Flow' },
+  { value: 'static',    label: 'スタティック / Static' },
+  { value: 'dynamic',   label: 'ダイナミック / Dynamic' },
+  { value: 'breathing', label: '呼吸法 / Breathing' },
+  { value: 'meditation',label: '瞑想 / Meditation' },
+  { value: 'stretching',label: 'ストレッチ / Stretching' },
+]
+
+const DIFFICULTY_LEVELS = [
+  { value: '',             label: '-- レベル別 / Level --' },
+  { value: 'all_levels',   label: 'すべてのレベル / All Levels' },
+  { value: 'beginner',     label: '初心者 / Beginner' },
+  { value: 'intermediate', label: '中級者 / Intermediate' },
+  { value: 'advanced',     label: '上級者 / Advanced' },
 ]
 
 const EMPTY_FORM = {
@@ -34,6 +64,9 @@ const EMPTY_FORM = {
   thumbnail_url: '',
   duration_label: '',
   category: 'meditation',
+  concerns: [] as string[],
+  movement_type: '',
+  difficulty_level: '',
   is_published: false,
 }
 
@@ -184,6 +217,13 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
     await fetch(`/api/wellness/videos/${id}`, { method: 'DELETE' })
   }
 
+  const toggleConcern = (id: string) => {
+    setForm(f => ({
+      ...f,
+      concerns: f.concerns.includes(id) ? f.concerns.filter(c => c !== id) : [...f.concerns, id],
+    }))
+  }
+
   const fileSizeMB = selectedFile ? (selectedFile.size / 1024 / 1024).toFixed(1) : null
 
   return (
@@ -322,16 +362,36 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
             )}
           </div>
 
-          {/* Category, Duration, Thumbnail */}
-          <div className="grid sm:grid-cols-3 gap-3">
+          {/* Category, Movement, Difficulty, Duration, Thumbnail */}
+          <div className="grid sm:grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">カテゴリ</label>
+              <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">カテゴリ / Category *</label>
               <select
                 value={form.category}
                 onChange={e => setForm({ ...form, category: e.target.value })}
                 className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
               >
                 {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">動き別 / Movement type</label>
+              <select
+                value={form.movement_type}
+                onChange={e => setForm({ ...form, movement_type: e.target.value })}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
+              >
+                {MOVEMENT_TYPES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">レベル別 / Level</label>
+              <select
+                value={form.difficulty_level}
+                onChange={e => setForm({ ...form, difficulty_level: e.target.value })}
+                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
+              >
+                {DIFFICULTY_LEVELS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
               </select>
             </div>
             <div>
@@ -343,15 +403,46 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
                 placeholder="5 min"
               />
             </div>
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">サムネイルURL（任意）</label>
-              <input
-                value={form.thumbnail_url}
-                onChange={e => setForm({ ...form, thumbnail_url: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
-                placeholder="https://..."
-              />
+          </div>
+
+          {/* Concerns chip grid */}
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-navy-300 mb-2">お悩みタグ / Concern tags（複数選択可）</label>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
+              {CONCERNS.map(c => {
+                const selected = form.concerns.includes(c.id)
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => toggleConcern(c.id)}
+                    className={`flex flex-col items-center gap-0.5 px-2 py-2 rounded-xl border text-center transition-all text-xs ${
+                      selected
+                        ? 'bg-navy-600 border-navy-600 text-white'
+                        : 'bg-white dark:bg-navy-800 border-gray-200 dark:border-navy-600 text-gray-600 dark:text-gray-300 hover:border-sage-400 hover:bg-sage-50 dark:hover:bg-navy-700'
+                    }`}
+                  >
+                    <span className="text-base leading-none">{c.icon}</span>
+                    <span className="font-medium leading-snug">{c.ja}</span>
+                    <span className="text-[10px] opacity-70 leading-snug">{c.en}</span>
+                  </button>
+                )
+              })}
             </div>
+            {form.concerns.length > 0 && (
+              <p className="text-xs text-sage-600 dark:text-sage-400 mt-1">{form.concerns.length}件選択中</p>
+            )}
+          </div>
+
+          {/* Thumbnail URL */}
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">サムネイルURL（任意）</label>
+            <input
+              value={form.thumbnail_url}
+              onChange={e => setForm({ ...form, thumbnail_url: e.target.value })}
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
+              placeholder="https://..."
+            />
           </div>
 
           {/* Descriptions */}

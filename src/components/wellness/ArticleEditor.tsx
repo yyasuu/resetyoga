@@ -19,6 +19,8 @@ interface ArticleData {
   cover_image_url: string
   image_urls: string[]
   concerns: string[]
+  movement_type: string
+  difficulty_level: string
   is_published: boolean
 }
 
@@ -29,12 +31,30 @@ interface ArticleEditorProps {
 }
 
 const CATEGORIES = [
-  { value: 'ayurveda', labelJa: 'アーユルヴェーダ', labelEn: 'Ayurveda' },
-  { value: 'nutrition', labelJa: '食事・栄養', labelEn: 'Nutrition' },
-  { value: 'breathing', labelJa: '呼吸法', labelEn: 'Breathing' },
-  { value: 'mindfulness', labelJa: 'マインドフルネス', labelEn: 'Mindfulness' },
-  { value: 'yoga', labelJa: 'ヨガ理論', labelEn: 'Yoga Theory' },
-  { value: 'other', labelJa: 'その他（自由入力）', labelEn: 'Other (custom)' },
+  { value: 'ayurveda',    labelJa: 'アーユルヴェーダ',    labelEn: 'Ayurveda' },
+  { value: 'nutrition',   labelJa: '食事・栄養',           labelEn: 'Nutrition' },
+  { value: 'breathing',   labelJa: '呼吸法',               labelEn: 'Breathing' },
+  { value: 'mindfulness', labelJa: 'マインドフルネス',      labelEn: 'Mindfulness' },
+  { value: 'yoga',        labelJa: 'ヨガ理論',             labelEn: 'Yoga Theory' },
+  { value: 'other',       labelJa: 'その他（自由入力）',    labelEn: 'Other (custom)' },
+]
+
+const MOVEMENT_TYPES = [
+  { value: '',           labelJa: '-- 動き別 --',      labelEn: '-- Movement type --' },
+  { value: 'flow',       labelJa: 'フロー',             labelEn: 'Flow' },
+  { value: 'static',     labelJa: 'スタティック',        labelEn: 'Static' },
+  { value: 'dynamic',    labelJa: 'ダイナミック',        labelEn: 'Dynamic' },
+  { value: 'breathing',  labelJa: '呼吸法',             labelEn: 'Breathing' },
+  { value: 'meditation', labelJa: '瞑想',               labelEn: 'Meditation' },
+  { value: 'stretching', labelJa: 'ストレッチ',          labelEn: 'Stretching' },
+]
+
+const DIFFICULTY_LEVELS = [
+  { value: '',             labelJa: '-- レベル別 --',       labelEn: '-- Level --' },
+  { value: 'all_levels',   labelJa: 'すべてのレベル',        labelEn: 'All Levels' },
+  { value: 'beginner',     labelJa: '初心者',               labelEn: 'Beginner' },
+  { value: 'intermediate', labelJa: '中級者',               labelEn: 'Intermediate' },
+  { value: 'advanced',     labelJa: '上級者',               labelEn: 'Advanced' },
 ]
 
 const PRESET_VALUES = CATEGORIES.filter(c => c.value !== 'other').map(c => c.value)
@@ -60,6 +80,8 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     cover_image_url: initialData?.cover_image_url ?? '',
     image_urls: initialData?.image_urls ?? [],
     concerns: (initialData as any)?.concerns ?? [],
+    movement_type: (initialData as any)?.movement_type ?? '',
+    difficulty_level: (initialData as any)?.difficulty_level ?? '',
     is_published: initialData?.is_published ?? false,
   })
   const [customCategory, setCustomCategory] = useState(initIsPreset ? '' : initCategory)
@@ -361,6 +383,48 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
               : `${form.concerns.length} concern tag${form.concerns.length > 1 ? 's' : ''} selected`}
           </p>
         )}
+      </div>
+
+      {/* ── Movement type + Difficulty level ─────────────────────────────────── */}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {locale === 'ja' ? '動き別' : 'Movement type'}
+            <span className="text-xs text-gray-400 dark:text-navy-400 ml-2">
+              {locale === 'ja' ? '任意' : 'optional'}
+            </span>
+          </label>
+          <select
+            value={form.movement_type}
+            onChange={e => setForm({ ...form, movement_type: e.target.value })}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
+          >
+            {MOVEMENT_TYPES.map(m => (
+              <option key={m.value} value={m.value}>
+                {locale === 'ja' ? m.labelJa : m.labelEn}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            {locale === 'ja' ? 'レベル別' : 'Level'}
+            <span className="text-xs text-gray-400 dark:text-navy-400 ml-2">
+              {locale === 'ja' ? '任意' : 'optional'}
+            </span>
+          </label>
+          <select
+            value={form.difficulty_level}
+            onChange={e => setForm({ ...form, difficulty_level: e.target.value })}
+            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
+          >
+            {DIFFICULTY_LEVELS.map(d => (
+              <option key={d.value} value={d.value}>
+                {locale === 'ja' ? d.labelJa : d.labelEn}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* ── Title ─────────────────────────────────── */}

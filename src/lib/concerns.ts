@@ -20,7 +20,7 @@ export const CONCERNS: Concern[] = [
     descEn: 'Release shoulder & neck tension',
     yogaStyles: ['Hatha', 'Yin', 'Restorative'],
     articleCategories: ['yoga', 'breathing', 'ayurveda'],
-    videoCategories: ['meditation', 'breathwork'],
+    videoCategories: ['meditation', 'breathwork', 'shoulder', 'flexibility'],
   },
   {
     id: 'stress',
@@ -31,7 +31,7 @@ export const CONCERNS: Concern[] = [
     descEn: 'Reset mind & body stress',
     yogaStyles: ['Yin', 'Restorative', 'Kundalini'],
     articleCategories: ['mindfulness', 'breathing', 'ayurveda'],
-    videoCategories: ['meditation', 'breathwork'],
+    videoCategories: ['meditation', 'breathwork', 'stress', 'evening'],
   },
   {
     id: 'neck',
@@ -42,7 +42,7 @@ export const CONCERNS: Concern[] = [
     descEn: 'Ease neck discomfort',
     yogaStyles: ['Yin', 'Restorative', 'Hatha'],
     articleCategories: ['yoga', 'breathing'],
-    videoCategories: ['meditation'],
+    videoCategories: ['meditation', 'shoulder'],
   },
   {
     id: 'eyes',
@@ -53,7 +53,7 @@ export const CONCERNS: Concern[] = [
     descEn: 'Reset screen fatigue',
     yogaStyles: ['Restorative', 'Yin'],
     articleCategories: ['mindfulness', 'breathing'],
-    videoCategories: ['meditation'],
+    videoCategories: ['meditation', 'stress'],
   },
   {
     id: 'flexibility',
@@ -64,7 +64,7 @@ export const CONCERNS: Concern[] = [
     descEn: 'Improve range of motion',
     yogaStyles: ['Hatha', 'Yin', 'Ashtanga'],
     articleCategories: ['yoga'],
-    videoCategories: ['morning'],
+    videoCategories: ['morning', 'flexibility', 'balance'],
   },
   {
     id: 'posture',
@@ -75,7 +75,7 @@ export const CONCERNS: Concern[] = [
     descEn: 'Correct posture from desk work',
     yogaStyles: ['Iyengar', 'Hatha', 'Power Yoga'],
     articleCategories: ['yoga', 'ayurveda'],
-    videoCategories: ['morning'],
+    videoCategories: ['morning', 'core', 'flexibility'],
   },
   {
     id: 'sleep',
@@ -86,7 +86,7 @@ export const CONCERNS: Concern[] = [
     descEn: 'Prepare body & mind for deep sleep',
     yogaStyles: ['Yin', 'Restorative'],
     articleCategories: ['mindfulness', 'breathing'],
-    videoCategories: ['meditation', 'evening'],
+    videoCategories: ['meditation', 'evening', 'sleep', 'stress'],
   },
   {
     id: 'focus',
@@ -97,7 +97,7 @@ export const CONCERNS: Concern[] = [
     descEn: 'Sharpen focus for work & study',
     yogaStyles: ['Kundalini', 'Hatha', 'Vinyasa'],
     articleCategories: ['mindfulness', 'breathing'],
-    videoCategories: ['breathwork', 'morning'],
+    videoCategories: ['breathwork', 'morning', 'stress'],
   },
   {
     id: 'core',
@@ -108,7 +108,7 @@ export const CONCERNS: Concern[] = [
     descEn: 'Build a stable, strong core',
     yogaStyles: ['Vinyasa', 'Power Yoga', 'Ashtanga'],
     articleCategories: ['yoga', 'nutrition'],
-    videoCategories: ['morning'],
+    videoCategories: ['morning', 'core', 'balance', 'arm_balance'],
   },
   {
     id: 'recovery',
@@ -119,6 +119,6 @@ export const CONCERNS: Concern[] = [
     descEn: 'Relieve accumulated fatigue',
     yogaStyles: ['Restorative', 'Yin', 'Chair Yoga'],
     articleCategories: ['nutrition', 'ayurveda'],
-    videoCategories: ['meditation', 'evening'],
+    videoCategories: ['meditation', 'evening', 'sleep', 'flexibility'],
   },
 ]

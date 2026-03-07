@@ -17,6 +17,7 @@ interface Video {
   thumbnail_url: string | null
   duration_label: string | null
   category: string
+  concerns: string[] | null
   is_published: boolean
 }
 
@@ -86,8 +87,12 @@ export function WellnessContent({
   const concern = selectedConcern ? CONCERNS.find((c) => c.id === selectedConcern) : null
 
   // Filter videos by concern
+  // Primary: use concerns[] tags on video; fallback to category-based matching for untagged videos
   const filteredVideos = concern
-    ? dbVideos.filter((v) => concern.videoCategories.includes(v.category))
+    ? dbVideos.filter((v) => {
+        if (v.concerns && v.concerns.length > 0) return v.concerns.includes(concern.id)
+        return concern.videoCategories.includes(v.category)
+      })
     : dbVideos
 
   // Filter articles by concern
