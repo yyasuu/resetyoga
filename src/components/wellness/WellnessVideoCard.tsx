@@ -28,7 +28,9 @@ function getEmbedUrl(url: string): string | null {
 }
 
 function isDirectVideo(url: string): boolean {
-  return /\.(mp4|webm|ogg)(\?|$)/i.test(url)
+  // Matches .mp4/.webm/.ogg in the URL (covers Supabase Storage URLs and direct links)
+  return /\.(mp4|webm|ogg|mov|avi)(\?|$)/i.test(url) ||
+    url.includes('supabase.co/storage')
 }
 
 export function WellnessVideoCard({ video, gradient, locale }: VideoCardProps) {
