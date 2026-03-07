@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
+import { cookies } from 'next/headers'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Navbar } from '@/components/layout/Navbar'
@@ -14,6 +15,9 @@ export default async function LandingPage() {
   let profile: Profile | null = null
   let instructors: any[] = []
   let user: { id: string } | null = null
+  let previewVideo: any = null
+  let previewArticles: any[] = []
+  let locale = 'en'
 
   try {
     const supabase = await createClient()
@@ -32,6 +36,26 @@ export default async function LandingPage() {
       .eq('instructor_profiles.is_approved', true)
       .limit(6)
     instructors = instructorData?.filter((i: any) => i.instructor_profiles) || []
+
+    const cookieStore = await cookies()
+    locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
+
+    const [{ data: vData }, { data: aData }] = await Promise.all([
+      supabase
+        .from('wellness_videos')
+        .select('id, title_ja, title_en, thumbnail_url, duration_label, category')
+        .eq('is_published', true)
+        .order('created_at', { ascending: true })
+        .limit(1),
+      supabase
+        .from('wellness_articles')
+        .select('id, title_ja, title_en, category, cover_image_url, image_urls')
+        .eq('is_published', true)
+        .order('created_at', { ascending: true })
+        .limit(3),
+    ])
+    previewVideo = vData?.[0] ?? null
+    previewArticles = aData ?? []
   } catch {
     // Supabase not configured yet
   }
@@ -220,41 +244,130 @@ export default async function LandingPage() {
           </h2>
           <p className="text-center text-gray-500 dark:text-navy-400 mb-12">{t('free_content_subtitle')}</p>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          {/* Two large clickable boxes → Wellness Library */}
+          <div className="grid md:grid-cols-2 gap-6 mb-12">
             {/* Meditation Videos */}
-            <div className="bg-white dark:bg-navy-900 rounded-2xl p-8 border border-sage-100 dark:border-navy-700 shadow-sm">
-              <div className="w-12 h-12 bg-sage-100 dark:bg-sage-900/40 rounded-xl flex items-center justify-center mb-5">
-                <Play className="h-6 w-6 text-sage-600 dark:text-sage-400" />
+            <Link href="/wellness" className="block group">
+              <div className="bg-white dark:bg-navy-900 rounded-2xl p-8 border border-sage-100 dark:border-navy-700 shadow-sm hover:shadow-md hover:border-sage-300 dark:hover:border-sage-700 transition-all cursor-pointer">
+                <div className="w-12 h-12 bg-sage-100 dark:bg-sage-900/40 rounded-xl flex items-center justify-center mb-5">
+                  <Play className="h-6 w-6 text-sage-600 dark:text-sage-400" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-sage-700 dark:group-hover:text-sage-400 transition-colors">{t('free_meditation_title')}</h3>
+                <p className="text-gray-500 dark:text-navy-300 text-sm mb-5 leading-relaxed">{t('free_meditation_desc')}</p>
+                <ul className="space-y-2.5 mb-5">
+                  {[t('free_meditation_1'), t('free_meditation_2'), t('free_meditation_3')].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                      <div className="w-1.5 h-1.5 rounded-full bg-sage-400 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-sage-600 dark:text-sage-400 font-semibold">
+                  {locale === 'ja' ? 'ライブラリを見る →' : 'View Library →'}
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{t('free_meditation_title')}</h3>
-              <p className="text-gray-500 dark:text-navy-300 text-sm mb-5 leading-relaxed">{t('free_meditation_desc')}</p>
-              <ul className="space-y-2.5">
-                {[t('free_meditation_1'), t('free_meditation_2'), t('free_meditation_3')].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-sage-400 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </Link>
 
             {/* Wellness Columns */}
-            <div className="bg-white dark:bg-navy-900 rounded-2xl p-8 border border-sage-100 dark:border-navy-700 shadow-sm">
-              <div className="w-12 h-12 bg-linen-200 dark:bg-navy-700 rounded-xl flex items-center justify-center mb-5">
-                <BookOpen className="h-6 w-6 text-navy-600 dark:text-navy-300" />
+            <Link href="/wellness" className="block group">
+              <div className="bg-white dark:bg-navy-900 rounded-2xl p-8 border border-sage-100 dark:border-navy-700 shadow-sm hover:shadow-md hover:border-navy-200 dark:hover:border-navy-500 transition-all cursor-pointer">
+                <div className="w-12 h-12 bg-linen-200 dark:bg-navy-700 rounded-xl flex items-center justify-center mb-5">
+                  <BookOpen className="h-6 w-6 text-navy-600 dark:text-navy-300" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">{t('free_column_title')}</h3>
+                <p className="text-gray-500 dark:text-navy-300 text-sm mb-5 leading-relaxed">{t('free_column_desc')}</p>
+                <ul className="space-y-2.5 mb-5">
+                  {[t('free_column_1'), t('free_column_2'), t('free_column_3')].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                      <div className="w-1.5 h-1.5 rounded-full bg-navy-400 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <p className="text-xs text-navy-600 dark:text-sage-400 font-semibold">
+                  {locale === 'ja' ? 'ライブラリを見る →' : 'View Library →'}
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{t('free_column_title')}</h3>
-              <p className="text-gray-500 dark:text-navy-300 text-sm mb-5 leading-relaxed">{t('free_column_desc')}</p>
-              <ul className="space-y-2.5">
-                {[t('free_column_1'), t('free_column_2'), t('free_column_3')].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
-                    <div className="w-1.5 h-1.5 rounded-full bg-navy-400 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </Link>
           </div>
+
+          {/* Preview content cards: 1 video + 3 articles (oldest) */}
+          {(previewVideo || previewArticles.length > 0) && (
+            <div className="mb-10">
+              <p className="text-xs font-semibold text-gray-400 dark:text-navy-400 uppercase tracking-wider mb-5 text-center">
+                {locale === 'ja' ? 'コンテンツをチェック' : 'Browse Content'}
+              </p>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Video card */}
+                {previewVideo && (
+                  <Link href={`/wellness/videos/${previewVideo.id}`} className="block group">
+                    <div className="bg-white dark:bg-navy-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow h-full">
+                      <div className="h-36 relative bg-gradient-to-br from-sage-100 to-linen-100 dark:from-navy-700 dark:to-navy-800 flex items-center justify-center">
+                        {previewVideo.thumbnail_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={previewVideo.thumbnail_url}
+                            alt={locale === 'ja' ? previewVideo.title_ja : previewVideo.title_en}
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        ) : null}
+                        <div className="w-10 h-10 bg-white/80 dark:bg-navy-900/80 rounded-full flex items-center justify-center shadow-md relative z-10 group-hover:scale-110 transition-transform">
+                          <Play className="h-4 w-4 text-sage-600 dark:text-sage-400 ml-0.5" />
+                        </div>
+                        {previewVideo.duration_label && (
+                          <span className="absolute bottom-2 right-2 text-xs bg-navy-900/60 text-white px-1.5 py-0.5 rounded-full z-10">
+                            {previewVideo.duration_label}
+                          </span>
+                        )}
+                        <span className="absolute top-2 left-2 text-xs bg-sage-500/90 text-white px-2 py-0.5 rounded-full z-10 font-medium">
+                          {locale === 'ja' ? '動画' : 'Video'}
+                        </span>
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-bold text-gray-900 dark:text-white text-sm leading-snug group-hover:text-sage-700 dark:group-hover:text-sage-400 transition-colors">
+                          {locale === 'ja' ? previewVideo.title_ja : previewVideo.title_en}
+                        </h3>
+                      </div>
+                    </div>
+                  </Link>
+                )}
+
+                {/* Article cards */}
+                {previewArticles.map((article: any) => {
+                  const coverImage = article.image_urls?.[0] ?? article.cover_image_url ?? null
+                  return (
+                    <Link key={article.id} href={`/wellness/articles/${article.id}`} className="block group">
+                      <div className="bg-white dark:bg-navy-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow h-full">
+                        <div className="h-36 relative bg-gradient-to-br from-linen-200 to-sage-50 dark:from-navy-800 dark:to-navy-700 flex items-center justify-center overflow-hidden">
+                          {coverImage ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={coverImage}
+                              alt={locale === 'ja' ? article.title_ja : article.title_en}
+                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          ) : (
+                            <BookOpen className="h-8 w-8 text-navy-300 dark:text-navy-500" />
+                          )}
+                          <span className="absolute top-2 left-2 text-xs bg-navy-600/90 text-white px-2 py-0.5 rounded-full z-10 font-medium">
+                            {locale === 'ja' ? 'コラム' : 'Article'}
+                          </span>
+                        </div>
+                        <div className="p-4">
+                          <p className="text-xs text-sage-600 dark:text-sage-400 font-semibold uppercase tracking-wider mb-1">
+                            {article.category}
+                          </p>
+                          <h3 className="font-bold text-gray-900 dark:text-white text-sm leading-snug group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
+                            {locale === 'ja' ? article.title_ja : article.title_en}
+                          </h3>
+                        </div>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           <div className="text-center mt-10">
             <Link href={user ? '/wellness' : '/register'}>
