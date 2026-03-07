@@ -243,6 +243,12 @@ export default async function InstructorDashboardPage() {
                     {locale === 'ja' ? 'ウェルネスライブラリ' : 'Wellness Library'}
                   </Button>
                 </Link>
+                <Link href="/instructor/premium/apply">
+                  <Button variant="outline" className="w-full justify-start gap-2 border-sage-300 dark:border-sage-700 text-sage-700 dark:text-sage-400 hover:bg-sage-50 dark:hover:bg-sage-900/20">
+                    <span className="text-xs">✦</span>
+                    {locale === 'ja' ? 'Premium講師に申請' : 'Apply for Premium'}
+                  </Button>
+                </Link>
                 <Link href="/instructor/articles">
                   <Button variant="outline" className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700">
                     <BookOpen className="h-4 w-4 text-navy-500 dark:text-navy-400" />

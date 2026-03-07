@@ -10,6 +10,7 @@ const publicPaths = [
   '/onboarding',
   '/instructors',
   '/wellness',
+  '/premium',
   '/auth',
   '/api',
   '/jp',

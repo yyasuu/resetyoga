@@ -103,6 +103,13 @@ export function Navbar({ user }: NavbarProps) {
               Wellness
             </Link>
 
+            <Link
+              href="/premium"
+              className="flex items-center gap-1 text-sage-600 dark:text-sage-400 hover:text-sage-500 font-semibold transition-colors"
+            >
+              <span className="text-xs">✦</span> Premium
+            </Link>
+
             {/* Language switcher — custom dropdown, no Radix portal */}
             <div ref={langRef} className="relative">
               <button
@@ -210,6 +217,13 @@ export function Navbar({ user }: NavbarProps) {
             onClick={() => setMenuOpen(false)}
           >
             Wellness
+          </Link>
+          <Link
+            href="/premium"
+            className="block text-sage-600 dark:text-sage-400 font-semibold"
+            onClick={() => setMenuOpen(false)}
+          >
+            ✦ Premium
           </Link>
           {user ? (
             <>

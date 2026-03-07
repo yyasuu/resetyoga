@@ -152,6 +152,28 @@ export default async function AdminDashboardPage() {
           </Link>
         </div>
 
+        {/* Premium Management */}
+        <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-5 mb-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-sage-100 dark:bg-sage-900/40 rounded-lg flex items-center justify-center text-lg">
+              ✦
+            </div>
+            <div>
+              <p className="font-bold text-gray-900 dark:text-white">
+                {locale === 'ja' ? 'Premium管理' : 'Premium Management'}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-navy-300">
+                {locale === 'ja' ? '講師Tier審査・クラス承認・待機リスト' : 'Tier review, class approval, waitlist'}
+              </p>
+            </div>
+          </div>
+          <Link href="/admin/premium">
+            <Button className="bg-sage-500 hover:bg-sage-600 text-white flex-shrink-0">
+              {locale === 'ja' ? '管理する' : 'Manage'}
+            </Button>
+          </Link>
+        </div>
+
         {/* Pending Approvals */}
         <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-6 mb-6">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
