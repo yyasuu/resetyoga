@@ -16,7 +16,7 @@ interface WellnessVideo {
   duration_label: string | null
   category: string
   concerns: string[]
-  movement_type: string | null
+  movement_type: string[] | null
   difficulty_level: string | null
   is_published: boolean
   created_at: string
@@ -38,13 +38,12 @@ const CATEGORIES = [
 ]
 
 const MOVEMENT_TYPES = [
-  { value: '',          label: '-- 動き別 / Movement type --' },
-  { value: 'flow',      label: 'フロー / Flow' },
+  { value: 'flow',       label: 'フロー / Flow' },
   { value: 'static',    label: 'スタティック / Static' },
   { value: 'dynamic',   label: 'ダイナミック / Dynamic' },
   { value: 'breathing', label: '呼吸法 / Breathing' },
-  { value: 'meditation',label: '瞑想 / Meditation' },
-  { value: 'stretching',label: 'ストレッチ / Stretching' },
+  { value: 'meditation', label: '瞑想 / Meditation' },
+  { value: 'stretching', label: 'ストレッチ / Stretching' },
 ]
 
 const DIFFICULTY_LEVELS = [
@@ -65,7 +64,7 @@ const EMPTY_FORM = {
   duration_label: '',
   category: 'meditation',
   concerns: [] as string[],
-  movement_type: '',
+  movement_type: [] as string[],
   difficulty_level: '',
   is_published: false,
 }
@@ -215,6 +214,15 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
     if (!confirm('この動画を削除しますか？')) return
     setVideos(videos.filter(v => v.id !== id))
     await fetch(`/api/wellness/videos/${id}`, { method: 'DELETE' })
+  }
+
+  const toggleMovementType = (val: string) => {
+    setForm(f => ({
+      ...f,
+      movement_type: f.movement_type.includes(val)
+        ? f.movement_type.filter(m => m !== val)
+        : [...f.movement_type, val],
+    }))
   }
 
   const toggleConcern = (id: string) => {
@@ -374,15 +382,27 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
                 {CATEGORIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
               </select>
             </div>
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">動き別 / Movement type</label>
-              <select
-                value={form.movement_type}
-                onChange={e => setForm({ ...form, movement_type: e.target.value })}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
-              >
-                {MOVEMENT_TYPES.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-              </select>
+            <div className="sm:col-span-2">
+              <label className="block text-xs text-gray-500 dark:text-navy-300 mb-2">動き別 / Movement type（複数選択可）</label>
+              <div className="flex flex-wrap gap-1.5">
+                {MOVEMENT_TYPES.map(m => {
+                  const selected = form.movement_type.includes(m.value)
+                  return (
+                    <button
+                      key={m.value}
+                      type="button"
+                      onClick={() => toggleMovementType(m.value)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                        selected
+                          ? 'bg-navy-600 border-navy-600 text-white'
+                          : 'bg-white dark:bg-navy-800 border-gray-200 dark:border-navy-600 text-gray-600 dark:text-gray-300 hover:border-sage-400'
+                      }`}
+                    >
+                      {m.label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
             <div>
               <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">レベル別 / Level</label>

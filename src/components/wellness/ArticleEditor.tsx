@@ -19,7 +19,7 @@ interface ArticleData {
   cover_image_url: string
   image_urls: string[]
   concerns: string[]
-  movement_type: string
+  movement_type: string[]
   difficulty_level: string
   is_published: boolean
 }
@@ -40,13 +40,12 @@ const CATEGORIES = [
 ]
 
 const MOVEMENT_TYPES = [
-  { value: '',           labelJa: '-- 動き別 --',      labelEn: '-- Movement type --' },
-  { value: 'flow',       labelJa: 'フロー',             labelEn: 'Flow' },
-  { value: 'static',     labelJa: 'スタティック',        labelEn: 'Static' },
-  { value: 'dynamic',    labelJa: 'ダイナミック',        labelEn: 'Dynamic' },
-  { value: 'breathing',  labelJa: '呼吸法',             labelEn: 'Breathing' },
-  { value: 'meditation', labelJa: '瞑想',               labelEn: 'Meditation' },
-  { value: 'stretching', labelJa: 'ストレッチ',          labelEn: 'Stretching' },
+  { value: 'flow',       labelJa: 'フロー',       labelEn: 'Flow' },
+  { value: 'static',     labelJa: 'スタティック',  labelEn: 'Static' },
+  { value: 'dynamic',    labelJa: 'ダイナミック',  labelEn: 'Dynamic' },
+  { value: 'breathing',  labelJa: '呼吸法',       labelEn: 'Breathing' },
+  { value: 'meditation', labelJa: '瞑想',         labelEn: 'Meditation' },
+  { value: 'stretching', labelJa: 'ストレッチ',    labelEn: 'Stretching' },
 ]
 
 const DIFFICULTY_LEVELS = [
@@ -80,7 +79,7 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     cover_image_url: initialData?.cover_image_url ?? '',
     image_urls: initialData?.image_urls ?? [],
     concerns: (initialData as any)?.concerns ?? [],
-    movement_type: (initialData as any)?.movement_type ?? '',
+    movement_type: (initialData as any)?.movement_type ?? [],
     difficulty_level: (initialData as any)?.difficulty_level ?? '',
     is_published: initialData?.is_published ?? false,
   })
@@ -114,6 +113,13 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     const current = form.concerns
     const next = current.includes(id) ? current.filter(c => c !== id) : [...current, id]
     setForm({ ...form, concerns: next })
+  }
+
+  const toggleMovementType = (val: string) => {
+    const next = form.movement_type.includes(val)
+      ? form.movement_type.filter(m => m !== val)
+      : [...form.movement_type, val]
+    setForm({ ...form, movement_type: next })
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
@@ -386,25 +392,33 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
       </div>
 
       {/* ── Movement type + Difficulty level ─────────────────────────────────── */}
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="space-y-4">
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             {locale === 'ja' ? '動き別' : 'Movement type'}
             <span className="text-xs text-gray-400 dark:text-navy-400 ml-2">
-              {locale === 'ja' ? '任意' : 'optional'}
+              {locale === 'ja' ? '複数選択可・任意' : 'multiple allowed · optional'}
             </span>
           </label>
-          <select
-            value={form.movement_type}
-            onChange={e => setForm({ ...form, movement_type: e.target.value })}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
-          >
-            {MOVEMENT_TYPES.map(m => (
-              <option key={m.value} value={m.value}>
-                {locale === 'ja' ? m.labelJa : m.labelEn}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-wrap gap-2">
+            {MOVEMENT_TYPES.map(m => {
+              const selected = form.movement_type.includes(m.value)
+              return (
+                <button
+                  key={m.value}
+                  type="button"
+                  onClick={() => toggleMovementType(m.value)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+                    selected
+                      ? 'bg-navy-600 border-navy-600 text-white'
+                      : 'bg-white dark:bg-navy-800 border-gray-200 dark:border-navy-600 text-gray-600 dark:text-gray-300 hover:border-sage-400 hover:bg-sage-50 dark:hover:bg-navy-700'
+                  }`}
+                >
+                  {locale === 'ja' ? m.labelJa : m.labelEn}
+                </button>
+              )
+            })}
+          </div>
         </div>
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -416,7 +430,7 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
           <select
             value={form.difficulty_level}
             onChange={e => setForm({ ...form, difficulty_level: e.target.value })}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
+            className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
           >
             {DIFFICULTY_LEVELS.map(d => (
               <option key={d.value} value={d.value}>
