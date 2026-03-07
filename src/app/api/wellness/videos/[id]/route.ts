@@ -17,10 +17,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const { id } = await params
   const body = await request.json()
   const admin = await createAdminClient()
-  const { error } = await admin.from('wellness_videos').update(body).eq('id', id)
+
+  const { data, error } = await admin
+    .from('wellness_videos')
+    .update(body)
+    .eq('id', id)
+    .select()
+    .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ data })
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -29,8 +35,8 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
 
   const { id } = await params
   const admin = await createAdminClient()
-  const { error } = await admin.from('wellness_videos').delete().eq('id', id)
 
+  const { error } = await admin.from('wellness_videos').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ ok: true })
 }

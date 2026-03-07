@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { Plus, Trash2, Eye, EyeOff, Play, Link2, Upload } from 'lucide-react'
+import { Plus, Trash2, Eye, EyeOff, Play, Link2, Upload, Pencil } from 'lucide-react'
 import { CONCERNS } from '@/lib/concerns'
 
 interface WellnessVideo {
@@ -75,6 +75,7 @@ const MAX_FILE_SIZE = 500 * 1024 * 1024 // 500MB
 export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[] }) {
   const [videos, setVideos] = useState<WellnessVideo[]>(initialVideos)
   const [showForm, setShowForm] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [inputMode, setInputMode] = useState<'url' | 'file'>('url')
   const [form, setForm] = useState(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
@@ -90,6 +91,37 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
   const thumbnailInputRef = useRef<HTMLInputElement>(null)
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false)
 
+  const openEdit = (video: WellnessVideo) => {
+    setEditingId(video.id)
+    setForm({
+      title_ja: video.title_ja,
+      title_en: video.title_en,
+      description_ja: video.description_ja ?? '',
+      description_en: video.description_en ?? '',
+      video_url: video.video_url,
+      thumbnail_url: video.thumbnail_url ?? '',
+      duration_label: video.duration_label ?? '',
+      category: video.category,
+      concerns: video.concerns ?? [],
+      movement_type: video.movement_type ?? [],
+      difficulty_level: video.difficulty_level ?? '',
+      is_published: video.is_published,
+    })
+    setInputMode('url')
+    setSelectedFile(null)
+    setError('')
+    setShowForm(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const closeForm = () => {
+    setShowForm(false)
+    setEditingId(null)
+    setForm(EMPTY_FORM)
+    setSelectedFile(null)
+    setError('')
+  }
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -103,7 +135,14 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
     }
     setSelectedFile(file)
     setError('')
-    // Auto-fill duration hint from filename if empty
+    // Auto-capture first frame as thumbnail if none set
+    if (!form.thumbnail_url) {
+      captureFirstFrame(file).then(blob => {
+        if (blob) uploadBlobAsThumbnail(blob).then(url => {
+          if (url) setForm(f => ({ ...f, thumbnail_url: url }))
+        })
+      })
+    }
   }
 
   const uploadFile = async (): Promise<string | null> => {
@@ -184,19 +223,38 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
         }
       }
 
-      const res = await fetch('/api/wellness/videos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, video_url: videoUrl }),
-      })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error)
+      const payload = { ...form, video_url: videoUrl }
 
-      setVideos([json.data, ...videos])
-      setForm(EMPTY_FORM)
-      setSelectedFile(null)
+      // Auto-generate thumbnail from YouTube URL if none
+      if (!payload.thumbnail_url) {
+        const ytMatch = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)
+        if (ytMatch) {
+          payload.thumbnail_url = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`
+        }
+      }
+
+      if (editingId) {
+        const res = await fetch(`/api/wellness/videos/${editingId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        const json = await res.json()
+        if (!res.ok) throw new Error(json.error)
+        setVideos(videos.map(v => v.id === editingId ? json.data : v))
+      } else {
+        const res = await fetch('/api/wellness/videos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        const json = await res.json()
+        if (!res.ok) throw new Error(json.error)
+        setVideos([json.data, ...videos])
+      }
+
+      closeForm()
       setUploadProgress(0)
-      setShowForm(false)
     } catch (err: any) {
       setError(err.message || 'エラーが発生しました')
     } finally {
@@ -218,6 +276,37 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
     if (!confirm('この動画を削除しますか？')) return
     setVideos(videos.filter(v => v.id !== id))
     await fetch(`/api/wellness/videos/${id}`, { method: 'DELETE' })
+  }
+
+  // Capture first frame of a local video file as thumbnail
+  const captureFirstFrame = (file: File): Promise<Blob | null> => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video')
+      video.preload = 'metadata'
+      video.muted = true
+      video.playsInline = true
+      const url = URL.createObjectURL(file)
+      video.src = url
+      video.currentTime = 0.5
+      video.addEventListener('seeked', () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = video.videoWidth || 640
+        canvas.height = video.videoHeight || 360
+        canvas.getContext('2d')?.drawImage(video, 0, 0)
+        URL.revokeObjectURL(url)
+        canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.85)
+      }, { once: true })
+      video.addEventListener('error', () => { URL.revokeObjectURL(url); resolve(null) }, { once: true })
+      video.load()
+    })
+  }
+
+  const uploadBlobAsThumbnail = async (blob: Blob): Promise<string | null> => {
+    const fd = new FormData()
+    fd.append('file', new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' }))
+    const res = await fetch('/api/wellness/upload-image', { method: 'POST', body: fd })
+    const json = await res.json()
+    return res.ok ? json.url : null
   }
 
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -269,17 +358,19 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
         <Button
           size="sm"
           className="bg-sage-500 hover:bg-sage-600 text-white gap-1"
-          onClick={() => { setShowForm(!showForm); setError('') }}
+          onClick={() => { if (showForm && !editingId) { closeForm() } else { closeForm(); setShowForm(true) } }}
         >
           <Plus className="h-4 w-4" />
-          動画を追加
+          {showForm && !editingId ? 'キャンセル' : '動画を追加'}
         </Button>
       </div>
 
       {/* Add Video Form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="mb-6 p-5 bg-sage-50 dark:bg-navy-700 rounded-xl border border-sage-200 dark:border-navy-600 space-y-4">
-          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">新しい動画を追加</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white text-sm">
+            {editingId ? '動画を編集' : '新しい動画を追加'}
+          </h3>
 
           {/* Title fields */}
           <div className="grid sm:grid-cols-2 gap-3">
@@ -303,8 +394,8 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
             </div>
           </div>
 
-          {/* Input mode tabs */}
-          <div>
+          {/* Input mode tabs — hidden in edit mode */}
+          <div className={editingId ? 'hidden' : ''}>
             <label className="block text-xs text-gray-500 dark:text-navy-300 mb-2">動画ソース *</label>
             <div className="flex gap-1 p-1 bg-white dark:bg-navy-800 rounded-lg w-fit border border-gray-200 dark:border-navy-600 mb-3">
               <button
@@ -564,9 +655,9 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
               className="bg-navy-600 hover:bg-navy-700 text-white"
               disabled={saving || uploading}
             >
-              {uploading ? `アップロード中 ${uploadProgress}%` : saving ? '保存中...' : '保存'}
+              {uploading ? `アップロード中 ${uploadProgress}%` : saving ? '保存中...' : editingId ? '更新' : '保存'}
             </Button>
-            <Button type="button" size="sm" variant="ghost" onClick={() => { setShowForm(false); setSelectedFile(null); setError('') }}>
+            <Button type="button" size="sm" variant="ghost" onClick={closeForm}>
               キャンセル
             </Button>
           </div>
@@ -583,10 +674,12 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
             return (
               <div key={video.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-navy-700 rounded-xl">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 bg-sage-100 dark:bg-sage-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
-                    {isFile
-                      ? <Upload className="h-4 w-4 text-sage-600 dark:text-sage-400" />
-                      : <Play className="h-5 w-5 text-sage-600 dark:text-sage-400" />}
+                  <div className="w-10 h-10 bg-sage-100 dark:bg-sage-900/40 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    {video.thumbnail_url
+                      ? <img src={video.thumbnail_url} alt="" className="w-full h-full object-cover" />
+                      : isFile
+                        ? <Upload className="h-4 w-4 text-sage-600 dark:text-sage-400" />
+                        : <Play className="h-5 w-5 text-sage-600 dark:text-sage-400" />}
                   </div>
                   <div className="min-w-0">
                     <p className="font-medium text-gray-900 dark:text-white text-sm truncate">{video.title_ja}</p>
@@ -605,6 +698,13 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
                   }`}>
                     {video.is_published ? '公開中' : '下書き'}
                   </span>
+                  <button
+                    onClick={() => openEdit(video)}
+                    className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-navy-600 text-blue-500 dark:text-blue-400"
+                    title="編集"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </button>
                   <button
                     onClick={() => togglePublish(video)}
                     className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-navy-600 text-gray-500 dark:text-navy-300"
