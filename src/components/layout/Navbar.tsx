@@ -58,6 +58,11 @@ export function Navbar({ user }: NavbarProps) {
     return '/dashboard'
   }
 
+  const getWellnessLink = () => {
+    if (user?.role === 'admin') return '/admin/wellness'
+    return '/wellness'
+  }
+
   return (
     <nav className="bg-white dark:bg-navy-900 border-b border-gray-100 dark:border-navy-700 sticky top-0 z-50 transition-colors overflow-visible">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,6 +87,13 @@ export function Navbar({ user }: NavbarProps) {
               className="text-gray-600 dark:text-gray-300 hover:text-navy-600 dark:hover:text-sage-400 font-medium transition-colors"
             >
               {t('instructors')}
+            </Link>
+
+            <Link
+              href="/wellness"
+              className="text-gray-600 dark:text-gray-300 hover:text-navy-600 dark:hover:text-sage-400 font-medium transition-colors"
+            >
+              Wellness
             </Link>
 
             {/* Language switcher — mounted guard prevents Radix useId() SSR mismatch */}
@@ -136,6 +148,9 @@ export function Navbar({ user }: NavbarProps) {
                     <DropdownMenuItem asChild className="dark:text-gray-200 dark:hover:bg-navy-700">
                       <Link href={getDashboardLink()}>{t('dashboard')}</Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="dark:text-gray-200 dark:hover:bg-navy-700">
+                      <Link href={getWellnessLink()}>Wellness Library</Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={handleLogout}
                       className="text-red-600 dark:text-red-400"
@@ -180,6 +195,13 @@ export function Navbar({ user }: NavbarProps) {
             onClick={() => setMenuOpen(false)}
           >
             {t('instructors')}
+          </Link>
+          <Link
+            href="/wellness"
+            className="block text-gray-600 dark:text-gray-300 font-medium"
+            onClick={() => setMenuOpen(false)}
+          >
+            Wellness
           </Link>
           {user ? (
             <>

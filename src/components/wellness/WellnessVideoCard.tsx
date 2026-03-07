@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Play, X } from 'lucide-react'
 
 interface VideoCardProps {
@@ -17,6 +18,7 @@ interface VideoCardProps {
   }
   gradient: string
   locale: string
+  isLoggedIn: boolean
 }
 
 function getEmbedUrl(url: string): string | null {
@@ -33,8 +35,17 @@ function isDirectVideo(url: string): boolean {
     url.includes('supabase.co/storage')
 }
 
-export function WellnessVideoCard({ video, gradient, locale }: VideoCardProps) {
+export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: VideoCardProps) {
   const [playing, setPlaying] = useState(false)
+  const router = useRouter()
+
+  const handlePlay = () => {
+    if (!isLoggedIn) {
+      router.push('/login?from=/wellness')
+      return
+    }
+    setPlaying(true)
+  }
 
   const embedUrl = getEmbedUrl(video.video_url)
   const isDirect = isDirectVideo(video.video_url)
@@ -47,7 +58,7 @@ export function WellnessVideoCard({ video, gradient, locale }: VideoCardProps) {
         {/* Thumbnail */}
         <div
           className={`h-40 relative cursor-pointer ${video.thumbnail_url ? '' : `bg-gradient-to-br ${gradient}`} flex items-center justify-center`}
-          onClick={() => setPlaying(true)}
+          onClick={handlePlay}
         >
           {video.thumbnail_url ? (
             // eslint-disable-next-line @next/next/no-img-element

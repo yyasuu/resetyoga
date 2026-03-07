@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Play, BookOpen } from 'lucide-react'
 import { CONCERNS } from '@/lib/concerns'
 import { WellnessVideoCard } from './WellnessVideoCard'
@@ -62,6 +63,7 @@ interface WellnessContentProps {
   staticArticles: StaticArticle[]
   locale: string
   gradients: string[]
+  isLoggedIn: boolean
 }
 
 const GRADIENTS = [
@@ -76,8 +78,10 @@ export function WellnessContent({
   staticVideos,
   staticArticles,
   locale,
+  isLoggedIn,
 }: WellnessContentProps) {
   const [selectedConcern, setSelectedConcern] = useState<string | null>(null)
+  const router = useRouter()
 
   const concern = selectedConcern ? CONCERNS.find((c) => c.id === selectedConcern) : null
 
@@ -199,6 +203,7 @@ export function WellnessContent({
                   video={video}
                   gradient={GRADIENTS[i % GRADIENTS.length]}
                   locale={locale}
+                  isLoggedIn={isLoggedIn}
                 />
               ))
             : (
@@ -252,10 +257,17 @@ export function WellnessContent({
             ? filteredArticles.map((article) => {
                 const coverImage =
                   (article.image_urls)?.[0] ?? article.cover_image_url ?? null
+                const handleArticleClick = (e: React.MouseEvent) => {
+                  if (!isLoggedIn) {
+                    e.preventDefault()
+                    router.push(`/login?from=/wellness/articles/${article.id}`)
+                  }
+                }
                 return (
                   <Link
                     key={article.id}
                     href={`/wellness/articles/${article.id}`}
+                    onClick={handleArticleClick}
                     className="bg-white dark:bg-navy-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow block group"
                   >
                     {coverImage && (

@@ -81,9 +81,10 @@ const STATIC_ARTICLES = [
 export default async function WellnessPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/register')
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+  const profile = user
+    ? (await supabase.from('profiles').select('*').eq('id', user.id).single()).data
+    : null
 
   const cookieStore = await cookies()
   const locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
@@ -92,6 +93,8 @@ export default async function WellnessPage() {
     supabase.from('wellness_videos').select('*').eq('is_published', true).order('created_at', { ascending: false }),
     supabase.from('wellness_articles').select('*, profiles(full_name)').eq('is_published', true).order('created_at', { ascending: false }),
   ])
+
+  const isLoggedIn = !!user
 
   return (
     <div className="min-h-screen bg-linen-50 dark:bg-navy-900 flex flex-col">
@@ -110,6 +113,19 @@ export default async function WellnessPage() {
             ? 'お悩みを選ぶと、あなたに合った瞑想動画とコラムが見つかります。'
             : 'Select a concern to find videos and articles tailored to your needs.'}
         </p>
+        {!isLoggedIn && (
+          <div className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-white/70 dark:bg-navy-800/70 backdrop-blur rounded-full border border-sage-200 dark:border-navy-600 text-sm text-navy-700 dark:text-navy-200">
+            <span>🔓</span>
+            <span>
+              {locale === 'ja'
+                ? 'コンテンツを閲覧するには無料会員登録が必要です'
+                : 'Free registration required to access content'}
+            </span>
+            <a href="/register" className="text-sage-600 dark:text-sage-400 font-semibold hover:underline ml-1">
+              {locale === 'ja' ? '今すぐ登録 →' : 'Sign up free →'}
+            </a>
+          </div>
+        )}
       </div>
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-12">
@@ -120,6 +136,7 @@ export default async function WellnessPage() {
           staticArticles={STATIC_ARTICLES}
           locale={locale}
           gradients={[]}
+          isLoggedIn={isLoggedIn}
         />
       </main>
 

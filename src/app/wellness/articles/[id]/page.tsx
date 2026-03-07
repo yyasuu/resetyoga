@@ -21,7 +21,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   const locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/register')
+  if (!user) redirect(`/login?from=/wellness/articles/${id}`)
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   if (!profile) redirect('/login')
