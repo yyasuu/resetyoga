@@ -313,6 +313,28 @@ function OnboardingForm() {
     window.location.reload()
   }
 
+  // Handle return from Stripe Connect onboarding
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('stripe_ok') === '1') {
+      const savedId = localStorage.getItem('onboarding_stripe_account_id')
+      if (savedId) {
+        setStripeAccountId(savedId)
+        localStorage.removeItem('onboarding_stripe_account_id')
+      }
+      setRole('instructor')
+      const stepParam = params.get('step')
+      if (stepParam === '6') setStep(6)
+      window.history.replaceState({}, '', '/onboarding?role=instructor')
+    } else if (params.get('stripe_reauth') === '1') {
+      setRole('instructor')
+      const stepParam = params.get('step')
+      if (stepParam === '5') setStep(5)
+      toast.info('Please complete Stripe Connect again to receive payouts. / Stripe設定を再度お試しください。')
+      window.history.replaceState({}, '', '/onboarding?role=instructor')
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Step 1
   const [timezone, setTimezone] = useState('Asia/Tokyo')
 
@@ -336,6 +358,7 @@ function OnboardingForm() {
   const [youtubeUrl, setYoutubeUrl] = useState('')
 
   const [stripeConnecting, setStripeConnecting] = useState(false)
+  const [stripeAccountId, setStripeAccountId] = useState<string | null>(null)
 
   // Step 5
   const [bankCountry, setBankCountry] = useState('Japan')
@@ -362,12 +385,18 @@ function OnboardingForm() {
   const handleStripeConnect = async () => {
     setStripeConnecting(true)
     try {
-      const res = await fetch('/api/instructor/stripe-connect', { method: 'POST' })
+      const res = await fetch('/api/onboarding/stripe-connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bankCountry }),
+      })
       const data = await res.json()
-      if (data.url) {
+      if (data.url && data.accountId) {
+        // Persist account ID so we can restore it after Stripe redirects back
+        localStorage.setItem('onboarding_stripe_account_id', data.accountId)
         window.location.href = data.url
       } else {
-        toast.error(data.error ?? 'Stripe Connect failed. Please try from your dashboard after approval.')
+        toast.error(data.error ?? 'Stripe Connect failed. Please try again.')
         setStripeConnecting(false)
       }
     } catch {
@@ -470,6 +499,7 @@ function OnboardingForm() {
             tagline, bio, yogaStyles, languages, yearsExperience,
             certifications, careerHistory, instagramUrl, youtubeUrl,
             bankCountry, bankName, swiftCode, ifscCode, accountNumber, accountHolderName,
+            stripeAccountId,
           }),
         })
         if (!res.ok) {
@@ -994,26 +1024,41 @@ function OnboardingForm() {
             </p>
 
             {/* Stripe recommended banner — clickable */}
-            <button
-              type="button"
-              onClick={handleStripeConnect}
-              disabled={stripeConnecting}
-              className="w-full text-left bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4 mb-4 hover:bg-indigo-100 dark:hover:bg-indigo-800/40 transition-colors disabled:opacity-70"
-            >
-              <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200 mb-1 flex items-center gap-1">
-                ⚡ Stripe Connect — Recommended / 推奨
-                {stripeConnecting
-                  ? <Loader2 className="h-3.5 w-3.5 ml-auto animate-spin text-indigo-600 dark:text-indigo-400" />
-                  : <ChevronRight className="h-3.5 w-3.5 ml-auto text-indigo-500 dark:text-indigo-400" />
-                }
-              </p>
-              <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">
-                {stripeConnecting
-                  ? 'Redirecting to Stripe… / Stripeへ移動中…'
-                  : <><strong>Click here</strong> to connect your Stripe account for automatic monthly payouts in USD. Supported in 40+ countries including India, Japan, US, UK, and more.<br /><span className="text-indigo-500 dark:text-indigo-400">ここをクリックしてStripe Connect設定 → USD自動支払い。インド・日本・米国・英国など40カ国以上対応。</span></>
-                }
-              </p>
-            </button>
+            {stripeAccountId ? (
+              <div className="bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-xl p-4 mb-4 flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-green-800 dark:text-green-300">
+                    Stripe Connect — Connected! / 接続済み ✓
+                  </p>
+                  <p className="text-xs text-green-700 dark:text-green-400 mt-0.5">
+                    Your Stripe account is linked. Payouts will begin after approval.
+                    <br />Stripeアカウントが連携されました。承認後に自動支払いが開始されます。
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleStripeConnect}
+                disabled={stripeConnecting}
+                className="w-full text-left bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4 mb-4 hover:bg-indigo-100 dark:hover:bg-indigo-800/40 transition-colors disabled:opacity-70"
+              >
+                <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200 mb-1 flex items-center gap-1">
+                  ⚡ Stripe Connect — Recommended / 推奨
+                  {stripeConnecting
+                    ? <Loader2 className="h-3.5 w-3.5 ml-auto animate-spin text-indigo-600 dark:text-indigo-400" />
+                    : <ChevronRight className="h-3.5 w-3.5 ml-auto text-indigo-500 dark:text-indigo-400" />
+                  }
+                </p>
+                <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">
+                  {stripeConnecting
+                    ? 'Redirecting to Stripe… / Stripeへ移動中…'
+                    : <><strong>Click here</strong> to connect your Stripe account for automatic monthly payouts in USD. Supported in 40+ countries including India, Japan, US, UK, and more.<br /><span className="text-indigo-500 dark:text-indigo-400">ここをクリックしてStripe Connect設定 → USD自動支払い。インド・日本・米国・英国など40カ国以上対応。</span></>
+                  }
+                </p>
+              </button>
+            )}
 
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-3 mb-5 text-xs text-blue-700 dark:text-blue-300">
               Bank details below are for <strong>manual transfer only</strong> (used if Stripe is not set up). All fields are optional.

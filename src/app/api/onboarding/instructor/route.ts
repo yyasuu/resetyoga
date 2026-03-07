@@ -25,6 +25,9 @@ const InstructorOnboardingSchema = z.object({
   ifscCode:          z.string().max(11).optional().nullable().or(z.literal('')),
   accountNumber:     z.string().max(50).optional().nullable(),
   accountHolderName: z.string().max(100).optional().nullable(),
+  // Stripe Connect account ID obtained during onboarding (stored client-side in
+  // localStorage and passed here so we can persist it after instructor_profiles exists)
+  stripeAccountId:   z.string().max(100).optional().nullable(),
 })
 
 /**
@@ -56,6 +59,7 @@ export async function POST(request: NextRequest) {
       tagline, bio, yogaStyles, languages, yearsExperience,
       certifications, careerHistory, instagramUrl, youtubeUrl,
       bankCountry, bankName, swiftCode, ifscCode, accountNumber, accountHolderName,
+      stripeAccountId,
     } = parsed.data
 
     const adminSupabase = await createAdminClient()
@@ -85,8 +89,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Upsert payout info only if any bank field is provided
-    if (bankName || accountNumber || accountHolderName) {
+    // Upsert payout info if any bank field or Stripe account ID is provided
+    if (bankName || accountNumber || accountHolderName || stripeAccountId) {
       const { error: payoutError } = await adminSupabase
         .from('instructor_payout_info')
         .upsert({
@@ -97,6 +101,7 @@ export async function POST(request: NextRequest) {
           ifsc_code: ifscCode || null,
           account_number: accountNumber || null,
           account_holder_name: accountHolderName || null,
+          ...(stripeAccountId ? { stripe_account_id: stripeAccountId } : {}),
         }, { onConflict: 'id' })
 
       if (payoutError) {
