@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { getTranslations } from 'next-intl/server'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
@@ -40,14 +40,16 @@ export default async function LandingPage() {
     const cookieStore = await cookies()
     locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
 
+    // Use admin client to bypass RLS — these are public preview cards
+    const adminSupabase = await createAdminClient()
     const [{ data: vData }, { data: aData }] = await Promise.all([
-      supabase
+      adminSupabase
         .from('wellness_videos')
         .select('id, title_ja, title_en, thumbnail_url, duration_label, category')
         .eq('is_published', true)
         .order('created_at', { ascending: true })
         .limit(1),
-      supabase
+      adminSupabase
         .from('wellness_articles')
         .select('id, title_ja, title_en, category, cover_image_url, image_urls')
         .eq('is_published', true)
