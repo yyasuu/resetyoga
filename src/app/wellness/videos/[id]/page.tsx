@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
@@ -30,7 +30,8 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
     ? (await supabase.from('profiles').select('*').eq('id', user.id).single()).data
     : null
 
-  const { data: video } = await supabase
+  const admin = await createAdminClient()
+  const { data: video } = await admin
     .from('wellness_videos')
     .select('*')
     .eq('id', id)
