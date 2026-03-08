@@ -51,6 +51,7 @@ export default async function LandingPage() {
         .from('wellness_articles')
         .select('id, title_ja, title_en, category, cover_image_url, image_urls')
         .eq('is_published', true)
+        .eq('is_premium', false)
         .order('created_at', { ascending: true })
         .limit(3),
     ])
