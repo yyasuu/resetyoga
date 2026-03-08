@@ -359,6 +359,7 @@ function OnboardingForm() {
 
   const [stripeConnecting, setStripeConnecting] = useState(false)
   const [stripeAccountId, setStripeAccountId] = useState<string | null>(null)
+  const [stripeError, setStripeError] = useState<string | null>(null)
 
   // Step 5
   const [bankCountry, setBankCountry] = useState('Japan')
@@ -384,6 +385,7 @@ function OnboardingForm() {
 
   const handleStripeConnect = async () => {
     setStripeConnecting(true)
+    setStripeError(null)
     try {
       const res = await fetch('/api/onboarding/stripe-connect', {
         method: 'POST',
@@ -396,11 +398,12 @@ function OnboardingForm() {
         localStorage.setItem('onboarding_stripe_account_id', data.accountId)
         window.location.href = data.url
       } else {
-        toast.error(data.error ?? 'Stripe Connect failed. Please try again.')
+        const msg = data.error ?? 'Stripe Connect failed. Please try again. / Stripe設定に失敗しました。'
+        setStripeError(msg)
         setStripeConnecting(false)
       }
     } catch {
-      toast.error('Connection error. Please try again.')
+      setStripeError('Connection error. Please check your internet and try again. / 通信エラーが発生しました。')
       setStripeConnecting(false)
     }
   }
@@ -437,17 +440,30 @@ function OnboardingForm() {
     if (s === 5) {
       const bankPartiallyFilled = bankName || swiftCode || accountNumber || accountHolderName
       if (bankPartiallyFilled) {
+        // SWIFT code length
         if (swiftCode && swiftCode.length !== 8 && swiftCode.length !== 11) {
-          errs.swiftCode = 'SWIFT code must be 8 or 11 characters / SWIFTコードは8〜11文字'
+          errs.swiftCode = `※ SWIFT code must be 8 or 11 characters (entered: ${swiftCode.length}) / SWIFTコードは8または11文字 (入力: ${swiftCode.length}文字)`
         }
+        // IFSC code length
         if (bankCountry === 'India' && ifscCode && ifscCode.length !== 11) {
-          errs.ifscCode = 'IFSC code must be exactly 11 characters / IFSCコードは11文字'
+          errs.ifscCode = `※ IFSC code must be exactly 11 characters (entered: ${ifscCode.length}) / IFSCコードは11文字 (入力: ${ifscCode.length}文字)`
         }
+        // Account number ↔ holder name pair
         if (accountNumber && !accountHolderName.trim()) {
-          errs.accountHolderName = 'Account holder name required / 口座名義人を入力してください'
+          errs.accountHolderName = '※ Account holder name is required when account number is entered / 口座番号を入力した場合は名義人も必須です'
         }
         if (accountHolderName.trim() && !accountNumber) {
-          errs.accountNumber = 'Account number required / 口座番号を入力してください'
+          errs.accountNumber = '※ Account number is required when account holder name is entered / 名義人を入力した場合は口座番号も必須です'
+        }
+        // Character limits
+        if (bankName && bankName.length > 100) {
+          errs.bankName = `※ Bank name too long (max 100 chars, entered: ${bankName.length}) / 銀行名が長すぎます（最大100文字）`
+        }
+        if (accountNumber && accountNumber.length > 50) {
+          errs.accountNumber = `※ Account number too long (max 50 chars, entered: ${accountNumber.length}) / 口座番号が長すぎます（最大50文字）`
+        }
+        if (accountHolderName && accountHolderName.length > 100) {
+          errs.accountHolderName = `※ Name too long (max 100 chars, entered: ${accountHolderName.length}) / 名前が長すぎます（最大100文字）`
         }
       }
     }
@@ -457,9 +473,11 @@ function OnboardingForm() {
 
   const goNext = (from: number) => {
     if (!validateStep(from)) {
-      // Scroll to first error
-      const el = document.querySelector('[data-error="true"]')
-      el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      // Scroll to first error after React re-renders with the new error state
+      setTimeout(() => {
+        const el = document.querySelector('[data-error="true"]')
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 50)
       return
     }
     setStep(from + 1)
@@ -467,6 +485,16 @@ function OnboardingForm() {
   }
 
   const handleSubmit = async () => {
+    // Re-validate bank fields before submitting (catches edits made after Next was clicked)
+    if (role === 'instructor' && !validateStep(5)) {
+      setStep(5) // Go back to payout step to show errors
+      setTimeout(() => {
+        const el = document.querySelector('[data-error="true"]')
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }, 50)
+      toast.error('Please fix the bank details errors before submitting. / 銀行情報のエラーを修正してから申請してください。')
+      return
+    }
     setLoading(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -1060,6 +1088,20 @@ function OnboardingForm() {
               </button>
             )}
 
+            {/* Stripe Connect error — shown inline instead of just a toast */}
+            {stripeError && (
+              <div className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 mb-3 text-xs text-red-700 dark:text-red-300">
+                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-500" />
+                <div>
+                  <p className="font-semibold mb-0.5">Stripe Connect failed / Stripe Connect エラー</p>
+                  <p>{stripeError}</p>
+                  <button type="button" onClick={handleStripeConnect} className="mt-1.5 underline font-semibold hover:opacity-80">
+                    Retry / 再試行
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-3 mb-5 text-xs text-blue-700 dark:text-blue-300">
               Bank details below are for <strong>manual transfer only</strong> (used if Stripe is not set up). All fields are optional.
               <br /><span className="text-blue-500">以下の銀行情報はStripe未設定時の手動送金用です。すべて任意入力です。</span>
@@ -1081,14 +1123,21 @@ function OnboardingForm() {
                 </Select>
               </div>
 
-              <div>
+              <div data-error={!!errors.bankName || undefined}>
                 <FieldLabel
                   label="Bank Name / 銀行名"
                   htmlFor="bankName"
+                  error={errors.bankName}
                   tooltip="Full name of your bank. e.g. 'State Bank of India', 'HDFC Bank', 'Mizuho Bank', 'JPMorgan Chase'"
                 />
-                <Input id="bankName" value={bankName} onChange={e => setBankName(e.target.value)}
-                  placeholder={bankCountry === 'India' ? 'e.g. State Bank of India, HDFC Bank' : 'e.g. Mizuho Bank, HSBC'} className="mt-1" />
+                <Input id="bankName" value={bankName}
+                  onChange={e => { setBankName(e.target.value); clearError('bankName') }}
+                  placeholder={bankCountry === 'India' ? 'e.g. State Bank of India, HDFC Bank' : 'e.g. Mizuho Bank, HSBC'}
+                  maxLength={100}
+                  className={`mt-1 ${errors.bankName ? 'border-red-400 focus:ring-red-300 bg-red-50 dark:bg-red-900/10' : ''}`} />
+                {errors.bankName && (
+                  <p className="flex items-center gap-1 text-red-500 text-xs mt-1"><AlertCircle className="h-3.5 w-3.5" /> {errors.bankName}</p>
+                )}
               </div>
 
               <div data-error={!!errors.swiftCode || undefined}>
@@ -1139,6 +1188,7 @@ function OnboardingForm() {
                 <Input id="accountNum" value={accountNumber}
                   onChange={e => { setAccountNumber(e.target.value); clearError('accountNumber') }}
                   placeholder={bankCountry === 'India' ? 'e.g. 12345678901 (11–16 digits)' : 'e.g. 1234567890'}
+                  maxLength={50}
                   className={`mt-1 font-mono tracking-wide ${errors.accountNumber ? 'border-red-400 focus:ring-red-300 bg-red-50 dark:bg-red-900/10' : ''}`} />
                 {errors.accountNumber && (
                   <p className="flex items-center gap-1 text-red-500 text-xs mt-1"><AlertCircle className="h-3.5 w-3.5" /> {errors.accountNumber}</p>
@@ -1155,6 +1205,7 @@ function OnboardingForm() {
                 <Input id="holderName" value={accountHolderName}
                   onChange={e => { setAccountHolderName(e.target.value); clearError('accountHolderName') }}
                   placeholder="e.g. PRIYA SHARMA (as on bank account)"
+                  maxLength={100}
                   className={`mt-1 uppercase ${errors.accountHolderName ? 'border-red-400 focus:ring-red-300 bg-red-50 dark:bg-red-900/10' : ''}`} />
                 {errors.accountHolderName && (
                   <p className="flex items-center gap-1 text-red-500 text-xs mt-1"><AlertCircle className="h-3.5 w-3.5" /> {errors.accountHolderName}</p>
