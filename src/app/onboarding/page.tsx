@@ -387,6 +387,13 @@ function OnboardingForm() {
     setStripeConnecting(true)
     setStripeError(null)
     try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setStripeError('Please log in to connect Stripe. / Stripeに接続するにはログインが必要です。')
+        setStripeConnecting(false)
+        router.push('/login')
+        return
+      }
       const res = await fetch('/api/onboarding/stripe-connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -439,6 +446,10 @@ function OnboardingForm() {
     }
     if (s === 5) {
       const bankPartiallyFilled = bankName || swiftCode || accountNumber || accountHolderName
+      const bankMinimumProvided = accountNumber.trim() && accountHolderName.trim()
+      if (!stripeAccountId && !bankMinimumProvided) {
+        errs.payout = '※ Please connect Stripe or enter your bank account number and account holder name. / StripeへのConnect、もしくは口座番号と名義人名を入力してください。'
+      }
       if (bankPartiallyFilled) {
         // SWIFT code length
         if (swiftCode && swiftCode.length !== 8 && swiftCode.length !== 11) {
@@ -1102,8 +1113,15 @@ function OnboardingForm() {
               </div>
             )}
 
+            {errors.payout && (
+              <div data-error="true" className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 mb-3 text-xs text-red-700 dark:text-red-300">
+                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-500" />
+                <p>{errors.payout}</p>
+              </div>
+            )}
+
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-3 mb-5 text-xs text-blue-700 dark:text-blue-300">
-              Bank details below are for <strong>manual transfer only</strong> (used if Stripe is not set up). All fields are optional.
+              Bank details below are for <strong>manual transfer only</strong> (used if Stripe is not set up). Enter account number + holder name, or connect Stripe above.
               <br /><span className="text-blue-500">以下の銀行情報はStripe未設定時の手動送金用です。すべて任意入力です。</span>
             </div>
 
