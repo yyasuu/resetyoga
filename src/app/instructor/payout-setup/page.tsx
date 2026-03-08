@@ -35,13 +35,16 @@ function PayoutSetupContent() {
   const [loading, setLoading] = useState(true)
   const [connecting, setConnecting] = useState(false)
 
-  const getAuthHeaders = async () => {
+  const getAuthHeaders = async (): Promise<Record<string, string>> => {
     const { data: { session } } = await supabase.auth.getSession()
-    return session ? { 'Authorization': `Bearer ${session.access_token}` } : {}
+    if (!session) return {}
+    return { 'Authorization': `Bearer ${session.access_token}` }
   }
 
   const loadStatus = async (token?: string) => {
-    const headers: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : await getAuthHeaders()
+    const headers: Record<string, string> = token
+      ? { 'Authorization': `Bearer ${token}` }
+      : await getAuthHeaders()
     const res = await fetch('/api/instructor/stripe-connect', { headers })
     if (res.ok) setStatus(await res.json())
     setLoading(false)
