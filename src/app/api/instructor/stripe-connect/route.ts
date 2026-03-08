@@ -1,14 +1,35 @@
-import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { createConnectAccount, createAccountLink, getConnectedAccount, isConnectComplete } from '@/lib/stripe'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
-// ── GET: return current Connect status ────────────────────────────────────────
-export async function GET() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+/**
+ * Resolve user from Authorization: Bearer <token> header (preferred) or
+ * fall back to cookie-based session. Returns null if unauthenticated.
+ */
+async function resolveUser(request: NextRequest) {
+  const authHeader = request.headers.get('Authorization')
+  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
 
   const admin = await createAdminClient()
+
+  if (bearerToken) {
+    const { data: { user }, error } = await admin.auth.getUser(bearerToken)
+    if (error || !user) return { user: null, admin }
+    return { user, admin }
+  }
+
+  // Cookie-based fallback
+  const { createClient } = await import('@/lib/supabase/server')
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return { user, admin }
+}
+
+// ── GET: return current Connect status ────────────────────────────────────────
+export async function GET(request: NextRequest) {
+  const { user, admin } = await resolveUser(request)
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { data: payoutInfo } = await admin
     .from('instructor_payout_info')
     .select('stripe_account_id, stripe_onboarding_complete')
@@ -42,12 +63,9 @@ export async function GET() {
 }
 
 // ── POST: start or resume Connect onboarding ──────────────────────────────────
-export async function POST() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export async function POST(request: NextRequest) {
+  const { user, admin } = await resolveUser(request)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const admin = await createAdminClient()
 
   // Get existing payout info
   const { data: profile } = await admin
@@ -74,7 +92,7 @@ export async function POST() {
     // Stripe uses 2-letter ISO codes; map common values
     const countryCode = COUNTRY_CODES[country] ?? country.slice(0, 2).toUpperCase()
 
-    const account = await createConnectAccount(profile?.email ?? '', countryCode)
+    const account = await createConnectAccount(profile?.email ?? user.email ?? '', countryCode)
     accountId = account.id
 
     // Upsert payout info with the new account id

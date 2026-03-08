@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { createConnectAccount, createAccountLink } from '@/lib/stripe'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -33,17 +33,48 @@ const COUNTRY_CODES: Record<string, string> = {
  *
  * We intentionally do NOT write to instructor_payout_info here because that
  * table has a FK → instructor_profiles(id) which doesn't exist yet.
+ *
+ * Auth: accepts JWT via Authorization: Bearer <token> header (preferred) so
+ * that this works even when session cookies are not properly set after OAuth
+ * redirect — a known issue with the next/headers cookies() approach.
  */
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  // Prefer JWT from Authorization header; fall back to cookie-based auth
+  const authHeader = request.headers.get('Authorization')
+  const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('email')
-    .eq('id', user.id)
-    .single()
+  const admin = await createAdminClient()
+
+  let userId: string | null = null
+  let userEmail: string | null = null
+
+  if (bearerToken) {
+    // Verify the JWT using the admin client (service role key)
+    const { data: { user }, error } = await admin.auth.getUser(bearerToken)
+    if (error || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    userId = user.id
+    userEmail = user.email ?? null
+  } else {
+    // Fall back to cookie-based auth (for environments where cookies work)
+    const { createClient } = await import('@/lib/supabase/server')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    userId = user.id
+    userEmail = user.email ?? null
+  }
+
+  // Get email from profiles if not available from auth
+  if (!userEmail) {
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('email')
+      .eq('id', userId)
+      .single()
+    userEmail = profile?.email ?? ''
+  }
 
   const body = await request.json().catch(() => ({}))
   const bankCountry: string = body.bankCountry ?? 'Japan'
@@ -54,7 +85,7 @@ export async function POST(request: NextRequest) {
   const refreshUrl = `${appUrl}/onboarding?role=instructor&stripe_reauth=1&step=5`
 
   try {
-    const account = await createConnectAccount(profile?.email ?? '', countryCode)
+    const account = await createConnectAccount(userEmail, countryCode)
     const link = await createAccountLink(account.id, refreshUrl, returnUrl)
     return NextResponse.json({ url: link.url, accountId: account.id })
   } catch (err: any) {

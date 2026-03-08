@@ -35,22 +35,28 @@ function PayoutSetupContent() {
   const [loading, setLoading] = useState(true)
   const [connecting, setConnecting] = useState(false)
 
-  const loadStatus = async () => {
-    const res = await fetch('/api/instructor/stripe-connect')
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    return session ? { 'Authorization': `Bearer ${session.access_token}` } : {}
+  }
+
+  const loadStatus = async (token?: string) => {
+    const headers: Record<string, string> = token ? { 'Authorization': `Bearer ${token}` } : await getAuthHeaders()
+    const res = await fetch('/api/instructor/stripe-connect', { headers })
     if (res.ok) setStatus(await res.json())
     setLoading(false)
   }
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { router.push('/login'); return }
-      supabase.from('profiles').select('*').eq('id', user.id).single()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) { router.push('/login'); return }
+      supabase.from('profiles').select('*').eq('id', session.user.id).single()
         .then(({ data }) => {
           if (!data || (data.role !== 'instructor' && data.role !== 'admin')) {
             router.push('/dashboard'); return
           }
           setProfile(data)
-          loadStatus()
+          loadStatus(session.access_token)
         })
     })
 
@@ -65,7 +71,8 @@ function PayoutSetupContent() {
 
   const handleConnect = async () => {
     setConnecting(true)
-    const res = await fetch('/api/instructor/stripe-connect', { method: 'POST' })
+    const headers = await getAuthHeaders()
+    const res = await fetch('/api/instructor/stripe-connect', { method: 'POST', headers })
     const data = await res.json()
     if (data.url) {
       window.location.href = data.url

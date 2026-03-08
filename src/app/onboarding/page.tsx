@@ -387,8 +387,11 @@ function OnboardingForm() {
     setStripeConnecting(true)
     setStripeError(null)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
+      // Use getSession() to get the access token directly from browser storage.
+      // This is more reliable than cookie-based auth for API calls because
+      // the session cookies might not be properly set after OAuth redirect.
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
         setStripeError('Please log in to connect Stripe. / Stripeに接続するにはログインが必要です。')
         setStripeConnecting(false)
         router.push('/login')
@@ -396,7 +399,10 @@ function OnboardingForm() {
       }
       const res = await fetch('/api/onboarding/stripe-connect', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({ bankCountry }),
       })
       const data = await res.json()
