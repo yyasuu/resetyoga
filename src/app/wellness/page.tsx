@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
@@ -89,9 +89,11 @@ export default async function WellnessPage() {
   const cookieStore = await cookies()
   const locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
 
+  // Use admin client to bypass RLS — wellness library is public
+  const adminSupabase = await createAdminClient()
   const [{ data: dbVideos }, { data: dbArticles }] = await Promise.all([
-    supabase.from('wellness_videos').select('*').eq('is_published', true).order('created_at', { ascending: false }),
-    supabase.from('wellness_articles').select('*, profiles(full_name)').eq('is_published', true).order('created_at', { ascending: false }),
+    adminSupabase.from('wellness_videos').select('*').eq('is_published', true).order('created_at', { ascending: false }),
+    adminSupabase.from('wellness_articles').select('*, profiles(full_name)').eq('is_published', true).order('created_at', { ascending: false }),
   ])
 
   const isLoggedIn = !!user
@@ -115,14 +117,14 @@ export default async function WellnessPage() {
         </p>
         {!isLoggedIn && (
           <div className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-white/70 dark:bg-navy-800/70 backdrop-blur rounded-full border border-sage-200 dark:border-navy-600 text-sm text-navy-700 dark:text-navy-200">
-            <span>🔓</span>
+            <span>✨</span>
             <span>
               {locale === 'ja'
-                ? 'コンテンツを閲覧するには無料会員登録が必要です'
-                : 'Free registration required to access content'}
+                ? '無料コンテンツはそのまま閲覧できます。プレミアムはログインが必要です。'
+                : 'Free content is open to all. Premium content requires login.'}
             </span>
             <a href="/register" className="text-sage-600 dark:text-sage-400 font-semibold hover:underline ml-1">
-              {locale === 'ja' ? '今すぐ登録 →' : 'Sign up free →'}
+              {locale === 'ja' ? '登録 →' : 'Sign up →'}
             </a>
           </div>
         )}

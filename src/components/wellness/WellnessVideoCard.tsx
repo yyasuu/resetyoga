@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Play, X } from 'lucide-react'
+import { Play, X, Sparkles } from 'lucide-react'
 
 interface VideoCardProps {
   video: {
@@ -15,6 +15,7 @@ interface VideoCardProps {
     thumbnail_url: string | null
     duration_label: string | null
     category: string
+    is_premium?: boolean
   }
   gradient: string
   locale: string
@@ -30,7 +31,6 @@ function getEmbedUrl(url: string): string | null {
 }
 
 function isDirectVideo(url: string): boolean {
-  // Matches .mp4/.webm/.ogg in the URL (covers Supabase Storage URLs and direct links)
   return /\.(mp4|webm|ogg|mov|avi)(\?|$)/i.test(url) ||
     url.includes('supabase.co/storage')
 }
@@ -39,11 +39,15 @@ export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: Video
   const [playing, setPlaying] = useState(false)
   const router = useRouter()
 
+  const isPremium = !!video.is_premium
+
   const handlePlay = () => {
-    if (!isLoggedIn) {
-      router.push('/login?from=/wellness')
+    if (isPremium) {
+      // Premium video → detail page handles login gate / paywall
+      router.push(`/wellness/videos/${video.id}`)
       return
     }
+    // Free video → play inline for everyone
     setPlaying(true)
   }
 
@@ -76,6 +80,12 @@ export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: Video
               {video.duration_label}
             </span>
           )}
+          {isPremium && (
+            <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full z-10">
+              <Sparkles className="h-3 w-3" />
+              {locale === 'ja' ? 'プレミアム' : 'Premium'}
+            </span>
+          )}
         </div>
 
         <div className="p-5">
@@ -86,7 +96,7 @@ export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: Video
         </div>
       </div>
 
-      {/* Video Modal */}
+      {/* Video Modal (free videos only) */}
       {playing && (
         <div
           className="fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4"

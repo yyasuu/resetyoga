@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Play, BookOpen } from 'lucide-react'
+import { Play, BookOpen, Sparkles } from 'lucide-react'
 import { CONCERNS } from '@/lib/concerns'
 import { WellnessVideoCard } from './WellnessVideoCard'
 
@@ -35,6 +35,7 @@ interface Article {
   concerns: string[] | null
   movement_type: string[] | null
   difficulty_level: string | null
+  is_premium?: boolean
   profiles: { full_name: string | null } | null
 }
 
@@ -334,8 +335,10 @@ export function WellnessContent({
             ? filteredArticles.map((article) => {
                 const coverImage =
                   (article.image_urls)?.[0] ?? article.cover_image_url ?? null
+                const isPremium = !!article.is_premium
                 const handleArticleClick = (e: React.MouseEvent) => {
-                  if (!isLoggedIn) {
+                  // Premium article + guest → redirect to login
+                  if (isPremium && !isLoggedIn) {
                     e.preventDefault()
                     router.push(`/login?from=/wellness/articles/${article.id}`)
                   }
@@ -358,9 +361,17 @@ export function WellnessContent({
                       </div>
                     )}
                     <div className="p-6">
-                      <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wider">
-                        {article.category}
-                      </span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wider">
+                          {article.category}
+                        </span>
+                        {isPremium && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">
+                            <Sparkles className="h-3 w-3" />
+                            {locale === 'ja' ? 'プレミアム' : 'Premium'}
+                          </span>
+                        )}
+                      </div>
                       <h3 className="font-bold text-gray-900 dark:text-white mt-2 mb-3 leading-snug group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
                         {locale === 'ja' ? article.title_ja : article.title_en}
                       </h3>

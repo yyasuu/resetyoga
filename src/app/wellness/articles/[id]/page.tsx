@@ -62,8 +62,9 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   }
 
   const showPaywall = isPremium && !canAccessPremium && !hasActiveSubscription && !!user
-  // Guest (not logged in) → show login gate instead of full content
-  const showLoginGate = !user
+  // Guest + premium article → show login gate
+  // Guest + free article → show full content
+  const showLoginGate = !user && isPremium
 
   // Preview text for guest gate and premium paywall
   const contentPlain = (content ?? '')
