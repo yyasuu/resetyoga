@@ -572,7 +572,7 @@ function OnboardingForm() {
           <p className="text-xs text-gray-400 dark:text-navy-500 mb-8">
             1〜3営業日以内に審査結果をメールでお知らせします。
           </p>
-          <Button onClick={() => router.push('/')} className="bg-navy-600 hover:bg-navy-700 !text-white w-full rounded-full">
+          <Button onClick={() => router.push('/')} variant="navy" className="w-full rounded-full">
             Go to Homepage / ホームへ
           </Button>
         </div>
@@ -693,7 +693,7 @@ function OnboardingForm() {
             )}
 
             <Button
-              className="w-full bg-navy-600 hover:bg-navy-700 !text-white rounded-full"
+              variant="navy" className="w-full rounded-full"
               onClick={() => { setTermsAgreed(false); setStep(2) }}
               disabled={loading}
             >
@@ -735,7 +735,7 @@ function OnboardingForm() {
               <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(1)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 !text-white rounded-full" onClick={handleSubmit} disabled={!termsAgreed || loading}>
+              <Button variant="navy" className="flex-1 rounded-full" onClick={handleSubmit} disabled={!termsAgreed || loading}>
                 {loading ? 'Setting up...' : 'Start My Trial 🎉'}
               </Button>
             </div>
@@ -795,7 +795,7 @@ function OnboardingForm() {
               <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(1)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 !text-white rounded-full" onClick={() => goNext(2)}>
+              <Button variant="navy" className="flex-1 rounded-full" onClick={() => goNext(2)}>
                 Next: Specialty <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -904,7 +904,7 @@ function OnboardingForm() {
               <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(2)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 !text-white rounded-full" onClick={() => goNext(3)}>
+              <Button variant="navy" className="flex-1 rounded-full" onClick={() => goNext(3)}>
                 Next: Experience <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -1032,7 +1032,7 @@ function OnboardingForm() {
               <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(3)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 !text-white rounded-full" onClick={() => goNext(4)}>
+              <Button variant="navy" className="flex-1 rounded-full" onClick={() => goNext(4)}>
                 Next: Payout <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -1217,7 +1217,7 @@ function OnboardingForm() {
               <Button variant="outline" className="flex-1 rounded-full dark:border-navy-600 dark:text-navy-200" onClick={() => setStep(4)}>
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
-              <Button className="flex-1 bg-navy-600 hover:bg-navy-700 !text-white rounded-full" onClick={() => { setTermsAgreed(false); goNext(5) }}>
+              <Button variant="navy" className="flex-1 rounded-full" onClick={() => { setTermsAgreed(false); goNext(5) }}>
                 Next: Terms <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -1289,7 +1289,7 @@ function OnboardingForm() {
                 <ChevronLeft className="h-4 w-4 mr-1" /> Back
               </Button>
               <Button
-                className="flex-1 bg-navy-600 hover:bg-navy-700 !text-white rounded-full disabled:opacity-50"
+                variant="navy" className="flex-1 rounded-full disabled:opacity-50"
                 onClick={handleSubmit}
                 disabled={!termsAgreed || loading}
               >
