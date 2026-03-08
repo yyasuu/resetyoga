@@ -3,33 +3,54 @@ import { createConnectAccount, createAccountLink, getConnectedAccount, isConnect
 import { NextRequest, NextResponse } from 'next/server'
 
 /**
- * Resolve user from Authorization: Bearer <token> header (preferred) or
- * fall back to cookie-based session. Returns null if unauthenticated.
+ * Verify a Supabase JWT by calling the Auth REST API directly.
+ * More reliable than createServerClient.auth.getUser(jwt) for explicit JWTs.
  */
-async function resolveUser(request: NextRequest) {
+async function verifyJWT(token: string): Promise<{ id: string; email: string | null } | null> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/user`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        },
+        cache: 'no-store',
+      }
+    )
+    if (!res.ok) return null
+    const data = await res.json()
+    return data?.id ? { id: data.id, email: data.email ?? null } : null
+  } catch {
+    return null
+  }
+}
+
+async function resolveUser(request: NextRequest): Promise<{ id: string; email: string | null } | null> {
   const authHeader = request.headers.get('Authorization')
   const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
 
-  const admin = await createAdminClient()
-
   if (bearerToken) {
-    const { data: { user }, error } = await admin.auth.getUser(bearerToken)
-    if (error || !user) return { user: null, admin }
-    return { user, admin }
+    return verifyJWT(bearerToken)
   }
 
-  // Cookie-based fallback
-  const { createClient } = await import('@/lib/supabase/server')
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  return { user, admin }
+  // Cookie-based fallback for environments where cookies work
+  try {
+    const { createClient } = await import('@/lib/supabase/server')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    return user ? { id: user.id, email: user.email ?? null } : null
+  } catch {
+    return null
+  }
 }
 
 // ── GET: return current Connect status ────────────────────────────────────────
 export async function GET(request: NextRequest) {
-  const { user, admin } = await resolveUser(request)
+  const user = await resolveUser(request)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const admin = await createAdminClient()
   const { data: payoutInfo } = await admin
     .from('instructor_payout_info')
     .select('stripe_account_id, stripe_onboarding_complete')
@@ -40,7 +61,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ connected: false })
   }
 
-  // Re-check with Stripe in case onboarding was just completed
   try {
     const account = await getConnectedAccount(payoutInfo.stripe_account_id)
     const complete = isConnectComplete(account)
@@ -64,10 +84,11 @@ export async function GET(request: NextRequest) {
 
 // ── POST: start or resume Connect onboarding ──────────────────────────────────
 export async function POST(request: NextRequest) {
-  const { user, admin } = await resolveUser(request)
+  const user = await resolveUser(request)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // Get existing payout info
+  const admin = await createAdminClient()
+
   const { data: profile } = await admin
     .from('profiles')
     .select('email')
@@ -86,16 +107,11 @@ export async function POST(request: NextRequest) {
 
   let accountId = payoutInfo?.stripe_account_id
 
-  // Create account if not yet started
   if (!accountId) {
     const country = payoutInfo?.bank_country ?? 'JP'
-    // Stripe uses 2-letter ISO codes; map common values
     const countryCode = COUNTRY_CODES[country] ?? country.slice(0, 2).toUpperCase()
-
     const account = await createConnectAccount(profile?.email ?? user.email ?? '', countryCode)
     accountId = account.id
-
-    // Upsert payout info with the new account id
     await admin
       .from('instructor_payout_info')
       .upsert({ id: user.id, stripe_account_id: accountId }, { onConflict: 'id' })
@@ -105,7 +121,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ url: link.url })
 }
 
-// Country name → ISO 3166-1 alpha-2 code mapping
 const COUNTRY_CODES: Record<string, string> = {
   Japan:          'JP',
   India:          'IN',

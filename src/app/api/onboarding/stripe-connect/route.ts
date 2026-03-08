@@ -24,50 +24,69 @@ const COUNTRY_CODES: Record<string, string> = {
 }
 
 /**
+ * Verify a Supabase JWT by calling the Auth REST API directly.
+ *
+ * We avoid using createServerClient from @supabase/ssr here because that
+ * wrapper is designed for cookie-based session management and does not
+ * reliably handle auth.getUser(jwt) with an explicit JWT argument.
+ * The direct REST call is guaranteed to work with any valid access token.
+ */
+async function verifyJWT(token: string): Promise<{ id: string; email: string | null } | null> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/user`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        },
+        cache: 'no-store',
+      }
+    )
+    if (!res.ok) return null
+    const data = await res.json()
+    return data?.id ? { id: data.id, email: data.email ?? null } : null
+  } catch {
+    return null
+  }
+}
+
+/**
  * POST /api/onboarding/stripe-connect
  *
- * Creates a Stripe Connect account during onboarding (before instructor_profiles
- * exists). Returns { url, accountId } — the client stores accountId in
- * localStorage and redirects to Stripe. On return the onboarding form reads
+ * Creates a Stripe Connect Express account during instructor onboarding.
+ * Returns { url, accountId } — the client stores accountId in localStorage
+ * and redirects the user to Stripe. On return, the onboarding form reads
  * accountId from localStorage and passes it to /api/onboarding/instructor.
  *
- * We intentionally do NOT write to instructor_payout_info here because that
- * table has a FK → instructor_profiles(id) which doesn't exist yet.
- *
- * Auth: accepts JWT via Authorization: Bearer <token> header (preferred) so
- * that this works even when session cookies are not properly set after OAuth
- * redirect — a known issue with the next/headers cookies() approach.
+ * Auth: requires Authorization: Bearer <access_token> header.
+ * The JWT is verified via a direct call to the Supabase Auth REST API.
  */
 export async function POST(request: NextRequest) {
-  // Prefer JWT from Authorization header; fall back to cookie-based auth
   const authHeader = request.headers.get('Authorization')
   const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
 
-  const admin = await createAdminClient()
-
-  let userId: string | null = null
-  let userEmail: string | null = null
-
-  if (bearerToken) {
-    // Verify the JWT using the admin client (service role key)
-    const { data: { user }, error } = await admin.auth.getUser(bearerToken)
-    if (error || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-    userId = user.id
-    userEmail = user.email ?? null
-  } else {
-    // Fall back to cookie-based auth (for environments where cookies work)
-    const { createClient } = await import('@/lib/supabase/server')
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    userId = user.id
-    userEmail = user.email ?? null
+  if (!bearerToken) {
+    return NextResponse.json(
+      { error: 'ログインが必要です。ページを再読み込みしてください。 / Not logged in. Please reload and log in.' },
+      { status: 401 }
+    )
   }
 
-  // Get email from profiles if not available from auth
+  const userData = await verifyJWT(bearerToken)
+  if (!userData) {
+    return NextResponse.json(
+      { error: 'セッションが無効です。再ログインしてください。 / Session invalid or expired. Please log in again.', needsLogin: true },
+      { status: 401 }
+    )
+  }
+
+  const { id: userId } = userData
+  let userEmail = userData.email
+
+  // Get email from profiles table if not in the JWT
   if (!userEmail) {
+    const admin = await createAdminClient()
     const { data: profile } = await admin
       .from('profiles')
       .select('email')
@@ -85,11 +104,15 @@ export async function POST(request: NextRequest) {
   const refreshUrl = `${appUrl}/onboarding?role=instructor&stripe_reauth=1&step=5`
 
   try {
-    const account = await createConnectAccount(userEmail, countryCode)
+    const account = await createConnectAccount(userEmail ?? '', countryCode)
     const link = await createAccountLink(account.id, refreshUrl, returnUrl)
     return NextResponse.json({ url: link.url, accountId: account.id })
   } catch (err: any) {
     console.error('[onboarding/stripe-connect]', err)
-    return NextResponse.json({ error: err.message ?? 'Stripe error' }, { status: 500 })
+    const msg = err?.message ?? 'Stripe error'
+    return NextResponse.json(
+      { error: `Stripe エラー: ${msg}` },
+      { status: 500 }
+    )
   }
 }

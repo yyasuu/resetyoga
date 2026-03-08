@@ -383,18 +383,28 @@ function OnboardingForm() {
     }
   }
 
+  const [stripeNeedsLogin, setStripeNeedsLogin] = useState(false)
+
   const handleStripeConnect = async () => {
     setStripeConnecting(true)
     setStripeError(null)
+    setStripeNeedsLogin(false)
     try {
-      // Use getSession() to get the access token directly from browser storage.
-      // This is more reliable than cookie-based auth for API calls because
-      // the session cookies might not be properly set after OAuth redirect.
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        setStripeError('Please log in to connect Stripe. / Stripeに接続するにはログインが必要です。')
+      // Call getUser() first — this makes a network request to Supabase and
+      // auto-refreshes the access token if it has expired. Then getSession()
+      // returns the fresh (possibly just-refreshed) token.
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) {
+        setStripeError('ログインが必要です。以下のリンクから再ログインしてください。 / Not logged in. Please log in again.')
+        setStripeNeedsLogin(true)
         setStripeConnecting(false)
-        router.push('/login')
+        return
+      }
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) {
+        setStripeError('セッションが取得できませんでした。再ログインしてください。 / Could not retrieve session. Please log in again.')
+        setStripeNeedsLogin(true)
+        setStripeConnecting(false)
         return
       }
       const res = await fetch('/api/onboarding/stripe-connect', {
@@ -413,10 +423,11 @@ function OnboardingForm() {
       } else {
         const msg = data.error ?? 'Stripe Connect failed. Please try again. / Stripe設定に失敗しました。'
         setStripeError(msg)
+        if (data.needsLogin) setStripeNeedsLogin(true)
         setStripeConnecting(false)
       }
     } catch {
-      setStripeError('Connection error. Please check your internet and try again. / 通信エラーが発生しました。')
+      setStripeError('通信エラーが発生しました。インターネット接続を確認してください。 / Connection error. Please check your internet and try again.')
       setStripeConnecting(false)
     }
   }
@@ -1105,16 +1116,25 @@ function OnboardingForm() {
               </button>
             )}
 
-            {/* Stripe Connect error — shown inline instead of just a toast */}
+            {/* Stripe Connect error — shown inline with specific reason */}
             {stripeError && (
               <div className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 mb-3 text-xs text-red-700 dark:text-red-300">
                 <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-500" />
-                <div>
-                  <p className="font-semibold mb-0.5">Stripe Connect failed / Stripe Connect エラー</p>
-                  <p>{stripeError}</p>
-                  <button type="button" onClick={handleStripeConnect} className="mt-1.5 underline font-semibold hover:opacity-80">
-                    Retry / 再試行
-                  </button>
+                <div className="space-y-1.5">
+                  <p className="font-semibold">※ Stripe Connect エラー / Stripe Connect Error</p>
+                  <p className="text-red-600 dark:text-red-400">{stripeError}</p>
+                  {stripeNeedsLogin ? (
+                    <a
+                      href="/login"
+                      className="inline-block underline font-semibold text-red-700 dark:text-red-300 hover:opacity-80"
+                    >
+                      ログインページへ / Go to Login →
+                    </a>
+                  ) : (
+                    <button type="button" onClick={handleStripeConnect} className="underline font-semibold hover:opacity-80">
+                      再試行 / Retry
+                    </button>
+                  )}
                 </div>
               </div>
             )}
