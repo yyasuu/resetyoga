@@ -32,15 +32,6 @@ interface ArticleEditorProps {
   locale?: string
 }
 
-const CATEGORIES = [
-  { value: 'ayurveda',    labelJa: 'アーユルヴェーダ',    labelEn: 'Ayurveda' },
-  { value: 'nutrition',   labelJa: '食事・栄養',           labelEn: 'Nutrition' },
-  { value: 'breathing',   labelJa: '呼吸法',               labelEn: 'Breathing' },
-  { value: 'mindfulness', labelJa: 'マインドフルネス',      labelEn: 'Mindfulness' },
-  { value: 'yoga',        labelJa: 'ヨガ理論',             labelEn: 'Yoga Theory' },
-  { value: 'other',       labelJa: 'その他（自由入力）',    labelEn: 'Other (custom)' },
-]
-
 const MOVEMENT_TYPES = [
   { value: 'flow',       labelJa: 'フロー',       labelEn: 'Flow' },
   { value: 'static',     labelJa: 'スタティック',  labelEn: 'Static' },
@@ -58,17 +49,12 @@ const DIFFICULTY_LEVELS = [
   { value: 'advanced',     labelJa: '上級者',               labelEn: 'Advanced' },
 ]
 
-const PRESET_VALUES = CATEGORIES.filter(c => c.value !== 'other').map(c => c.value)
-
 export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: ArticleEditorProps) {
   const router = useRouter()
   const [tab, setTab] = useState<'ja' | 'en'>('ja')
   const [showPresets, setShowPresets] = useState(!initialData?.id)
   const [presetFilter, setPresetFilter] = useState<string | null>(null)
   const [appliedPresetId, setAppliedPresetId] = useState<string | null>(null)
-
-  const initCategory = initialData?.category ?? 'ayurveda'
-  const initIsPreset = PRESET_VALUES.includes(initCategory)
 
   // Derive initial access_level from existing data
   const initAccessLevel = (() => {
@@ -84,7 +70,7 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     subtitle_en: initialData?.subtitle_en ?? '',
     content_ja: initialData?.content_ja ?? '',
     content_en: initialData?.content_en ?? '',
-    category: initIsPreset ? initCategory : 'other',
+    category: 'other',
     cover_image_url: initialData?.cover_image_url ?? '',
     image_urls: initialData?.image_urls ?? [],
     concerns: (initialData as any)?.concerns ?? [],
@@ -94,7 +80,6 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     is_published: initialData?.is_published ?? false,
     is_premium: initAccessLevel === 'premium',
   })
-  const [customCategory, setCustomCategory] = useState(initIsPreset ? '' : initCategory)
   const [uploading, setUploading] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -103,19 +88,16 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
 
   const isEdit = !!initialData?.id
 
-  // Apply a preset: fill titles, category, and auto-check concerns
+  // Apply a preset: fill titles and auto-check concerns
   const applyPreset = (presetId: string) => {
     const preset = ARTICLE_PRESETS.find(p => p.id === presetId)
     if (!preset) return
-    const isPresetCat = PRESET_VALUES.includes(preset.category)
     setForm(prev => ({
       ...prev,
       title_ja: preset.title_ja,
       title_en: preset.title_en,
-      category: isPresetCat ? preset.category : 'other',
       concerns: preset.concerns,
     }))
-    if (!isPresetCat) setCustomCategory(preset.category)
     setAppliedPresetId(presetId)
     setShowPresets(false)
   }
@@ -169,16 +151,12 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
       setError(locale === 'ja' ? 'タイトル（日英）は必須です' : 'Title in both languages is required')
       return
     }
-    if (form.category === 'other' && !customCategory.trim()) {
-      setError(locale === 'ja' ? 'カテゴリ名を入力してください' : 'Please enter a custom category name')
-      return
-    }
     setSaving(true)
     setError('')
     try {
       const payload = {
         ...form,
-        category: form.category === 'other' ? customCategory.trim() : form.category,
+        category: 'other',
         access_level: form.access_level,
         is_premium: form.access_level === 'premium',
         is_published: publish,
@@ -339,32 +317,6 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
         >
           English
         </button>
-      </div>
-
-      {/* ── Category ─────────────────────────────────── */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          {locale === 'ja' ? 'カテゴリ' : 'Category'}
-        </label>
-        <select
-          value={form.category}
-          onChange={e => setForm({ ...form, category: e.target.value })}
-          className="px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
-        >
-          {CATEGORIES.map(c => (
-            <option key={c.value} value={c.value}>
-              {locale === 'ja' ? c.labelJa : c.labelEn}
-            </option>
-          ))}
-        </select>
-        {form.category === 'other' && (
-          <input
-            value={customCategory}
-            onChange={e => setCustomCategory(e.target.value)}
-            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sage-400"
-            placeholder={locale === 'ja' ? 'カテゴリ名を入力（例：ライフスタイル）' : 'Enter category name (e.g. Lifestyle)'}
-          />
-        )}
       </div>
 
       {/* ── Concern tags ─────────────────────────────────── */}

@@ -4,26 +4,20 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { BookOpen, Trash2, Eye, EyeOff, Plus, Pencil, Sparkles, Lock } from 'lucide-react'
+import { CONCERNS } from '@/lib/concerns'
 
 interface WellnessArticle {
   id: string
   title_ja: string
   title_en: string
   category: string
+  concerns?: string[]
   is_published: boolean
   access_level?: string
   is_premium?: boolean
   author_id: string
   created_at: string
   profiles: { full_name: string | null; role: string } | null
-}
-
-const CATEGORY_LABELS: Record<string, string> = {
-  ayurveda: 'アーユルヴェーダ',
-  nutrition: '食事',
-  breathing: '呼吸法',
-  mindfulness: 'マインドフルネス',
-  yoga: 'ヨガ理論',
 }
 
 interface ArticleManagerProps {
@@ -81,11 +75,23 @@ export function ArticleManager({ initialArticles, newArticleHref, locale = 'en' 
                 </div>
                 <div className="min-w-0">
                   <p className="font-medium text-gray-900 dark:text-white text-sm truncate">{article.title_ja}</p>
-                  <p className="text-xs text-gray-400 dark:text-navy-400 truncate">
-                    {CATEGORY_LABELS[article.category] ?? article.category}
-                    {article.profiles?.full_name ? ` · ${article.profiles.full_name}` : ''}
-                    {article.profiles?.role === 'instructor' ? ' (講師)' : article.profiles?.role === 'admin' ? ' (管理者)' : ''}
-                  </p>
+                  <div className="flex items-center gap-1 flex-wrap mt-0.5">
+                    {(article.concerns ?? []).slice(0, 2).map(cId => {
+                      const c = CONCERNS.find(x => x.id === cId)
+                      if (!c) return null
+                      return (
+                        <span key={c.id} className="inline-flex items-center gap-0.5 text-[10px] font-medium text-sage-700 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/30 px-1.5 py-0.5 rounded-full border border-sage-200 dark:border-sage-800">
+                          {c.icon} {c.ja}
+                        </span>
+                      )
+                    })}
+                    {article.profiles?.full_name && (
+                      <span className="text-[10px] text-gray-400 dark:text-navy-400">
+                        {article.profiles.full_name}
+                        {article.profiles.role === 'instructor' ? ' (講師)' : article.profiles.role === 'admin' ? ' (管理者)' : ''}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0 ml-2">

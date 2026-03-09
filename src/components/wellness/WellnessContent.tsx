@@ -73,8 +73,6 @@ interface StaticVideo {
 
 interface StaticArticle {
   id: string
-  category: string
-  category_ja: string
   title_ja: string
   title_en: string
   excerpt_ja: string
@@ -315,9 +313,7 @@ export function WellnessContent({
               {locale === 'ja' ? 'ウェルネスコラム' : 'Wellness Articles'}
             </h2>
             <p className="text-sm text-gray-400 dark:text-navy-400">
-              {locale === 'ja'
-                ? 'アーユルヴェーダ · 食事 · 呼吸法 · マインドフルネス'
-                : 'Ayurveda · Nutrition · Breathing · Mindfulness'}
+              {locale === 'ja' ? 'お悩み別で読む' : 'Browse by concern'}
             </p>
           </div>
         </div>
@@ -329,10 +325,7 @@ export function WellnessContent({
                   key={col.id}
                   className="bg-white dark:bg-navy-800 rounded-2xl p-6 border border-gray-100 dark:border-navy-700 shadow-sm"
                 >
-                  <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wider">
-                    {locale === 'ja' ? col.category_ja : col.category}
-                  </span>
-                  <h3 className="font-bold text-gray-900 dark:text-white mt-2 mb-3 leading-snug">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-3 leading-snug">
                     {locale === 'ja' ? col.title_ja : col.title_en}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-navy-300 leading-relaxed">
@@ -385,10 +378,16 @@ export function WellnessContent({
                       </div>
                     )}
                     <div className="p-6">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wider">
-                          {article.category}
-                        </span>
+                      <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                        {(article.concerns ?? []).slice(0, 3).map(cId => {
+                          const c = CONCERNS.find(x => x.id === cId)
+                          if (!c) return null
+                          return (
+                            <span key={c.id} className="inline-flex items-center gap-0.5 text-[11px] font-medium text-sage-700 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/30 border border-sage-200 dark:border-sage-800 px-2 py-0.5 rounded-full">
+                              {c.icon} {locale === 'ja' ? c.ja : c.en}
+                            </span>
+                          )
+                        })}
                         {!coverImage && accessLevel === 'premium' && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">
                             <Sparkles className="h-3 w-3" />

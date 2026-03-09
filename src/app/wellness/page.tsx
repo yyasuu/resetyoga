@@ -48,8 +48,6 @@ const STATIC_VIDEOS = [
 const STATIC_ARTICLES = [
   {
     id: 'a1',
-    category: 'ayurveda',
-    category_ja: 'アーユルヴェーダ',
     title_ja: '体質（ドーシャ）とヨガスタイルの選び方',
     title_en: 'Finding Your Yoga Style by Dosha Type',
     excerpt_ja: 'アーユルヴェーダでは人の体質をヴァータ・ピッタ・カパの3つに分類します。自分のドーシャを知ることで、より効果的なヨガスタイルと呼吸法を選ぶことができます。',
@@ -58,8 +56,6 @@ const STATIC_ARTICLES = [
   },
   {
     id: 'a2',
-    category: 'nutrition',
-    category_ja: '食事',
     title_ja: 'ヨガ前後の食事ガイド — 体を内側から整える',
     title_en: 'What to Eat Before & After Yoga',
     excerpt_ja: 'ヨガの効果を最大化するには、食事のタイミングと内容が重要です。',
@@ -68,8 +64,6 @@ const STATIC_ARTICLES = [
   },
   {
     id: 'a3',
-    category: 'breathing',
-    category_ja: '呼吸法',
     title_ja: 'プラナヤマ入門 — 呼吸が変わると人生が変わる',
     title_en: 'Introduction to Pranayama',
     excerpt_ja: 'ヨガの呼吸法（プラナヤマ）は、不安を和らげ、集中力を高め、エネルギーを調整する強力なツールです。',

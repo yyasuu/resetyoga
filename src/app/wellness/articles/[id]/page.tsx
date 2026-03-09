@@ -6,14 +6,7 @@ import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { ChevronLeft, BookOpen, Pencil, Library, ArrowRight, Sparkles, LogIn, Lock } from 'lucide-react'
 import { PremiumPaywall } from '@/components/wellness/PremiumPaywall'
-
-const CATEGORY_LABELS: Record<string, { ja: string; en: string }> = {
-  ayurveda: { ja: 'アーユルヴェーダ', en: 'Ayurveda' },
-  nutrition: { ja: '食事・栄養', en: 'Nutrition' },
-  breathing: { ja: '呼吸法', en: 'Breathing' },
-  mindfulness: { ja: 'マインドフルネス', en: 'Mindfulness' },
-  yoga: { ja: 'ヨガ理論', en: 'Yoga Theory' },
-}
+import { CONCERNS } from '@/lib/concerns'
 
 export default async function ArticleDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -40,8 +33,9 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
   const title = locale === 'ja' ? article.title_ja : article.title_en
   const subtitle = locale === 'ja' ? article.subtitle_ja : article.subtitle_en
   const content = locale === 'ja' ? article.content_ja : article.content_en
-  const category = CATEGORY_LABELS[article.category]
-  const categoryLabel = locale === 'ja' ? (category?.ja ?? article.category) : (category?.en ?? article.category)
+  const articleConcerns = ((article as any).concerns ?? [] as string[])
+    .map((id: string) => CONCERNS.find(c => c.id === id))
+    .filter(Boolean) as typeof CONCERNS
 
   const canEdit =
     profile &&
@@ -93,13 +87,20 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
             : (user ? 'Back to Wellness Library' : 'Back to Home')}
         </Link>
 
-        {/* Category badge */}
+        {/* Concern tags + access badge */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wider flex items-center gap-1.5">
-              <BookOpen className="h-3.5 w-3.5" />
-              {categoryLabel}
-            </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            {articleConcerns.length > 0
+              ? articleConcerns.map(c => (
+                  <span key={c.id} className="inline-flex items-center gap-1 text-xs font-medium text-sage-700 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/30 border border-sage-200 dark:border-sage-800 px-2.5 py-1 rounded-full">
+                    {c.icon} {locale === 'ja' ? c.ja : c.en}
+                  </span>
+                ))
+              : (
+                <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 flex items-center gap-1.5">
+                  <BookOpen className="h-3.5 w-3.5" /> Wellness
+                </span>
+              )}
             {isPremium && (
               <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">
                 <Sparkles className="h-3 w-3" />
