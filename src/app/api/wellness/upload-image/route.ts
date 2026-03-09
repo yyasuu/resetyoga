@@ -4,18 +4,6 @@ import { NextResponse } from 'next/server'
 
 const BUCKET = 'wellness-images'
 
-async function ensureBucketPublic(storageClient: ReturnType<typeof createSupabaseClient>) {
-  // Create bucket if missing (fails silently if already exists)
-  await storageClient.storage.createBucket(BUCKET, {
-    public: true,
-    fileSizeLimit: 5 * 1024 * 1024,
-    allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-  }).catch(() => {})
-
-  // Force public = true even if bucket already existed as private
-  await storageClient.storage.updateBucket(BUCKET, { public: true }).catch(() => {})
-}
-
 export async function POST(request: Request) {
   // Auth check with SSR client
   const supabase = await createClient()
@@ -45,13 +33,19 @@ export async function POST(request: Request) {
   const buffer = Buffer.from(arrayBuffer)
 
   // Use standard supabase-js client with service role for storage
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const storageClient = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  ) as any
 
-  // Ensure bucket exists and is public before uploading
-  await ensureBucketPublic(storageClient)
+  // Ensure bucket exists and is public
+  await storageClient.storage.createBucket(BUCKET, {
+    public: true,
+    fileSizeLimit: 5 * 1024 * 1024,
+    allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+  }).catch(() => {})
+  await storageClient.storage.updateBucket(BUCKET, { public: true }).catch(() => {})
 
   const { error } = await storageClient.storage
     .from(BUCKET)

@@ -4,16 +4,6 @@ import { NextResponse } from 'next/server'
 
 const BUCKET = 'wellness-videos'
 
-async function ensureBucketPublic(storageClient: ReturnType<typeof createSupabaseClient>) {
-  await storageClient.storage.createBucket(BUCKET, {
-    public: true,
-    fileSizeLimit: 500 * 1024 * 1024,
-    allowedMimeTypes: ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'],
-  }).catch(() => {})
-
-  await storageClient.storage.updateBucket(BUCKET, { public: true }).catch(() => {})
-}
-
 export async function GET(request: Request) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -29,13 +19,19 @@ export async function GET(request: Request) {
   const ext = filename.split('.').pop()?.toLowerCase() || 'mp4'
   const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const storageClient = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  ) as any
 
   // Ensure bucket exists and is public
-  await ensureBucketPublic(storageClient)
+  await storageClient.storage.createBucket(BUCKET, {
+    public: true,
+    fileSizeLimit: 500 * 1024 * 1024,
+    allowedMimeTypes: ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'],
+  }).catch(() => {})
+  await storageClient.storage.updateBucket(BUCKET, { public: true }).catch(() => {})
 
   const admin = await createAdminClient()
   const { data, error } = await admin.storage
