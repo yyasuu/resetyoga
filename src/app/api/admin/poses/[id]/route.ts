@@ -25,7 +25,7 @@ export async function PATCH(
 
   const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() }
   const allowedFields = [
-    'name_sanskrit', 'name_en', 'name_ja', 'image_url',
+    'name_sanskrit', 'name_en', 'name_ja', 'image_url', 'image_url_ja', 'image_url_en',
     'description_ja', 'description_en', 'how_to_ja', 'how_to_en',
     'pose_family', 'concerns', 'difficulty', 'variation_number',
     'access_level', 'is_published',

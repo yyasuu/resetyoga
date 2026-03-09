@@ -250,7 +250,15 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
         }
       }
 
-      const payload = { ...form, video_url: videoUrl }
+      const payload = {
+        ...form,
+        video_url: videoUrl,
+        thumbnail_url: form.thumbnail_url || null,
+        description_ja: form.description_ja || null,
+        description_en: form.description_en || null,
+        duration_label: form.duration_label || null,
+        difficulty_level: form.difficulty_level || null,
+      }
 
       // Auto-generate thumbnail from YouTube URL if none
       if (!payload.thumbnail_url) {

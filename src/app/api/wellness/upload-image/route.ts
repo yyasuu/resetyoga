@@ -2,6 +2,20 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
+const BUCKET = 'wellness-images'
+
+async function ensureBucketPublic(storageClient: ReturnType<typeof createSupabaseClient>) {
+  // Create bucket if missing (fails silently if already exists)
+  await storageClient.storage.createBucket(BUCKET, {
+    public: true,
+    fileSizeLimit: 5 * 1024 * 1024,
+    allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
+  }).catch(() => {})
+
+  // Force public = true even if bucket already existed as private
+  await storageClient.storage.updateBucket(BUCKET, { public: true }).catch(() => {})
+}
+
 export async function POST(request: Request) {
   // Auth check with SSR client
   const supabase = await createClient()
@@ -30,20 +44,23 @@ export async function POST(request: Request) {
   const arrayBuffer = await file.arrayBuffer()
   const buffer = Buffer.from(arrayBuffer)
 
-  // Use standard supabase-js client (not SSR) for storage — SSR client doesn't support uploads
+  // Use standard supabase-js client with service role for storage
   const storageClient = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
+  // Ensure bucket exists and is public before uploading
+  await ensureBucketPublic(storageClient)
+
   const { error } = await storageClient.storage
-    .from('wellness-images')
-    .upload(fileName, buffer, { contentType: file.type, upsert: false })
+    .from(BUCKET)
+    .upload(fileName, buffer, { contentType: file.type, upsert: true })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   const { data: { publicUrl } } = storageClient.storage
-    .from('wellness-images')
+    .from(BUCKET)
     .getPublicUrl(fileName)
 
   return NextResponse.json({ url: publicUrl })

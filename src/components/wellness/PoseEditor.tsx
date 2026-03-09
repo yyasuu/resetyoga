@@ -155,7 +155,7 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
                   {imgUrl ? (
                     <div className="relative">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={imgUrl} alt="" className="w-full h-36 object-cover" />
+                      <img src={imgUrl} alt="" className="w-full h-auto max-h-64 object-contain" />
                       <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                         <span className="text-white text-xs font-medium flex items-center gap-1">
                           <Upload className="h-3.5 w-3.5" />

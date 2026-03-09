@@ -106,7 +106,7 @@ export default async function PoseDetailPage({ params }: { params: Promise<{ id:
             <img
               src={imageUrl}
               alt={title}
-              className="w-full h-72 sm:h-96 object-cover"
+              className="w-full h-auto"
             />
           </div>
         ) : (

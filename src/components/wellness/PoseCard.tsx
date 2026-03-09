@@ -62,13 +62,13 @@ export function PoseCard({ pose, locale, isLoggedIn }: PoseCardProps) {
         className="group bg-white dark:bg-navy-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow block"
       >
         {/* Image / Fallback */}
-        <div className="relative h-44 bg-gradient-to-br from-linen-100 to-sage-50 dark:from-navy-700 dark:to-navy-800 flex items-center justify-center overflow-hidden">
+        <div className="relative bg-gradient-to-br from-linen-100 to-sage-50 dark:from-navy-700 dark:to-navy-800 flex items-center justify-center overflow-hidden">
           {imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={imageUrl}
               alt={title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="w-full h-auto group-hover:scale-105 transition-transform duration-300"
             />
           ) : (
             <span className="text-6xl select-none">🧘</span>

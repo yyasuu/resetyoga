@@ -40,6 +40,8 @@ export async function POST(request: Request) {
       name_en: body.name_en,
       name_ja: body.name_ja,
       image_url: body.image_url ?? null,
+      image_url_ja: body.image_url_ja ?? null,
+      image_url_en: body.image_url_en ?? null,
       description_ja: body.description_ja ?? null,
       description_en: body.description_en ?? null,
       how_to_ja: body.how_to_ja ?? null,
