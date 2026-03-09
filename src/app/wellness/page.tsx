@@ -86,8 +86,8 @@ export default async function WellnessPage() {
   // Use admin client to bypass RLS — wellness library is public
   const adminSupabase = await createAdminClient()
   const [{ data: dbVideos }, { data: dbArticles }] = await Promise.all([
-    adminSupabase.from('wellness_videos').select('*').eq('is_published', true).order('created_at', { ascending: false }),
-    adminSupabase.from('wellness_articles').select('*, profiles(full_name)').eq('is_published', true).order('created_at', { ascending: false }),
+    adminSupabase.from('wellness_videos').select('*').eq('is_published', true).order('created_at', { ascending: true }),
+    adminSupabase.from('wellness_articles').select('*, profiles(full_name)').eq('is_published', true).order('created_at', { ascending: true }),
   ])
 
   const isLoggedIn = !!user

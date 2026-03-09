@@ -8,6 +8,7 @@ import { Footer } from '@/components/layout/Footer'
 import { Profile } from '@/types'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, Star, Video, Clock, Heart, Sparkles, Globe, Play, BookOpen } from 'lucide-react'
+import { CONCERNS } from '@/lib/concerns'
 
 export default async function LandingPage() {
   const t = await getTranslations('landing')
@@ -51,7 +52,7 @@ export default async function LandingPage() {
         .limit(1),
       adminSupabase
         .from('wellness_articles')
-        .select('id, title_ja, title_en, category, cover_image_url, image_urls')
+        .select('id, title_ja, title_en, category, concerns, cover_image_url, image_urls')
         .eq('is_published', true)
         .eq('is_premium', false)
         .order('created_at', { ascending: true })
@@ -357,9 +358,19 @@ export default async function LandingPage() {
                           </span>
                         </div>
                         <div className="p-4">
-                          <p className="text-xs text-sage-600 dark:text-sage-400 font-semibold uppercase tracking-wider mb-1">
-                            {article.category}
-                          </p>
+                          {(article.concerns ?? []).length > 0 && (
+                            <div className="flex flex-wrap gap-1 mb-1.5">
+                              {(article.concerns as string[]).slice(0, 2).map((cId: string) => {
+                                const c = CONCERNS.find(x => x.id === cId)
+                                if (!c) return null
+                                return (
+                                  <span key={c.id} className="inline-flex items-center gap-0.5 text-[10px] font-medium text-sage-700 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/30 border border-sage-200 dark:border-sage-800 px-1.5 py-0.5 rounded-full">
+                                    {c.icon} {locale === 'ja' ? c.ja : c.en}
+                                  </span>
+                                )
+                              })}
+                            </div>
+                          )}
                           <h3 className="font-bold text-gray-900 dark:text-white text-sm leading-snug group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
                             {locale === 'ja' ? article.title_ja : article.title_en}
                           </h3>
