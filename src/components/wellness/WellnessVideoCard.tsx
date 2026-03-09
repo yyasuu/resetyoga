@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Play, X, Sparkles, Lock } from 'lucide-react'
+import { Play, Sparkles, Lock } from 'lucide-react'
 import { MemberGateModal } from './MemberGateModal'
 
 interface VideoCardProps {
@@ -24,21 +24,8 @@ interface VideoCardProps {
   isLoggedIn: boolean
 }
 
-function getEmbedUrl(url: string): string | null {
-  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)
-  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`
-  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/)
-  if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`
-  return null
-}
-
-function isDirectVideo(url: string): boolean {
-  return /\.(mp4|webm|ogg|mov|avi)(\?|$)/i.test(url) ||
-    url.includes('supabase.co/storage')
-}
 
 export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: VideoCardProps) {
-  const [playing, setPlaying] = useState(false)
   const [showGateModal, setShowGateModal] = useState(false)
   const router = useRouter()
 
@@ -50,17 +37,10 @@ export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: Video
       setShowGateModal(true)
       return
     }
-    if (accessLevel === 'premium') {
-      // Detail page handles the subscription paywall
-      router.push(`/wellness/videos/${video.id}`)
-      return
-    }
-    // public or logged-in member → play inline
-    setPlaying(true)
+    // All other cases → navigate to full detail page
+    router.push(`/wellness/videos/${video.id}`)
   }
 
-  const embedUrl = getEmbedUrl(video.video_url)
-  const isDirect = isDirectVideo(video.video_url)
   const title = locale === 'ja' ? video.title_ja : video.title_en
   const description = locale === 'ja' ? video.description_ja : video.description_en
 
@@ -123,47 +103,6 @@ export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: Video
         />
       )}
 
-      {/* Video modal (public or logged-in member) */}
-      {playing && (
-        <div
-          className="fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4"
-          onClick={() => setPlaying(false)}
-        >
-          <div
-            className="relative w-full max-w-3xl aspect-video bg-black rounded-xl overflow-hidden"
-            onClick={e => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setPlaying(false)}
-              className="absolute top-3 right-3 z-10 w-8 h-8 bg-black/60 rounded-full flex items-center justify-center text-white hover:bg-black/80"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            {embedUrl ? (
-              <iframe
-                src={embedUrl}
-                className="w-full h-full"
-                allow="autoplay; fullscreen"
-                allowFullScreen
-              />
-            ) : isDirect ? (
-              // eslint-disable-next-line jsx-a11y/media-has-caption
-              <video
-                src={video.video_url}
-                className="w-full h-full"
-                controls
-                autoPlay
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-white text-sm">
-                <a href={video.video_url} target="_blank" rel="noopener noreferrer" className="underline">
-                  {locale === 'ja' ? '動画を開く' : 'Open Video'}
-                </a>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </>
   )
 }
