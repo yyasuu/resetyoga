@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { cookies } from 'next/headers'
 import { format } from 'date-fns'
-import { Calendar, Users, Star, Video, ChevronRight, FileText, DollarSign, BookOpen } from 'lucide-react'
+import { Calendar, Users, Star, Video, ChevronRight, FileText, DollarSign, BookOpen, Zap, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { AccountCancelButton } from '@/components/account/AccountCancelButton'
@@ -32,8 +32,17 @@ export default async function InstructorDashboardPage() {
     .eq('id', user.id)
     .single()
 
-  // Recent payouts (instructor can see their own via RLS)
+  // Stripe payout connection status
   const supabaseAdmin = await import('@/lib/supabase/server').then(m => m.createAdminClient())
+
+  const { data: payoutInfo } = await (await supabaseAdmin)
+    .from('instructor_payout_info')
+    .select('stripe_account_id, stripe_onboarding_complete')
+    .eq('id', user.id)
+    .single()
+
+  const stripeConnected = !!(payoutInfo?.stripe_account_id && payoutInfo?.stripe_onboarding_complete)
+
   const { data: recentPayouts } = await (await supabaseAdmin)
     .from('instructor_payouts')
     .select('id, session_count, amount_usd, payment_method, paid_at')
@@ -317,14 +326,51 @@ export default async function InstructorDashboardPage() {
               )}
 
               <div className="mt-4 pt-4 border-t border-gray-100 dark:border-navy-700">
-                <Link href="/instructor/payout-setup">
-                  <Button variant="outline" size="sm" className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700">
-                    <DollarSign className="h-4 w-4 text-sage-500" />
-                    {locale === 'ja' ? 'Stripe 振込設定' : 'Stripe Payout Setup'}
-                  </Button>
+                <Link href="/instructor/payout-setup" className="text-xs text-navy-500 dark:text-sage-400 hover:underline">
+                  {locale === 'ja' ? '支払い履歴を詳しく見る →' : 'View full payout history →'}
                 </Link>
               </div>
             </div>
+
+            {/* Stripe Payout Setup — prominent CTA */}
+            <Link href="/instructor/payout-setup" className="block group">
+              <div className={`rounded-xl border p-5 transition-all ${
+                stripeConnected
+                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 hover:border-green-400'
+                  : 'bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900/30 dark:to-indigo-900/10 border-indigo-200 dark:border-indigo-700 hover:border-indigo-400 shadow-sm'
+              }`}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      stripeConnected
+                        ? 'bg-green-100 dark:bg-green-900/40'
+                        : 'bg-indigo-100 dark:bg-indigo-900/40'
+                    }`}>
+                      <Zap className={`h-4 w-4 ${stripeConnected ? 'text-green-600 dark:text-green-400' : 'text-indigo-600 dark:text-indigo-400'}`} />
+                    </div>
+                    <span className={`text-sm font-bold ${
+                      stripeConnected ? 'text-green-800 dark:text-green-300' : 'text-indigo-800 dark:text-indigo-200'
+                    }`}>
+                      {locale === 'ja' ? 'Stripe 振込設定' : 'Stripe Payout Setup'}
+                    </span>
+                  </div>
+                  <ArrowRight className={`h-4 w-4 group-hover:translate-x-0.5 transition-transform ${
+                    stripeConnected ? 'text-green-500' : 'text-indigo-400'
+                  }`} />
+                </div>
+                {stripeConnected ? (
+                  <p className="text-xs text-green-700 dark:text-green-400">
+                    ✓ {locale === 'ja' ? 'Stripe 接続済み — 自動振込が有効です' : 'Connected — automated payouts enabled'}
+                  </p>
+                ) : (
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">
+                    {locale === 'ja'
+                      ? '⚠ 未設定です。報酬を受け取るにはStripe Connect設定が必要です。'
+                      : '⚠ Not set up yet. Connect Stripe to receive your payouts automatically.'}
+                  </p>
+                )}
+              </div>
+            </Link>
           </div>
         </div>
       </div>

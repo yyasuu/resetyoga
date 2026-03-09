@@ -463,10 +463,6 @@ function OnboardingForm() {
     }
     if (s === 5) {
       const bankPartiallyFilled = bankName || swiftCode || accountNumber || accountHolderName
-      const bankMinimumProvided = accountNumber.trim() && accountHolderName.trim()
-      if (!stripeAccountId && !bankMinimumProvided) {
-        errs.payout = '※ Please connect Stripe or enter your bank account number and account holder name. / StripeへのConnect、もしくは口座番号と名義人名を入力してください。'
-      }
       if (bankPartiallyFilled) {
         // SWIFT code length
         if (swiftCode && swiftCode.length !== 8 && swiftCode.length !== 11) {
@@ -1079,72 +1075,19 @@ function OnboardingForm() {
               <br /><span className="text-xs text-gray-400">後でダッシュボードから設定することもできます。</span>
             </p>
 
-            {/* Stripe recommended banner — clickable */}
-            {stripeAccountId ? (
-              <div className="bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 rounded-xl p-4 mb-4 flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-green-800 dark:text-green-300">
-                    Stripe Connect — Connected! / 接続済み ✓
-                  </p>
-                  <p className="text-xs text-green-700 dark:text-green-400 mt-0.5">
-                    Your Stripe account is linked. Payouts will begin after approval.
-                    <br />Stripeアカウントが連携されました。承認後に自動支払いが開始されます。
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={handleStripeConnect}
-                disabled={stripeConnecting}
-                className="w-full text-left bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4 mb-4 hover:bg-indigo-100 dark:hover:bg-indigo-800/40 transition-colors disabled:opacity-70"
-              >
-                <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200 mb-1 flex items-center gap-1">
-                  ⚡ Stripe Connect — Recommended / 推奨
-                  {stripeConnecting
-                    ? <Loader2 className="h-3.5 w-3.5 ml-auto animate-spin text-indigo-600 dark:text-indigo-400" />
-                    : <ChevronRight className="h-3.5 w-3.5 ml-auto text-indigo-500 dark:text-indigo-400" />
-                  }
+            {/* Stripe — set up AFTER registration notice */}
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700 rounded-xl p-4 mb-4 flex items-start gap-3">
+              <span className="text-xl flex-shrink-0 mt-0.5">⚡</span>
+              <div>
+                <p className="text-sm font-bold text-indigo-800 dark:text-indigo-200 mb-1">
+                  Stripe Payout Setup — 登録完了後にダッシュボードから設定してください
                 </p>
                 <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed">
-                  {stripeConnecting
-                    ? 'Redirecting to Stripe… / Stripeへ移動中…'
-                    : <><strong>Click here</strong> to connect your Stripe account for automatic monthly payouts in USD. Supported in 40+ countries including India, Japan, US, UK, and more.<br /><span className="text-indigo-500 dark:text-indigo-400">ここをクリックしてStripe Connect設定 → USD自動支払い。インド・日本・米国・英国など40カ国以上対応。</span></>
-                  }
+                  Stripe Connect は <strong>登録完了後</strong>、ダッシュボードの「Stripe 振込設定」から行えます。今は設定不要です。<br />
+                  <span className="text-indigo-500 dark:text-indigo-400">Stripe Payout Setup can be completed after registration from your instructor dashboard. You do not need to set it up now.</span>
                 </p>
-              </button>
-            )}
-
-            {/* Stripe Connect error — shown inline with specific reason */}
-            {stripeError && (
-              <div className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 mb-3 text-xs text-red-700 dark:text-red-300">
-                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-500" />
-                <div className="space-y-1.5">
-                  <p className="font-semibold">※ Stripe Connect エラー / Stripe Connect Error</p>
-                  <p className="text-red-600 dark:text-red-400">{stripeError}</p>
-                  {stripeNeedsLogin ? (
-                    <a
-                      href="/login"
-                      className="inline-block underline font-semibold text-red-700 dark:text-red-300 hover:opacity-80"
-                    >
-                      ログインページへ / Go to Login →
-                    </a>
-                  ) : (
-                    <button type="button" onClick={handleStripeConnect} className="underline font-semibold hover:opacity-80">
-                      再試行 / Retry
-                    </button>
-                  )}
-                </div>
               </div>
-            )}
-
-            {errors.payout && (
-              <div data-error="true" className="flex items-start gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 mb-3 text-xs text-red-700 dark:text-red-300">
-                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-500" />
-                <p>{errors.payout}</p>
-              </div>
-            )}
+            </div>
 
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-3 mb-5 text-xs text-blue-700 dark:text-blue-300">
               Bank details below are for <strong>manual transfer only</strong> (used if Stripe is not set up). Enter account number + holder name, or connect Stripe above.
