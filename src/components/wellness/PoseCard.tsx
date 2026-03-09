@@ -42,6 +42,9 @@ export function PoseCard({ pose, locale, isLoggedIn }: PoseCardProps) {
     .filter(Boolean) as typeof CONCERNS
 
   const title = locale === 'ja' ? pose.name_ja : pose.name_en
+  const imageUrl = locale === 'ja'
+    ? (pose.image_url_ja ?? pose.image_url)
+    : (pose.image_url_en ?? pose.image_url)
 
   return (
     <>
@@ -60,10 +63,10 @@ export function PoseCard({ pose, locale, isLoggedIn }: PoseCardProps) {
       >
         {/* Image / Fallback */}
         <div className="relative h-44 bg-gradient-to-br from-linen-100 to-sage-50 dark:from-navy-700 dark:to-navy-800 flex items-center justify-center overflow-hidden">
-          {pose.image_url ? (
+          {imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={pose.image_url}
+              src={imageUrl}
               alt={title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />

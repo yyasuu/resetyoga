@@ -34,7 +34,9 @@ export interface YogaPose {
   name_sanskrit: string
   name_en: string
   name_ja: string
-  image_url: string | null
+  image_url: string | null      // legacy / fallback
+  image_url_ja: string | null
+  image_url_en: string | null
   description_ja: string | null
   description_en: string | null
   how_to_ja: string | null

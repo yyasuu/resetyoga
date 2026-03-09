@@ -15,13 +15,16 @@ interface PoseEditorProps {
 
 export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
   const router = useRouter()
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRefJa = useRef<HTMLInputElement>(null)
+  const fileInputRefEn = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
     name_sanskrit:  initialPose?.name_sanskrit  ?? '',
     name_en:        initialPose?.name_en        ?? '',
     name_ja:        initialPose?.name_ja        ?? '',
     image_url:      initialPose?.image_url       ?? '',
+    image_url_ja:   initialPose?.image_url_ja   ?? '',
+    image_url_en:   initialPose?.image_url_en   ?? '',
     description_ja: initialPose?.description_ja ?? '',
     description_en: initialPose?.description_en ?? '',
     how_to_ja:      initialPose?.how_to_ja      ?? '',
@@ -34,12 +37,14 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
     is_published:   initialPose?.is_published   ?? false,
   })
 
-  const [uploading, setUploading] = useState(false)
+  const [uploadingJa, setUploadingJa] = useState(false)
+  const [uploadingEn, setUploadingEn] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  const handleImageUpload = async (file: File) => {
-    setUploading(true)
+  const handleImageUpload = async (file: File, lang: 'ja' | 'en') => {
+    if (lang === 'ja') setUploadingJa(true)
+    else setUploadingEn(true)
     setError('')
     const fd = new FormData()
     fd.append('file', file)
@@ -49,14 +54,16 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
       let data: any = {}
       try { data = JSON.parse(text) } catch { /* not JSON */ }
       if (data.url) {
-        setForm(f => ({ ...f, image_url: data.url }))
+        if (lang === 'ja') setForm(f => ({ ...f, image_url_ja: data.url }))
+        else setForm(f => ({ ...f, image_url_en: data.url }))
       } else {
         setError(`Upload failed (HTTP ${res.status}): ${data.error ?? text.slice(0, 200)}`)
       }
     } catch (e) {
       setError('Network error: ' + (e as Error).message)
     } finally {
-      setUploading(false)
+      if (lang === 'ja') setUploadingJa(false)
+      else setUploadingEn(false)
     }
   }
 
@@ -84,6 +91,8 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
       name_en:          form.name_en,
       name_ja:          form.name_ja,
       image_url:        form.image_url || null,
+      image_url_ja:     form.image_url_ja || null,
+      image_url_en:     form.image_url_en || null,
       description_ja:   form.description_ja || null,
       description_en:   form.description_en || null,
       how_to_ja:        form.how_to_ja || null,
@@ -123,56 +132,67 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 max-w-2xl">
-      {/* Image Upload */}
+      {/* Image Upload — JA + EN */}
       <div>
         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-2">
-          {locale === 'ja' ? '画像' : 'Image'}
+          {locale === 'ja' ? '画像（日本語・英語それぞれ）' : 'Images (Japanese & English)'}
         </label>
-        <div
-          className="border-2 border-dashed border-gray-200 dark:border-navy-600 rounded-2xl overflow-hidden cursor-pointer hover:border-sage-400 dark:hover:border-sage-500 transition-colors"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {form.image_url ? (
-            <div className="relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={form.image_url}
-                alt="Pose preview"
-                className="w-full h-56 object-cover"
-              />
-              <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                <span className="text-white text-sm font-medium flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  {locale === 'ja' ? '画像を変更' : 'Change image'}
-                </span>
+        <div className="grid grid-cols-2 gap-4">
+          {(['ja', 'en'] as const).map(lang => {
+            const isJa = lang === 'ja'
+            const uploading = isJa ? uploadingJa : uploadingEn
+            const imgUrl = isJa ? form.image_url_ja : form.image_url_en
+            const inputRef = isJa ? fileInputRefJa : fileInputRefEn
+            return (
+              <div key={lang}>
+                <p className="text-xs font-semibold text-gray-500 dark:text-navy-400 mb-1.5">
+                  {isJa ? '🇯🇵 日本語用' : '🇬🇧 英語用'}
+                </p>
+                <div
+                  className="border-2 border-dashed border-gray-200 dark:border-navy-600 rounded-xl overflow-hidden cursor-pointer hover:border-sage-400 dark:hover:border-sage-500 transition-colors"
+                  onClick={() => inputRef.current?.click()}
+                >
+                  {imgUrl ? (
+                    <div className="relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={imgUrl} alt="" className="w-full h-36 object-cover" />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <span className="text-white text-xs font-medium flex items-center gap-1">
+                          <Upload className="h-3.5 w-3.5" />
+                          {locale === 'ja' ? '変更' : 'Change'}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400 dark:text-navy-400">
+                      {uploading ? (
+                        <div className="w-6 h-6 border-2 border-sage-300 border-t-sage-600 rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <Upload className="h-6 w-6" />
+                          <span className="text-xs text-center px-2">
+                            {locale === 'ja' ? 'クリックしてアップロード' : 'Click to upload'}
+                          </span>
+                          <span className="text-[10px] text-gray-300 dark:text-navy-600">JPG, PNG, WebP</span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  className="hidden"
+                  onChange={e => {
+                    const file = e.target.files?.[0]
+                    if (file) handleImageUpload(file, lang)
+                  }}
+                />
               </div>
-            </div>
-          ) : (
-            <div className="h-40 flex flex-col items-center justify-center gap-3 text-gray-400 dark:text-navy-400">
-              {uploading ? (
-                <div className="w-8 h-8 border-2 border-sage-300 border-t-sage-600 rounded-full animate-spin" />
-              ) : (
-                <>
-                  <Upload className="h-8 w-8" />
-                  <span className="text-sm">
-                    {locale === 'ja' ? 'クリックして画像をアップロード' : 'Click to upload image'}
-                  </span>
-                  <span className="text-xs">JPG, PNG, WebP — max 5MB</span>
-                </>
-              )}
-            </div>
-          )}
+            )
+          })}
         </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          className="hidden"
-          onChange={e => {
-            const file = e.target.files?.[0]
-            if (file) handleImageUpload(file)
-          }}
-        />
       </div>
 
       {/* Names */}

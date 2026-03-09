@@ -37,6 +37,10 @@ export default async function PoseDetailPage({ params }: { params: Promise<{ id:
     .map(cid => CONCERNS.find(c => c.id === cid))
     .filter(Boolean) as typeof CONCERNS
 
+  const imageUrl = locale === 'ja'
+    ? ((pose.image_url_ja as string | null) ?? (pose.image_url as string | null))
+    : ((pose.image_url_en as string | null) ?? (pose.image_url as string | null))
+
   const familyLabel = (() => {
     const f = POSE_FAMILIES.find(f => f.value === pose.pose_family)
     return f ? (locale === 'ja' ? f.ja : f.en) : pose.pose_family ?? ''
@@ -96,11 +100,11 @@ export default async function PoseDetailPage({ params }: { params: Promise<{ id:
         </Link>
 
         {/* Hero Image */}
-        {pose.image_url ? (
+        {imageUrl ? (
           <div className="rounded-2xl overflow-hidden mb-8 border border-gray-100 dark:border-navy-700">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={pose.image_url}
+              src={imageUrl}
               alt={title}
               className="w-full h-72 sm:h-96 object-cover"
             />
