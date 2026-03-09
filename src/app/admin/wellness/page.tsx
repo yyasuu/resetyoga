@@ -4,6 +4,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { cookies } from 'next/headers'
 import { VideoManager } from '@/components/wellness/VideoManager'
 import { ArticleManager } from '@/components/wellness/ArticleManager'
+import { PoseManager } from '@/components/wellness/PoseManager'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 
@@ -27,6 +28,11 @@ export default async function AdminWellnessPage() {
   const { data: articles } = await admin
     .from('wellness_articles')
     .select('*, profiles(full_name, role)')
+    .order('created_at', { ascending: false })
+
+  const { data: poses } = await admin
+    .from('yoga_poses')
+    .select('*')
     .order('created_at', { ascending: false })
 
   return (
@@ -60,6 +66,14 @@ export default async function AdminWellnessPage() {
             <ArticleManager
               initialArticles={(articles ?? []) as any}
               newArticleHref="/instructor/articles/new"
+              locale={locale}
+            />
+          </div>
+
+          {/* Pose Library Management */}
+          <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-6">
+            <PoseManager
+              initialPoses={(poses ?? []) as any}
               locale={locale}
             />
           </div>
