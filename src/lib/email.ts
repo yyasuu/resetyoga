@@ -430,3 +430,54 @@ export async function sendPasswordResetEmail({
     `,
   })
 }
+
+// ── Corporate inquiry emails ──────────────────────────────────────────────
+
+export async function sendCorporateInquiryAdmin({
+  name, email, company, teamSize, plan, message,
+}: {
+  name: string; email: string; company: string; teamSize: string; plan?: string; message?: string
+}) {
+  const adminEmail = process.env.ADMIN_EMAIL || 'support@tryresetyoga.com'
+  await resend.emails.send({
+    from: FROM,
+    to: adminEmail,
+    subject: `[New B2B Lead] ${company} — ${plan ?? 'plan TBD'}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:${BRAND_LINEN};padding:24px;border-radius:12px;">
+        <h2 style="color:${BRAND_NAVY};margin-top:0;">New Corporate Inquiry</h2>
+        <div style="background:#fff;padding:16px;border-radius:8px;border-left:4px solid ${BRAND_SAGE};">
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Company:</strong> ${company}</p>
+          <p><strong>Team Size:</strong> ${teamSize}</p>
+          <p><strong>Plan Interest:</strong> ${plan ?? '—'}</p>
+          <p><strong>Message:</strong> ${message ?? '—'}</p>
+        </div>
+        <hr style="margin:24px 0;border:none;border-top:1px solid #ddd;" />
+        <p style="color:#999;font-size:12px;">Reset Yoga — for-teams inquiry</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendCorporateInquiryConfirmation({
+  to, name,
+}: {
+  to: string; name: string
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: 'We received your Reset for Teams inquiry',
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto;background:${BRAND_LINEN};padding:24px;border-radius:12px;">
+        <h2 style="color:${BRAND_NAVY};margin-top:0;">Thanks, ${name}.</h2>
+        <p style="color:#444;">We've received your inquiry about Reset for Teams and will get back to you within one business day.</p>
+        <p style="color:#444;">In the meantime, feel free to explore our <a href="https://tryresetyoga.com/wellness" style="color:${BRAND_SAGE};">Wellness Library</a> — it's free and open to everyone.</p>
+        <hr style="margin:32px 0;border:none;border-top:1px solid #ddd;" />
+        <p style="color:#999;font-size:12px;">Reset Yoga Team — reset your body and mind in 45 minutes.</p>
+      </div>
+    `,
+  })
+}

@@ -110,6 +110,13 @@ export function Navbar({ user }: NavbarProps) {
               <span className="text-xs">✦</span> Premium
             </Link>
 
+            <Link
+              href="/corporate"
+              className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-navy-200 dark:border-navy-600 text-navy-700 dark:text-navy-200 hover:bg-navy-50 dark:hover:bg-navy-800 transition-colors"
+            >
+              For Teams
+            </Link>
+
             {/* Language switcher — custom dropdown, no Radix portal */}
             <div ref={langRef} className="relative">
               <button
@@ -224,6 +231,13 @@ export function Navbar({ user }: NavbarProps) {
             onClick={() => setMenuOpen(false)}
           >
             ✦ Premium
+          </Link>
+          <Link
+            href="/corporate"
+            className="block text-navy-700 dark:text-navy-200 font-medium"
+            onClick={() => setMenuOpen(false)}
+          >
+            For Teams
           </Link>
           {user ? (
             <>
