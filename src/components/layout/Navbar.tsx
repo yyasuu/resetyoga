@@ -104,6 +104,13 @@ export function Navbar({ user }: NavbarProps) {
             </Link>
 
             <Link
+              href="/wellness/poses"
+              className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-navy-700 dark:hover:text-sage-400 transition-colors"
+            >
+              Poses
+            </Link>
+
+            <Link
               href="/premium"
               className="text-sm font-medium text-sage-600 dark:text-sage-400 hover:text-sage-500 dark:hover:text-sage-300 transition-colors flex items-center gap-1"
             >
@@ -224,6 +231,13 @@ export function Navbar({ user }: NavbarProps) {
             onClick={() => setMenuOpen(false)}
           >
             Wellness
+          </Link>
+          <Link
+            href="/wellness/poses"
+            className="block text-gray-600 dark:text-gray-300 font-medium"
+            onClick={() => setMenuOpen(false)}
+          >
+            Poses
           </Link>
           <Link
             href="/premium"

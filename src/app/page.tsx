@@ -7,8 +7,9 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { Profile } from '@/types'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, Star, Video, Clock, Heart, Sparkles, Globe, Play, BookOpen } from 'lucide-react'
+import { CheckCircle, Star, Video, Clock, Heart, Sparkles, Globe, Play, BookOpen, Layers, ArrowRight } from 'lucide-react'
 import { CONCERNS } from '@/lib/concerns'
+import { POSE_FAMILIES, DIFFICULTY_LEVELS } from '@/lib/poses'
 
 export default async function LandingPage() {
   const t = await getTranslations('landing')
@@ -18,6 +19,7 @@ export default async function LandingPage() {
   let user: { id: string } | null = null
   let previewVideo: any = null
   let previewArticles: any[] = []
+  let previewPose: any = null
   let locale = 'en'
 
   try {
@@ -43,7 +45,7 @@ export default async function LandingPage() {
 
     // Use admin client to bypass RLS — these are public preview cards
     const adminSupabase = await createAdminClient()
-    const [{ data: vData }, { data: aData }] = await Promise.all([
+    const [{ data: vData }, { data: aData }, { data: pData }] = await Promise.all([
       adminSupabase
         .from('wellness_videos')
         .select('id, title_ja, title_en, thumbnail_url, duration_label, category, concerns')
@@ -57,9 +59,17 @@ export default async function LandingPage() {
         .eq('is_premium', false)
         .order('created_at', { ascending: true })
         .limit(3),
+      adminSupabase
+        .from('yoga_poses')
+        .select('id, name_sanskrit, name_en, name_ja, image_url_ja, image_url_en, image_url, description_ja, description_en, pose_family, difficulty, concerns, access_level')
+        .eq('is_published', true)
+        .eq('access_level', 'public')
+        .order('created_at', { ascending: true })
+        .limit(1),
     ])
     previewVideo = vData?.[0] ?? null
     previewArticles = aData ?? []
+    previewPose = pData?.[0] ?? null
   } catch {
     // Supabase not configured yet
   }
@@ -405,6 +415,86 @@ export default async function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Yoga Pose Preview ─────────────────────────────────────────── */}
+      {previewPose && (
+        <section className="relative z-10 py-20 px-4 bg-linen-50 dark:bg-navy-900">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">
+              {locale === 'ja' ? 'ヨガポーズライブラリ' : 'Yoga Pose Library'}
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-4">
+              {locale === 'ja' ? '今日のポーズ' : 'Pose of the Day'}
+            </h2>
+            <p className="text-center text-gray-500 dark:text-navy-400 mb-10">
+              {locale === 'ja'
+                ? 'お悩み・難易度・部位から絞り込んで、あなたに合ったポーズを見つけましょう。'
+                : 'Filter by concern, difficulty, or pose family to find your perfect pose.'}
+            </p>
+
+            <div className="max-w-sm mx-auto">
+              <Link href={`/wellness/poses/${previewPose.id}`} className="block group">
+                <div className="bg-white dark:bg-navy-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-lg transition-shadow">
+                  {/* Image */}
+                  {(locale === 'ja' ? (previewPose.image_url_ja ?? previewPose.image_url) : (previewPose.image_url_en ?? previewPose.image_url)) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={locale === 'ja' ? (previewPose.image_url_ja ?? previewPose.image_url) : (previewPose.image_url_en ?? previewPose.image_url)}
+                      alt={locale === 'ja' ? previewPose.name_ja : previewPose.name_en}
+                      className="w-full h-auto"
+                    />
+                  ) : (
+                    <div className="h-48 bg-gradient-to-br from-linen-100 to-sage-50 dark:from-navy-700 dark:to-navy-800 flex items-center justify-center">
+                      <span className="text-7xl">🧘</span>
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <p className="text-xs text-sage-600 dark:text-sage-400 font-semibold tracking-wide mb-1">
+                      {previewPose.name_sanskrit}
+                    </p>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
+                      {locale === 'ja' ? previewPose.name_ja : previewPose.name_en}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-navy-300 mb-3">
+                      {locale === 'ja' ? previewPose.name_en : previewPose.name_ja}
+                    </p>
+                    {previewPose.description_ja || previewPose.description_en ? (
+                      <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">
+                        {locale === 'ja' ? previewPose.description_ja : previewPose.description_en}
+                      </p>
+                    ) : null}
+                    <div className="flex items-center gap-2 mt-4">
+                      {previewPose.pose_family && (
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-linen-100 dark:bg-navy-700 text-navy-600 dark:text-navy-300 border border-linen-200 dark:border-navy-600 font-medium">
+                          {(() => { const f = POSE_FAMILIES.find(f => f.value === previewPose.pose_family); return f ? (locale === 'ja' ? f.ja : f.en) : previewPose.pose_family })()}
+                        </span>
+                      )}
+                      {previewPose.difficulty && (
+                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                          previewPose.difficulty === 'advanced' ? 'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                          : previewPose.difficulty === 'intermediate' ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400'
+                          : 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                        }`}>
+                          {(() => { const d = DIFFICULTY_LEVELS.find(d => d.value === previewPose.difficulty); return d ? (locale === 'ja' ? d.ja : d.en) : previewPose.difficulty })()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+
+            <div className="text-center mt-10">
+              <Link href="/wellness/poses">
+                <Button size="lg" variant="outline" className="border-navy-300 dark:border-navy-600 text-navy-700 dark:text-navy-200 px-8 py-3 h-auto rounded-full hover:bg-navy-50 dark:hover:bg-navy-800">
+                  {locale === 'ja' ? 'ポーズライブラリを見る' : 'View Pose Library'}
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Testimonials ─────────────────────────────────────────────── */}
       <section className="relative z-10 py-20 px-4 bg-gradient-to-br from-sage-50 to-linen-100 dark:from-navy-800 dark:to-navy-900">

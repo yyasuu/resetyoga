@@ -132,24 +132,20 @@ export default async function WellnessPage() {
         <section className="mb-10">
           <Link
             href="/wellness/poses"
-            className="flex items-center gap-5 p-5 bg-white dark:bg-navy-800 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow group"
+            className="flex items-center gap-4 px-5 py-4 bg-white dark:bg-navy-800 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow group"
           >
-            <div className="w-14 h-14 bg-gradient-to-br from-sage-50 to-linen-100 dark:from-navy-700 dark:to-navy-800 rounded-2xl flex items-center justify-center flex-shrink-0 text-3xl">
-              🧘
+            <span className="text-2xl flex-shrink-0">🧘</span>
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
+                {locale === 'ja' ? 'ヨガポーズライブラリ' : 'Yoga Pose Library'}
+              </span>
+              <span className="hidden sm:inline text-sm text-gray-400 dark:text-navy-400 ml-2">
+                {locale === 'ja' ? '— お悩み・部位・難易度から検索' : '— Browse by concern, family & difficulty'}
+              </span>
             </div>
-            <div className="flex-1">
-              <h2 className="font-bold text-gray-900 dark:text-white text-base group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
-                {locale === 'ja' ? 'ヨガポーズ集' : 'Yoga Pose Library'}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-navy-300 mt-0.5">
-                {locale === 'ja'
-                  ? 'お悩み・部位・難易度で絞り込んで、あなたに合ったポーズを見つけましょう。'
-                  : 'Browse poses by concern, family, and difficulty level.'}
-              </p>
-            </div>
-            <div className="text-gray-300 dark:text-navy-500 group-hover:text-navy-400 dark:group-hover:text-sage-500 transition-colors">
-              →
-            </div>
+            <span className="text-sm text-gray-400 dark:text-navy-500 group-hover:text-navy-500 dark:group-hover:text-sage-400 transition-colors flex-shrink-0">
+              {locale === 'ja' ? '見る →' : 'View →'}
+            </span>
           </Link>
         </section>
 
