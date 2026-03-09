@@ -44,15 +44,15 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
     const fd = new FormData()
     fd.append('file', file)
     try {
-      const res = await fetch('/api/wellness/upload-pose-image', { method: 'POST', body: fd })
+      const res = await fetch('/api/wellness/upload-image', { method: 'POST', body: fd })
       const data = await res.json()
       if (data.url) {
         setForm(f => ({ ...f, image_url: data.url }))
       } else {
         setError(data.error ?? 'Upload failed')
       }
-    } catch {
-      setError('Image upload failed')
+    } catch (e) {
+      setError('Image upload failed: ' + (e as Error).message)
     } finally {
       setUploading(false)
     }
