@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Play, Sparkles, Lock } from 'lucide-react'
 import { MemberGateModal } from './MemberGateModal'
+import { CONCERNS } from '@/lib/concerns'
 
 interface VideoCardProps {
   video: {
@@ -16,6 +17,7 @@ interface VideoCardProps {
     thumbnail_url: string | null
     duration_label: string | null
     category: string
+    concerns?: string[] | null
     access_level?: string   // 'public' | 'member' | 'premium'
     is_premium?: boolean    // legacy fallback
   }
@@ -87,6 +89,19 @@ export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: Video
         </div>
 
         <div className="p-5">
+          {(video.concerns ?? []).length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-2">
+              {(video.concerns as string[]).slice(0, 2).map((cId) => {
+                const c = CONCERNS.find(x => x.id === cId)
+                if (!c) return null
+                return (
+                  <span key={c.id} className="inline-flex items-center gap-0.5 text-[10px] font-medium text-sage-700 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/30 border border-sage-200 dark:border-sage-800 px-1.5 py-0.5 rounded-full">
+                    {c.icon} {locale === 'ja' ? c.ja : c.en}
+                  </span>
+                )
+              })}
+            </div>
+          )}
           <h3 className="font-bold text-gray-900 dark:text-white mb-2">{title}</h3>
           {description && (
             <p className="text-sm text-gray-500 dark:text-navy-300 leading-relaxed">{description}</p>

@@ -46,7 +46,7 @@ export default async function LandingPage() {
     const [{ data: vData }, { data: aData }] = await Promise.all([
       adminSupabase
         .from('wellness_videos')
-        .select('id, title_ja, title_en, thumbnail_url, duration_label, category')
+        .select('id, title_ja, title_en, thumbnail_url, duration_label, category, concerns')
         .eq('is_published', true)
         .order('created_at', { ascending: true })
         .limit(1),
@@ -328,6 +328,19 @@ export default async function LandingPage() {
                         </span>
                       </div>
                       <div className="p-4">
+                        {(previewVideo.concerns ?? []).length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-1.5">
+                            {(previewVideo.concerns as string[]).slice(0, 2).map((cId: string) => {
+                              const c = CONCERNS.find(x => x.id === cId)
+                              if (!c) return null
+                              return (
+                                <span key={c.id} className="inline-flex items-center gap-0.5 text-[10px] font-medium text-sage-700 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/30 border border-sage-200 dark:border-sage-800 px-1.5 py-0.5 rounded-full">
+                                  {c.icon} {locale === 'ja' ? c.ja : c.en}
+                                </span>
+                              )
+                            })}
+                          </div>
+                        )}
                         <h3 className="font-bold text-gray-900 dark:text-white text-sm leading-snug group-hover:text-sage-700 dark:group-hover:text-sage-400 transition-colors">
                           {locale === 'ja' ? previewVideo.title_ja : previewVideo.title_en}
                         </h3>
