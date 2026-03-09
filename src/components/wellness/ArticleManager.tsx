@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { BookOpen, Trash2, Eye, EyeOff, Plus, Pencil } from 'lucide-react'
+import { BookOpen, Trash2, Eye, EyeOff, Plus, Pencil, Sparkles, Lock } from 'lucide-react'
 
 interface WellnessArticle {
   id: string
@@ -11,6 +11,8 @@ interface WellnessArticle {
   title_en: string
   category: string
   is_published: boolean
+  access_level?: string
+  is_premium?: boolean
   author_id: string
   created_at: string
   profiles: { full_name: string | null; role: string } | null
@@ -87,6 +89,20 @@ export function ArticleManager({ initialArticles, newArticleHref, locale = 'en' 
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                {(() => {
+                  const al = article.access_level ?? (article.is_premium ? 'premium' : 'public')
+                  if (al === 'premium') return (
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 inline-flex items-center gap-1">
+                      <Sparkles className="h-3 w-3" />{locale === 'ja' ? 'プレミアム' : 'Premium'}
+                    </span>
+                  )
+                  if (al === 'member') return (
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-sage-100 dark:bg-sage-900/40 text-sage-700 dark:text-sage-400 inline-flex items-center gap-1">
+                      <Lock className="h-3 w-3" />{locale === 'ja' ? '無料会員' : 'Members'}
+                    </span>
+                  )
+                  return null
+                })()}
                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                   article.is_published
                     ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400'

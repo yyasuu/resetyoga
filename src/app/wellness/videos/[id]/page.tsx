@@ -4,7 +4,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { ChevronLeft, Library, ArrowRight, LogIn, Sparkles } from 'lucide-react'
+import { ChevronLeft, Library, ArrowRight, LogIn, Sparkles, Lock } from 'lucide-react'
 import { PremiumPaywall } from '@/components/wellness/PremiumPaywall'
 
 function getEmbedUrl(url: string): string | null {
@@ -46,8 +46,12 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
   const embedUrl = getEmbedUrl(video.video_url)
   const isDirect = isDirectVideo(video.video_url)
 
-  // ── Premium / access check ───────────────────────────────────────────────
-  const isPremium = !!(video as any).is_premium
+  // ── Access level check ──────────────────────────────────────────────────
+  // New 3-tier: 'public' | 'member' | 'premium'  (falls back to legacy is_premium)
+  const accessLevel: string = (video as any).access_level
+    ?? ((video as any).is_premium ? 'premium' : 'public')
+  const isPremium = accessLevel === 'premium'
+  const isMemberOnly = accessLevel === 'member'
   const canAccessPremium = profile?.role === 'admin' || profile?.role === 'instructor'
 
   let hasActiveSubscription = false
@@ -60,12 +64,16 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
     hasActiveSubscription = sub?.status === 'active'
   }
 
-  // Guest + premium video → login gate
-  const showLoginGate = !user && isPremium
-  // Member + premium + no subscription → paywall
+  // Guest + member or premium → show inline login gate
+  const showLoginGate = !user && (isMemberOnly || isPremium)
+  // Logged-in member + premium + no subscription → paywall
   const showPaywall = isPremium && !canAccessPremium && !hasActiveSubscription && !!user
-  // Can watch if: free, OR admin/instructor, OR subscriber
-  const canWatch = !isPremium || canAccessPremium || hasActiveSubscription
+  // Can watch: public, OR admin/instructor, OR member-level+logged-in, OR premium+subscriber
+  const canWatch =
+    accessLevel === 'public' ||
+    canAccessPremium ||
+    (isMemberOnly && !!user) ||
+    (isPremium && hasActiveSubscription)
 
   return (
     <div className="min-h-screen bg-linen-50 dark:bg-navy-900 flex flex-col">
@@ -80,7 +88,7 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
           {locale === 'ja' ? 'ウェルネスライブラリへ戻る' : 'Back to Wellness Library'}
         </Link>
 
-        {/* Title + premium badge */}
+        {/* Title + access level badge */}
         <div className="flex items-start gap-3 mb-3">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white leading-snug flex-1">
             {title}
@@ -89,6 +97,12 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
             <span className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-2.5 py-1 rounded-full mt-1">
               <Sparkles className="h-3.5 w-3.5" />
               {locale === 'ja' ? 'プレミアム' : 'Premium'}
+            </span>
+          )}
+          {isMemberOnly && (
+            <span className="flex-shrink-0 inline-flex items-center gap-1 text-xs font-bold bg-sage-100 dark:bg-sage-900/40 text-sage-700 dark:text-sage-400 px-2.5 py-1 rounded-full mt-1">
+              <Lock className="h-3.5 w-3.5" />
+              {locale === 'ja' ? '無料会員限定' : 'Members Only'}
             </span>
           )}
         </div>
@@ -100,27 +114,27 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
         {/* ── Three states: login gate / paywall / video player ── */}
         {showLoginGate ? (
           <div className="rounded-2xl bg-gradient-to-br from-sage-50 to-linen-100 dark:from-navy-800 dark:to-navy-700 border border-sage-200 dark:border-navy-600 p-8 mb-8 text-center">
-            <LogIn className="h-10 w-10 text-sage-600 dark:text-sage-400 mx-auto mb-4" />
+            <Lock className="h-10 w-10 text-sage-600 dark:text-sage-400 mx-auto mb-4" />
             <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-2">
-              {locale === 'ja' ? 'この動画を視聴するにはログインが必要です' : 'Log in to watch this video'}
+              {locale === 'ja' ? 'この機能はロックされています' : 'This content is locked'}
             </h3>
             <p className="text-sm text-gray-500 dark:text-navy-300 mb-5">
               {locale === 'ja'
-                ? 'プレミアム動画は定額プラン会員がご利用いただけます。'
-                : 'Premium videos are available to subscribers.'}
+                ? 'この動画を見るにはログインをする必要があります。他にもログインならではのサービスがありますので、是非ログインしてみてください。'
+                : 'You need to log in to watch this video. Logging in unlocks many more features and services!'}
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
               <Link
-                href={`/register?from=/wellness/videos/${id}`}
+                href={`/login?from=/wellness/videos/${id}`}
                 className="inline-flex items-center gap-2 bg-sage-500 hover:bg-sage-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
               >
-                {locale === 'ja' ? '無料で会員登録' : 'Sign up free'}
+                {locale === 'ja' ? 'ログイン' : 'Log in'}
               </Link>
               <Link
-                href={`/login?from=/wellness/videos/${id}`}
+                href={`/register?from=/wellness/videos/${id}`}
                 className="inline-flex items-center gap-2 text-sage-700 dark:text-sage-400 text-sm font-semibold hover:underline"
               >
-                {locale === 'ja' ? 'ログイン' : 'Log in'}
+                {locale === 'ja' ? '新規登録（無料）' : 'Sign up free'}
               </Link>
             </div>
           </div>

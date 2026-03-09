@@ -48,6 +48,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     is_published:   body.is_published,
   }
   if (body.is_premium !== undefined) payload.is_premium = body.is_premium
+  if (body.access_level !== undefined) payload.access_level = body.access_level
 
   const { error } = await admin
     .from('wellness_articles')

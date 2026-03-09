@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Upload, X, ImageIcon, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react'
+import { Upload, X, ImageIcon, ChevronDown, ChevronUp, CheckCircle2, Sparkles, Lock, Globe2 } from 'lucide-react'
 import { RichTextEditor } from './RichTextEditor'
 import { CONCERNS } from '@/lib/concerns'
 import { ARTICLE_PRESETS } from '@/lib/article-presets'
@@ -21,8 +21,9 @@ interface ArticleData {
   concerns: string[]
   movement_type: string[]
   difficulty_level: string
+  access_level: string  // 'public' | 'member' | 'premium'
   is_published: boolean
-  is_premium: boolean
+  is_premium: boolean   // derived from access_level for backward compat
 }
 
 interface ArticleEditorProps {
@@ -69,6 +70,13 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
   const initCategory = initialData?.category ?? 'ayurveda'
   const initIsPreset = PRESET_VALUES.includes(initCategory)
 
+  // Derive initial access_level from existing data
+  const initAccessLevel = (() => {
+    const al = (initialData as any)?.access_level
+    if (al === 'public' || al === 'member' || al === 'premium') return al
+    return (initialData as any)?.is_premium ? 'premium' : 'public'
+  })()
+
   const [form, setForm] = useState<ArticleData>({
     title_ja: initialData?.title_ja ?? '',
     title_en: initialData?.title_en ?? '',
@@ -82,8 +90,9 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
     concerns: (initialData as any)?.concerns ?? [],
     movement_type: (initialData as any)?.movement_type ?? [],
     difficulty_level: (initialData as any)?.difficulty_level ?? '',
+    access_level: initAccessLevel,
     is_published: initialData?.is_published ?? false,
-    is_premium: (initialData as any)?.is_premium ?? false,
+    is_premium: initAccessLevel === 'premium',
   })
   const [customCategory, setCustomCategory] = useState(initIsPreset ? '' : initCategory)
   const [uploading, setUploading] = useState<number | null>(null)
@@ -170,6 +179,8 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
       const payload = {
         ...form,
         category: form.category === 'other' ? customCategory.trim() : form.category,
+        access_level: form.access_level,
+        is_premium: form.access_level === 'premium',
         is_published: publish,
       }
       let res: Response
@@ -581,58 +592,90 @@ export function ArticleEditor({ initialData, redirectTo, locale = 'en' }: Articl
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {locale === 'ja' ? 'アクセス設定' : 'Access Setting'}
         </label>
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-2">
+          {/* Public */}
           <button
             type="button"
-            onClick={() => setForm({ ...form, is_premium: false })}
-            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
-              !form.is_premium
+            onClick={() => setForm({ ...form, access_level: 'public', is_premium: false })}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
+              form.access_level === 'public'
+                ? 'border-navy-500 bg-navy-50 dark:bg-navy-900/30'
+                : 'border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 hover:border-navy-300'
+            }`}
+          >
+            <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
+              form.access_level === 'public'
+                ? 'border-navy-500 bg-navy-500'
+                : 'border-gray-300 dark:border-navy-500'
+            }`}>
+              {form.access_level === 'public' && <div className="w-2 h-2 bg-white rounded-full m-auto mt-[2px]" />}
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <Globe2 className="h-3.5 w-3.5 text-navy-500" />
+                {locale === 'ja' ? '全体公開' : 'Public'}
+              </p>
+              <p className="text-xs text-gray-400 dark:text-navy-400">
+                {locale === 'ja' ? 'ゲスト含む全員が閲覧できます' : 'Anyone can read, no login required'}
+              </p>
+            </div>
+          </button>
+
+          {/* Member only */}
+          <button
+            type="button"
+            onClick={() => setForm({ ...form, access_level: 'member', is_premium: false })}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
+              form.access_level === 'member'
                 ? 'border-sage-500 bg-sage-50 dark:bg-sage-900/20'
                 : 'border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 hover:border-sage-300'
             }`}
           >
             <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
-              !form.is_premium
+              form.access_level === 'member'
                 ? 'border-sage-500 bg-sage-500'
                 : 'border-gray-300 dark:border-navy-500'
             }`}>
-              {!form.is_premium && <div className="w-2 h-2 bg-white rounded-full m-auto mt-[2px]" />}
+              {form.access_level === 'member' && <div className="w-2 h-2 bg-white rounded-full m-auto mt-[2px]" />}
             </div>
             <div>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                {locale === 'ja' ? '無料' : 'Free'}
+              <p className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
+                <Lock className="h-3.5 w-3.5 text-sage-500" />
+                {locale === 'ja' ? '無料会員限定' : 'Members Only'}
               </p>
               <p className="text-xs text-gray-400 dark:text-navy-400">
-                {locale === 'ja' ? '会員全員が閲覧できます' : 'All registered members can read'}
+                {locale === 'ja' ? '無料登録したユーザーのみ閲覧できます' : 'Free registered members only'}
               </p>
             </div>
           </button>
 
+          {/* Premium */}
           <button
             type="button"
-            onClick={() => setForm({ ...form, is_premium: true })}
-            className={`flex-1 flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
-              form.is_premium
+            onClick={() => setForm({ ...form, access_level: 'premium', is_premium: true })}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all text-left ${
+              form.access_level === 'premium'
                 ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
                 : 'border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 hover:border-amber-300'
             }`}
           >
             <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${
-              form.is_premium
+              form.access_level === 'premium'
                 ? 'border-amber-500 bg-amber-500'
                 : 'border-gray-300 dark:border-navy-500'
             }`}>
-              {form.is_premium && <div className="w-2 h-2 bg-white rounded-full m-auto mt-[2px]" />}
+              {form.access_level === 'premium' && <div className="w-2 h-2 bg-white rounded-full m-auto mt-[2px]" />}
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
-                {locale === 'ja' ? '有料（プレミアム）' : 'Premium (Paid)'}
+                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                {locale === 'ja' ? 'プレミアム限定' : 'Premium Only'}
                 <span className="text-[10px] bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-1.5 py-0.5 rounded-full font-bold">
                   $19.99/mo
                 </span>
               </p>
               <p className="text-xs text-gray-400 dark:text-navy-400">
-                {locale === 'ja' ? 'サブスク会員のみ閲覧可能' : 'Subscribers only ($19.99/month)'}
+                {locale === 'ja' ? '有料サブスク会員のみ閲覧できます' : 'Paid subscribers only ($19.99/month)'}
               </p>
             </div>
           </button>

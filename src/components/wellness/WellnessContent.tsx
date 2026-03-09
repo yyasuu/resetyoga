@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Play, BookOpen, Sparkles } from 'lucide-react'
+import { Play, BookOpen, Sparkles, Lock } from 'lucide-react'
 import { CONCERNS } from '@/lib/concerns'
 import { WellnessVideoCard } from './WellnessVideoCard'
+import { MemberGateModal } from './MemberGateModal'
 
 interface Video {
   id: string
@@ -20,6 +21,8 @@ interface Video {
   concerns: string[] | null
   movement_type: string[] | null
   difficulty_level: string | null
+  access_level?: string   // 'public' | 'member' | 'premium'
+  is_premium?: boolean    // legacy fallback
   is_published: boolean
 }
 
@@ -35,7 +38,8 @@ interface Article {
   concerns: string[] | null
   movement_type: string[] | null
   difficulty_level: string | null
-  is_premium?: boolean
+  access_level?: string   // 'public' | 'member' | 'premium'
+  is_premium?: boolean    // legacy fallback
   profiles: { full_name: string | null } | null
 }
 
@@ -105,6 +109,7 @@ export function WellnessContent({
   const [selectedConcern, setSelectedConcern] = useState<string | null>(null)
   const [selectedMovement, setSelectedMovement] = useState<string>('')
   const [selectedLevel, setSelectedLevel] = useState<string>('')
+  const [gateTarget, setGateTarget] = useState<string | null>(null)
   const router = useRouter()
 
   const concern = selectedConcern ? CONCERNS.find((c) => c.id === selectedConcern) : null
@@ -142,6 +147,13 @@ export function WellnessContent({
 
   return (
     <div>
+      {gateTarget && (
+        <MemberGateModal
+          contentPath={gateTarget}
+          locale={locale}
+          onClose={() => setGateTarget(null)}
+        />
+      )}
       {/* Concern filter chips */}
       <section className="mb-10">
         <p className="text-xs font-semibold text-gray-400 dark:text-navy-400 uppercase tracking-wider mb-3">
@@ -335,12 +347,12 @@ export function WellnessContent({
             ? filteredArticles.map((article) => {
                 const coverImage =
                   (article.image_urls)?.[0] ?? article.cover_image_url ?? null
-                const isPremium = !!article.is_premium
+                const accessLevel = article.access_level ?? (article.is_premium ? 'premium' : 'public')
                 const handleArticleClick = (e: React.MouseEvent) => {
-                  // Premium article + guest → redirect to login
-                  if (isPremium && !isLoggedIn) {
+                  // Member/Premium article + guest → show modal
+                  if (!isLoggedIn && (accessLevel === 'member' || accessLevel === 'premium')) {
                     e.preventDefault()
-                    router.push(`/login?from=/wellness/articles/${article.id}`)
+                    setGateTarget(`/wellness/articles/${article.id}`)
                   }
                 }
                 return (
@@ -351,13 +363,25 @@ export function WellnessContent({
                     className="bg-white dark:bg-navy-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow block group"
                   >
                     {coverImage && (
-                      <div className="h-40 overflow-hidden">
+                      <div className="h-40 overflow-hidden relative">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={coverImage}
                           alt={locale === 'ja' ? article.title_ja : article.title_en}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
+                        {accessLevel === 'member' && (
+                          <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold bg-sage-100 dark:bg-sage-900/60 text-sage-700 dark:text-sage-400 px-2 py-0.5 rounded-full">
+                            <Lock className="h-3 w-3" />
+                            {locale === 'ja' ? '無料会員' : 'Members'}
+                          </span>
+                        )}
+                        {accessLevel === 'premium' && (
+                          <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">
+                            <Sparkles className="h-3 w-3" />
+                            {locale === 'ja' ? 'プレミアム' : 'Premium'}
+                          </span>
+                        )}
                       </div>
                     )}
                     <div className="p-6">
@@ -365,10 +389,16 @@ export function WellnessContent({
                         <span className="text-xs font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-wider">
                           {article.category}
                         </span>
-                        {isPremium && (
+                        {!coverImage && accessLevel === 'premium' && (
                           <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">
                             <Sparkles className="h-3 w-3" />
                             {locale === 'ja' ? 'プレミアム' : 'Premium'}
+                          </span>
+                        )}
+                        {!coverImage && accessLevel === 'member' && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-sage-100 dark:bg-sage-900/40 text-sage-700 dark:text-sage-400 px-2 py-0.5 rounded-full">
+                            <Lock className="h-3 w-3" />
+                            {locale === 'ja' ? '無料会員' : 'Members'}
                           </span>
                         )}
                       </div>

@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Play, X, Sparkles } from 'lucide-react'
+import { Play, X, Sparkles, Lock } from 'lucide-react'
+import { MemberGateModal } from './MemberGateModal'
 
 interface VideoCardProps {
   video: {
@@ -15,7 +16,8 @@ interface VideoCardProps {
     thumbnail_url: string | null
     duration_label: string | null
     category: string
-    is_premium?: boolean
+    access_level?: string   // 'public' | 'member' | 'premium'
+    is_premium?: boolean    // legacy fallback
   }
   gradient: string
   locale: string
@@ -37,17 +39,23 @@ function isDirectVideo(url: string): boolean {
 
 export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: VideoCardProps) {
   const [playing, setPlaying] = useState(false)
+  const [showGateModal, setShowGateModal] = useState(false)
   const router = useRouter()
 
-  const isPremium = !!video.is_premium
+  // Derive access level (new field takes precedence over legacy is_premium)
+  const accessLevel = video.access_level ?? (video.is_premium ? 'premium' : 'public')
 
   const handlePlay = () => {
-    if (isPremium) {
-      // Premium video → detail page handles login gate / paywall
+    if (!isLoggedIn && (accessLevel === 'member' || accessLevel === 'premium')) {
+      setShowGateModal(true)
+      return
+    }
+    if (accessLevel === 'premium') {
+      // Detail page handles the subscription paywall
       router.push(`/wellness/videos/${video.id}`)
       return
     }
-    // Free video → play inline for everyone
+    // public or logged-in member → play inline
     setPlaying(true)
   }
 
@@ -73,17 +81,27 @@ export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: Video
             />
           ) : null}
           <div className="w-14 h-14 bg-white/80 dark:bg-navy-900/80 rounded-full flex items-center justify-center shadow-md relative z-10 hover:scale-105 transition-transform">
-            <Play className="h-6 w-6 text-sage-600 dark:text-sage-400 ml-0.5" />
+            {!isLoggedIn && accessLevel !== 'public'
+              ? <Lock className="h-6 w-6 text-sage-600 dark:text-sage-400" />
+              : <Play className="h-6 w-6 text-sage-600 dark:text-sage-400 ml-0.5" />
+            }
           </div>
           {video.duration_label && (
             <span className="absolute bottom-3 right-3 text-xs bg-navy-900/60 text-white px-2 py-0.5 rounded-full z-10">
               {video.duration_label}
             </span>
           )}
-          {isPremium && (
+          {/* Access level badge */}
+          {accessLevel === 'premium' && (
             <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full z-10">
               <Sparkles className="h-3 w-3" />
               {locale === 'ja' ? 'プレミアム' : 'Premium'}
+            </span>
+          )}
+          {accessLevel === 'member' && (
+            <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[10px] font-bold bg-sage-100 dark:bg-sage-900/60 text-sage-700 dark:text-sage-400 px-2 py-0.5 rounded-full z-10">
+              <Lock className="h-3 w-3" />
+              {locale === 'ja' ? '無料会員' : 'Members'}
             </span>
           )}
         </div>
@@ -96,7 +114,16 @@ export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: Video
         </div>
       </div>
 
-      {/* Video Modal (free videos only) */}
+      {/* Member gate modal */}
+      {showGateModal && (
+        <MemberGateModal
+          contentPath={`/wellness/videos/${video.id}`}
+          locale={locale}
+          onClose={() => setShowGateModal(false)}
+        />
+      )}
+
+      {/* Video modal (public or logged-in member) */}
       {playing && (
         <div
           className="fixed inset-0 z-[300] bg-black/80 flex items-center justify-center p-4"

@@ -4,7 +4,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
-import { ChevronLeft, BookOpen, Pencil, Library, ArrowRight, Sparkles, LogIn } from 'lucide-react'
+import { ChevronLeft, BookOpen, Pencil, Library, ArrowRight, Sparkles, LogIn, Lock } from 'lucide-react'
 import { PremiumPaywall } from '@/components/wellness/PremiumPaywall'
 
 const CATEGORY_LABELS: Record<string, { ja: string; en: string }> = {
@@ -47,8 +47,12 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
     profile &&
     (profile.role === 'admin' || (profile.role === 'instructor' && article.author_id === user?.id))
 
-  // ── Premium / paywall check ───────────────────────────────────────────────
-  const isPremium = !!(article as any).is_premium
+  // ── Access level check ──────────────────────────────────────────────────
+  // New 3-tier: 'public' | 'member' | 'premium'  (falls back to legacy is_premium)
+  const accessLevel: string = (article as any).access_level
+    ?? ((article as any).is_premium ? 'premium' : 'public')
+  const isPremium = accessLevel === 'premium'
+  const isMemberOnly = accessLevel === 'member'
   const canAccessPremium = profile?.role === 'admin' || profile?.role === 'instructor'
 
   let hasActiveSubscription = false
@@ -61,10 +65,10 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
     hasActiveSubscription = sub?.status === 'active'
   }
 
+  // Logged-in member + premium + no subscription → paywall
   const showPaywall = isPremium && !canAccessPremium && !hasActiveSubscription && !!user
-  // Guest + premium article → show login gate
-  // Guest + free article → show full content
-  const showLoginGate = !user && isPremium
+  // Guest + member or premium → inline login gate
+  const showLoginGate = !user && (isMemberOnly || isPremium)
 
   // Preview text for guest gate and premium paywall
   const contentPlain = (content ?? '')
@@ -100,6 +104,12 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
               <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-full">
                 <Sparkles className="h-3 w-3" />
                 {locale === 'ja' ? 'プレミアム' : 'Premium'}
+              </span>
+            )}
+            {isMemberOnly && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-sage-100 dark:bg-sage-900/40 text-sage-700 dark:text-sage-400 px-2 py-0.5 rounded-full">
+                <Lock className="h-3 w-3" />
+                {locale === 'ja' ? '無料会員限定' : 'Members Only'}
               </span>
             )}
           </div>
@@ -184,27 +194,27 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
               </div>
             )}
             <div className="mt-6 rounded-2xl bg-gradient-to-br from-sage-50 to-linen-100 dark:from-navy-800 dark:to-navy-700 border border-sage-200 dark:border-navy-600 p-6 text-center">
-              <LogIn className="h-8 w-8 text-sage-600 dark:text-sage-400 mx-auto mb-3" />
+              <Lock className="h-8 w-8 text-sage-600 dark:text-sage-400 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900 dark:text-white text-lg mb-1">
-                {locale === 'ja' ? 'この記事を読むにはログインが必要です' : 'Log in to read this article'}
+                {locale === 'ja' ? 'この機能はロックされています' : 'This content is locked'}
               </h3>
               <p className="text-sm text-gray-500 dark:text-navy-300 mb-5">
                 {locale === 'ja'
-                  ? '会員登録（無料）で、全ての無料コラム・動画にアクセスできます。'
-                  : 'Create a free account to access all free articles and videos.'}
+                  ? 'この記事を読むにはログインをする必要があります。他にもログインならではのサービスがありますので、是非ログインしてみてください。'
+                  : 'You need to log in to read this article. Logging in unlocks many more features and services!'}
               </p>
               <div className="flex items-center justify-center gap-3 flex-wrap">
                 <Link
-                  href={`/register?from=/wellness/articles/${id}`}
+                  href={`/login?from=/wellness/articles/${id}`}
                   className="inline-flex items-center gap-2 bg-sage-500 hover:bg-sage-600 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors"
                 >
-                  {locale === 'ja' ? '無料で会員登録' : 'Sign up free'}
+                  {locale === 'ja' ? 'ログイン' : 'Log in'}
                 </Link>
                 <Link
-                  href={`/login?from=/wellness/articles/${id}`}
+                  href={`/register?from=/wellness/articles/${id}`}
                   className="inline-flex items-center gap-2 text-sage-700 dark:text-sage-400 text-sm font-semibold hover:underline"
                 >
-                  {locale === 'ja' ? 'ログイン' : 'Log in'}
+                  {locale === 'ja' ? '新規登録（無料）' : 'Sign up free'}
                 </Link>
               </div>
             </div>

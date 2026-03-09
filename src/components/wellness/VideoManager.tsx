@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { Plus, Trash2, Eye, EyeOff, Play, Link2, Upload, Pencil } from 'lucide-react'
+import { Plus, Trash2, Eye, EyeOff, Play, Link2, Upload, Pencil, Sparkles, Lock, Globe2 } from 'lucide-react'
 import { CONCERNS } from '@/lib/concerns'
 
 interface WellnessVideo {
@@ -18,6 +18,7 @@ interface WellnessVideo {
   concerns: string[]
   movement_type: string[] | null
   difficulty_level: string | null
+  access_level: string
   is_published: boolean
   created_at: string
 }
@@ -54,6 +55,30 @@ const DIFFICULTY_LEVELS = [
   { value: 'advanced',     label: '上級者 / Advanced' },
 ]
 
+const ACCESS_LEVELS = [
+  {
+    value: 'public',
+    labelJa: '全体公開',
+    descJa: 'ゲスト含む全員が視聴できます',
+    labelEn: 'Public',
+    descEn: 'Anyone can watch, no login required',
+  },
+  {
+    value: 'member',
+    labelJa: '無料会員限定',
+    descJa: '無料登録が必要です',
+    labelEn: 'Members Only',
+    descEn: 'Free registration required',
+  },
+  {
+    value: 'premium',
+    labelJa: 'プレミアム限定',
+    descJa: '有料サブスク会員のみ視聴できます',
+    labelEn: 'Premium Only',
+    descEn: 'Paid subscribers only',
+  },
+]
+
 const EMPTY_FORM = {
   title_ja: '',
   title_en: '',
@@ -66,6 +91,7 @@ const EMPTY_FORM = {
   concerns: [] as string[],
   movement_type: [] as string[],
   difficulty_level: '',
+  access_level: 'public',
   is_published: false,
 }
 
@@ -105,6 +131,7 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
       concerns: video.concerns ?? [],
       movement_type: video.movement_type ?? [],
       difficulty_level: video.difficulty_level ?? '',
+      access_level: video.access_level ?? 'public',
       is_published: video.is_published,
     })
     setInputMode('url')
@@ -635,6 +662,48 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
             </div>
           </div>
 
+          {/* Access level */}
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-navy-300 mb-2">アクセス設定 / Access Level</label>
+            <div className="flex flex-col gap-2">
+              {ACCESS_LEVELS.map(level => (
+                <button
+                  key={level.value}
+                  type="button"
+                  onClick={() => setForm({ ...form, access_level: level.value })}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-left transition-all ${
+                    form.access_level === level.value
+                      ? level.value === 'premium'
+                        ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20'
+                        : level.value === 'member'
+                        ? 'border-sage-500 bg-sage-50 dark:bg-sage-900/20'
+                        : 'border-navy-500 bg-navy-50 dark:bg-navy-900/20'
+                      : 'border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 hover:border-gray-300'
+                  }`}
+                >
+                  <div className={`w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 ${
+                    form.access_level === level.value
+                      ? level.value === 'premium'
+                        ? 'border-amber-500 bg-amber-500'
+                        : level.value === 'member'
+                        ? 'border-sage-500 bg-sage-500'
+                        : 'border-navy-500 bg-navy-500'
+                      : 'border-gray-300 dark:border-navy-500'
+                  }`} />
+                  <div>
+                    <p className="text-xs font-semibold text-gray-900 dark:text-white flex items-center gap-1">
+                      {level.value === 'public' && <Globe2 className="h-3 w-3 text-navy-500" />}
+                      {level.value === 'member' && <Lock className="h-3 w-3 text-sage-500" />}
+                      {level.value === 'premium' && <Sparkles className="h-3 w-3 text-amber-500" />}
+                      {level.labelJa}
+                    </p>
+                    <p className="text-[10px] text-gray-400 dark:text-navy-400">{level.descJa}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
@@ -691,6 +760,16 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
                   </div>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                  {(video.access_level ?? 'public') === 'premium' && (
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 inline-flex items-center gap-1">
+                      <Sparkles className="h-3 w-3" />プレミアム
+                    </span>
+                  )}
+                  {(video.access_level ?? 'public') === 'member' && (
+                    <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-sage-100 dark:bg-sage-900/40 text-sage-700 dark:text-sage-400 inline-flex items-center gap-1">
+                      <Lock className="h-3 w-3" />無料会員
+                    </span>
+                  )}
                   <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                     video.is_published
                       ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400'

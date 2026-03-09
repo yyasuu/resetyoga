@@ -61,6 +61,7 @@ export async function POST(request: Request) {
     is_published:   body.is_published ?? false,
   }
   if (body.is_premium !== undefined) payload.is_premium = body.is_premium
+  if (body.access_level !== undefined) payload.access_level = body.access_level
 
   const { data, error } = await admin
     .from('wellness_articles')

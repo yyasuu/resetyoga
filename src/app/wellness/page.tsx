@@ -116,15 +116,17 @@ export default async function WellnessPage() {
             : 'Select a concern to find videos and articles tailored to your needs.'}
         </p>
         {!isLoggedIn && (
-          <div className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 bg-white/70 dark:bg-navy-800/70 backdrop-blur rounded-full border border-sage-200 dark:border-navy-600 text-sm text-navy-700 dark:text-navy-200">
-            <span>✨</span>
-            <span>
-              {locale === 'ja'
-                ? '無料コンテンツはそのまま閲覧できます。プレミアムはログインが必要です。'
-                : 'Free content is open to all. Premium content requires login.'}
-            </span>
-            <a href="/register" className="text-sage-600 dark:text-sage-400 font-semibold hover:underline ml-1">
-              {locale === 'ja' ? '登録 →' : 'Sign up →'}
+          <div className="mt-5 flex flex-col sm:flex-row items-center justify-center gap-2 text-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/70 dark:bg-navy-800/70 backdrop-blur rounded-full border border-sage-200 dark:border-navy-600 text-navy-700 dark:text-navy-200">
+              <span>🌿</span>
+              <span>{locale === 'ja' ? '全体公開' : 'Public'}</span>
+              <span className="text-gray-400">·</span>
+              <span className="text-sage-700 dark:text-sage-400 font-semibold inline-flex items-center gap-1">🔒 {locale === 'ja' ? '無料会員限定' : 'Members'}</span>
+              <span className="text-gray-400">·</span>
+              <span className="text-amber-600 dark:text-amber-400 font-semibold inline-flex items-center gap-1">✨ {locale === 'ja' ? 'プレミアム' : 'Premium'}</span>
+            </div>
+            <a href="/register" className="px-4 py-2 bg-sage-500 hover:bg-sage-600 text-white text-sm font-semibold rounded-full transition-colors">
+              {locale === 'ja' ? '無料登録 →' : 'Sign up free →'}
             </a>
           </div>
         )}
