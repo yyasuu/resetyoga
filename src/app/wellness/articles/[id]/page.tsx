@@ -234,7 +234,8 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
               prose-em:text-gray-700 dark:prose-em:text-gray-200
               prose-ul:text-gray-700 dark:prose-ul:text-gray-200
               prose-ol:text-gray-700 dark:prose-ol:text-gray-200
-              prose-hr:border-gray-200 dark:prose-hr:border-navy-600"
+              prose-hr:border-gray-200 dark:prose-hr:border-navy-600
+              [&_img]:max-w-full [&_img]:h-auto"
             dangerouslySetInnerHTML={{ __html: content }}
           />
         ) : (
