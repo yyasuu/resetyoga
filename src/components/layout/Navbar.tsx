@@ -88,31 +88,31 @@ export function Navbar({ user }: NavbarProps) {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-5">
             <Link
               href="/instructors"
-              className="text-gray-600 dark:text-gray-300 hover:text-navy-600 dark:hover:text-sage-400 font-medium transition-colors"
+              className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-navy-700 dark:hover:text-sage-400 transition-colors"
             >
               {t('instructors')}
             </Link>
 
             <Link
               href="/wellness"
-              className="text-gray-600 dark:text-gray-300 hover:text-navy-600 dark:hover:text-sage-400 font-medium transition-colors"
+              className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-navy-700 dark:hover:text-sage-400 transition-colors"
             >
               Wellness
             </Link>
 
             <Link
               href="/premium"
-              className="flex items-center gap-1 text-sage-600 dark:text-sage-400 hover:text-sage-500 font-semibold transition-colors"
+              className="text-sm font-medium text-sage-600 dark:text-sage-400 hover:text-sage-500 dark:hover:text-sage-300 transition-colors flex items-center gap-1"
             >
-              <span className="text-xs">✦</span> Premium
+              <span className="text-[11px]">✦</span> Premium
             </Link>
 
             <Link
               href="/corporate"
-              className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-navy-200 dark:border-navy-600 text-navy-700 dark:text-navy-200 hover:bg-navy-50 dark:hover:bg-navy-800 transition-colors"
+              className="text-sm font-medium text-navy-600 dark:text-navy-300 hover:text-navy-800 dark:hover:text-sage-400 transition-colors"
             >
               For Teams
             </Link>

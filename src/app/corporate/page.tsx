@@ -3,8 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { InquiryForm } from '@/components/corporate/InquiryForm'
-import { Check, Users, BookOpen, BarChart2, Calendar, Zap, Shield } from 'lucide-react'
+import { Check, Users, BookOpen, BarChart2, Calendar, Zap, Shield, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export const metadata = {
   title: 'Reset for Teams | Corporate Wellness | Reset Yoga',
@@ -269,6 +270,96 @@ export default async function CorporatePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── In the Field ─────────────────────────────────────────────────── */}
+      <section className="py-24 bg-linen-50 dark:bg-navy-950 overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="mb-14">
+            <p className="text-xs font-bold tracking-[0.2em] text-sage-600 dark:text-sage-400 uppercase mb-3">
+              {ja ? 'フィールドから' : 'In the field'}
+            </p>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-gray-900 dark:text-white leading-tight max-w-lg">
+              {ja ? <>どこにいても、<br />本物の実践を。</> : <>Anywhere you need us.</>}
+            </h2>
+            <p className="mt-4 text-base text-gray-500 dark:text-navy-300 max-w-md leading-relaxed">
+              {ja
+                ? 'チェンナイの寺院から、フランスの郊外まで。あなたの街でも。Reset Yogaの講師はどこへでも行きます。'
+                : 'From a 2,000-year-old temple in South India to a session in southern France — and to your city too.'}
+            </p>
+          </div>
+
+          {/* Editorial photo grid — asymmetric 3-panel */}
+          <div className="grid grid-cols-12 gap-3 sm:gap-4 h-[480px] sm:h-[560px]">
+
+            {/* Chennai — tall portrait hero, left */}
+            <div className="col-span-5 relative rounded-2xl overflow-hidden group">
+              <Image
+                src="/yoga-chennai.jpeg"
+                alt="Group yoga session at the Kapaleeshwarar Temple, Chennai, India"
+                fill
+                className="object-cover object-top group-hover:scale-[1.03] transition-transform duration-700"
+                sizes="(max-width: 768px) 50vw, 38vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/85 via-navy-900/10 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-5 sm:p-6">
+                <p className="text-[9px] font-bold tracking-[0.2em] text-white/50 uppercase mb-1.5">
+                  Chennai, India
+                </p>
+                <p className="text-white font-semibold text-sm sm:text-base leading-snug">
+                  {ja ? 'カパレーシュワラル寺院\nグループ研修' : <>Immersion at<br />Kapaleeshwarar Temple</>}
+                </p>
+              </div>
+            </div>
+
+            {/* France — tall portrait, center */}
+            <div className="col-span-4 relative rounded-2xl overflow-hidden group">
+              <Image
+                src="/yoga-france.jpeg"
+                alt="Yoga retreat session in southern France"
+                fill
+                className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-700"
+                sizes="(max-width: 768px) 40vw, 30vw"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-900/85 via-navy-900/10 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-5 sm:p-6">
+                <p className="text-[9px] font-bold tracking-[0.2em] text-white/50 uppercase mb-1.5">
+                  France
+                </p>
+                <p className="text-white font-semibold text-sm sm:text-base leading-snug">
+                  {ja ? 'フランス招待\nセッション' : <>Invited instructor<br />retreat</>}
+                </p>
+              </div>
+            </div>
+
+            {/* Your city — dark text card, right */}
+            <div className="col-span-3 rounded-2xl bg-navy-900 dark:bg-navy-700 flex flex-col justify-between p-5 sm:p-7">
+              <div>
+                <p className="text-[9px] font-bold tracking-[0.2em] text-sage-400 uppercase mb-3">
+                  {ja ? 'あなたの街で' : 'Your city'}
+                </p>
+                <p className="text-white font-bold text-base sm:text-lg leading-snug mb-3">
+                  {ja
+                    ? <>あなたの街で<br />ヨガ研修を<br />開催できる。</>
+                    : <>Bring a session<br />to wherever<br />your team is.</>}
+                </p>
+                <p className="text-navy-300 text-xs leading-relaxed">
+                  {ja
+                    ? '認定講師があなたの元へ。場所はあなたが決める。'
+                    : 'Certified instructors travel to your office, studio, or retreat space.'}
+                </p>
+              </div>
+              <Link
+                href="/instructors"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-sage-500 hover:bg-sage-600 px-3.5 py-2 rounded-full transition-colors self-start mt-4"
+              >
+                {ja ? '講師を探す' : 'Find an instructor'}
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+
           </div>
         </div>
       </section>
