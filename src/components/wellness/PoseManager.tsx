@@ -193,8 +193,8 @@ export function PoseManager({ initialPoses, locale }: PoseManagerProps) {
                   key={pose.id}
                   className="flex items-center justify-between p-3 bg-gray-50 dark:bg-navy-700 rounded-xl gap-3"
                 >
-                  {/* Thumbnail */}
-                  <div className="w-10 h-10 rounded-lg overflow-hidden bg-linen-100 dark:bg-navy-600 flex items-center justify-center flex-shrink-0">
+                  {/* Thumbnail — click to edit */}
+                  <Link href={`/admin/poses/${pose.id}/edit`} className="w-10 h-10 rounded-lg overflow-hidden bg-linen-100 dark:bg-navy-600 flex items-center justify-center flex-shrink-0 hover:ring-2 hover:ring-navy-400 dark:hover:ring-sage-400 transition-all flex-shrink-0">
                     {pose.image_url
                       ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -207,7 +207,7 @@ export function PoseManager({ initialPoses, locale }: PoseManagerProps) {
                       : (
                         <span className="text-lg">🧘</span>
                       )}
-                  </div>
+                  </Link>
 
                   {/* Names */}
                   <div className="flex-1 min-w-0">
@@ -276,10 +276,11 @@ export function PoseManager({ initialPoses, locale }: PoseManagerProps) {
                     >
                       {pose.is_published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
-                    <Link href={`/admin/poses/${pose.id}/edit`}>
-                      <button className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-navy-600 text-gray-500 dark:text-navy-300">
-                        <Edit className="h-4 w-4" />
-                      </button>
+                    <Link
+                      href={`/admin/poses/${pose.id}/edit`}
+                      className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-navy-600 text-gray-500 dark:text-navy-300 inline-flex items-center justify-center"
+                    >
+                      <Edit className="h-4 w-4" />
                     </Link>
                     <button
                       onClick={() => deletePose(pose.id)}
