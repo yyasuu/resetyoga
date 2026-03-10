@@ -76,6 +76,27 @@ export default async function PosesPage() {
           </Link>
         </div>
 
+        {/* Anatomy link card */}
+        <div className="mb-6">
+          <Link
+            href="/wellness/poses/anatomy"
+            className="flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-navy-900 to-navy-800 dark:from-navy-800 dark:to-navy-900 rounded-2xl border border-navy-700 dark:border-navy-600 shadow-sm hover:shadow-md transition-shadow group"
+          >
+            <span className="text-2xl flex-shrink-0">🫀</span>
+            <div className="flex-1 min-w-0">
+              <span className="text-sm font-semibold text-white group-hover:text-sage-300 transition-colors">
+                {locale === 'ja' ? '人体解剖学ガイド' : 'Human Anatomy & Yoga Guide'}
+              </span>
+              <span className="hidden sm:inline text-sm text-white/40 ml-2">
+                {locale === 'ja' ? '— 11の器官系とヨガの医学的な関係' : '— How yoga interacts with all 11 organ systems'}
+              </span>
+            </div>
+            <span className="text-sm text-white/40 group-hover:text-sage-400 transition-colors flex-shrink-0">
+              {locale === 'ja' ? '見る →' : 'View →'}
+            </span>
+          </Link>
+        </div>
+
         {/* Yoga Styles World Map — editorial infographic */}
         <div className="mb-12">
           <div className="text-center mb-4">
