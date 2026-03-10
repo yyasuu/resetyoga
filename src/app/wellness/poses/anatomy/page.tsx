@@ -41,8 +41,8 @@ export default async function AnatomyPage() {
           </h1>
           <p className="text-white/60 max-w-xl mx-auto text-sm leading-relaxed">
             {locale === 'ja'
-              ? '細胞からゲノム、骨格から神経まで。11の器官系がヨガ・瞑想とどのように関わるかを、医学研究のエビデンスとともに解説。'
-              : 'From cells to the nervous system — how all 11 organ systems interact with yoga and meditation, backed by medical research.'}
+              ? '細胞・骨格・神経から内分泌・消化器まで、人体の11カテゴリーとヨガ・瞑想の関わりを医学研究のエビデンスとともに解説。'
+              : 'From cells and bones to nerves and hormones — 11 body categories and how yoga & meditation interact with each, backed by medical research.'}
           </p>
 
           {/* System count badges */}
