@@ -39,10 +39,11 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
 
   const [uploadingJa, setUploadingJa] = useState(false)
   const [uploadingEn, setUploadingEn] = useState(false)
+  const uploading = uploadingJa || uploadingEn
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  const handleImageUpload = async (file: File, lang: 'ja' | 'en') => {
+  const handleImageUpload = async (file: File, lang: 'ja' | 'en', inputEl: HTMLInputElement | null) => {
     if (lang === 'ja') setUploadingJa(true)
     else setUploadingEn(true)
     setError('')
@@ -64,6 +65,8 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
     } finally {
       if (lang === 'ja') setUploadingJa(false)
       else setUploadingEn(false)
+      // Reset input so the same file can be re-selected next time
+      if (inputEl) inputEl.value = ''
     }
   }
 
@@ -140,7 +143,7 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
         <div className="grid grid-cols-2 gap-4">
           {(['ja', 'en'] as const).map(lang => {
             const isJa = lang === 'ja'
-            const uploading = isJa ? uploadingJa : uploadingEn
+            const uploadingThis = isJa ? uploadingJa : uploadingEn
             const imgUrl = isJa ? form.image_url_ja : form.image_url_en
             const inputRef = isJa ? fileInputRefJa : fileInputRefEn
             return (
@@ -150,22 +153,31 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
                 </p>
                 <div
                   className="border-2 border-dashed border-gray-200 dark:border-navy-600 rounded-xl overflow-hidden cursor-pointer hover:border-sage-400 dark:hover:border-sage-500 transition-colors"
-                  onClick={() => inputRef.current?.click()}
+                  onClick={() => !uploadingThis && inputRef.current?.click()}
                 >
                   {imgUrl ? (
                     <div className="relative">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={imgUrl} alt="" className="w-full h-auto max-h-64 object-contain" />
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                        <span className="text-white text-xs font-medium flex items-center gap-1">
-                          <Upload className="h-3.5 w-3.5" />
-                          {locale === 'ja' ? '変更' : 'Change'}
-                        </span>
+                      {/* Overlay: uploading spinner or hover "Change" */}
+                      <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${
+                        uploadingThis
+                          ? 'bg-black/40 opacity-100'
+                          : 'bg-black/30 opacity-0 hover:opacity-100'
+                      }`}>
+                        {uploadingThis ? (
+                          <div className="w-7 h-7 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <span className="text-white text-xs font-medium flex items-center gap-1">
+                            <Upload className="h-3.5 w-3.5" />
+                            {locale === 'ja' ? '変更' : 'Change'}
+                          </span>
+                        )}
                       </div>
                     </div>
                   ) : (
                     <div className="h-36 flex flex-col items-center justify-center gap-2 text-gray-400 dark:text-navy-400">
-                      {uploading ? (
+                      {uploadingThis ? (
                         <div className="w-6 h-6 border-2 border-sage-300 border-t-sage-600 rounded-full animate-spin" />
                       ) : (
                         <>
@@ -186,7 +198,7 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
                   className="hidden"
                   onChange={e => {
                     const file = e.target.files?.[0]
-                    if (file) handleImageUpload(file, lang)
+                    if (file) handleImageUpload(file, lang, e.target)
                   }}
                 />
               </div>
@@ -456,7 +468,7 @@ export function PoseEditor({ initialPose, mode, locale }: PoseEditorProps) {
       <div className="flex items-center gap-3 pt-2">
         <Button
           type="submit"
-          disabled={saving}
+          disabled={saving || uploading}
           className="bg-navy-600 hover:bg-navy-700 text-white px-6"
         >
           {saving ? (
