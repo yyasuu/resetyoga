@@ -4,6 +4,7 @@ import { Footer } from '@/components/layout/Footer'
 import { cookies } from 'next/headers'
 import { PoseLibraryContent } from '@/components/wellness/PoseLibraryContent'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ChevronLeft } from 'lucide-react'
 
 export const metadata = {
@@ -73,6 +74,30 @@ export default async function PosesPage() {
             <ChevronLeft className="h-4 w-4" />
             {locale === 'ja' ? 'ウェルネスライブラリへ戻る' : 'Back to Wellness Library'}
           </Link>
+        </div>
+
+        {/* Yoga Styles World Map — editorial infographic */}
+        <div className="mb-12">
+          <div className="text-center mb-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-sage-500 dark:text-sage-400 mb-1">
+              {locale === 'ja' ? 'ヨガスタイル全体マップ' : 'Complete Yoga Style Map'}
+            </p>
+            <p className="text-xs text-gray-400 dark:text-navy-400 max-w-sm mx-auto">
+              {locale === 'ja'
+                ? '主要なヨガスタイルと身体・心・感情への効能を一枚に。'
+                : 'Major yoga traditions and their physical, mental & emotional benefits at a glance.'}
+            </p>
+          </div>
+          <div className="relative max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-lg ring-1 ring-black/5 dark:ring-white/5">
+            <Image
+              src="/yoga-styles-map.jpg"
+              alt="The Complete World Map of Yoga Styles and Their Benefits"
+              width={900}
+              height={1013}
+              className="w-full h-auto"
+              priority
+            />
+          </div>
         </div>
 
         {poses && poses.length > 0 ? (
