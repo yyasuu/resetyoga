@@ -176,7 +176,7 @@ export default async function CorporatePage() {
           </span>
           <h1 className="text-4xl sm:text-6xl font-extrabold leading-tight mb-6 max-w-3xl mx-auto">
             {ja
-              ? <>チームに、<br className="sm:hidden" />週45分の<br className="sm:hidden" />リセットを。</>
+              ? <>チームに、週1の<wbr />ウェルネス習慣を。</>
               : <>Your team deserves<br className="hidden sm:block" /> 45 minutes.</>}
           </h1>
           <p className="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
@@ -211,7 +211,7 @@ export default async function CorporatePage() {
         </p>
         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-6">
           {ja
-            ? 'ウェルネス施策は、<br/>なぜ続かないのか。'
+            ? <>「また続かなかった」には、<br className="hidden sm:block" />理由がある。</>
             : 'Why most workplace wellness doesn\'t stick.'}
         </h2>
         <div className="grid sm:grid-cols-3 gap-6 mt-10 text-left">

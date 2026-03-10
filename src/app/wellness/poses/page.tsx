@@ -65,8 +65,8 @@ export default async function PosesPage() {
         )}
       </div>
 
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-12">
-        <div className="mb-6">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 pt-5 pb-12">
+        <div className="mb-4">
           <Link
             href="/wellness"
             className="inline-flex items-center gap-1 text-sm text-gray-500 dark:text-navy-300 hover:text-navy-600 dark:hover:text-sage-400"
