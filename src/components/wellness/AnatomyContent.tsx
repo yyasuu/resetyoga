@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { BODY_SYSTEMS, type BodySystem } from '@/lib/anatomy'
-import { FlaskConical, Microscope, Leaf, BookOpen } from 'lucide-react'
+import { CONCERNS } from '@/lib/concerns'
+import { FlaskConical, Microscope, Leaf, BookOpen, Heart } from 'lucide-react'
 
 interface AnatomyContentProps {
   locale: string
@@ -113,6 +114,21 @@ function SystemCard({ system, locale }: { system: BodySystem; locale: string }) 
             </div>
           </div>
 
+          {/* Concern tags — visible even when collapsed */}
+          {system.concernLinks.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {system.concernLinks.map(link => {
+                const concern = CONCERNS.find(c => c.id === link.concernId)
+                if (!concern) return null
+                return (
+                  <span key={link.concernId} className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full ${system.badge}`}>
+                    {concern.icon} {ja ? concern.ja : concern.en}
+                  </span>
+                )
+              })}
+            </div>
+          )}
+
           {/* Key facts */}
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
             {system.facts.map((f, i) => (
@@ -130,6 +146,57 @@ function SystemCard({ system, locale }: { system: BodySystem; locale: string }) 
       {/* Expanded content */}
       {open && (
         <div className="border-t border-white/40 dark:border-white/5">
+
+          {/* Concern connections section */}
+          {system.concernLinks.length > 0 && (
+            <div className="px-5 sm:px-6 pt-5 pb-2">
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className={`h-4 w-4 ${system.text}`} />
+                <span className={`text-xs font-bold uppercase tracking-widest ${system.text}`}>
+                  {ja ? '関連するお悩みとヨガの解消法' : 'Related Concerns & Yoga Solutions'}
+                </span>
+              </div>
+              <div className="space-y-3">
+                {system.concernLinks.map(link => {
+                  const concern = CONCERNS.find(c => c.id === link.concernId)
+                  if (!concern) return null
+                  return (
+                    <div key={link.concernId} className="rounded-xl border border-white/60 dark:border-white/5 bg-white/50 dark:bg-black/20 overflow-hidden">
+                      {/* Concern header */}
+                      <div className={`flex items-center gap-2 px-3 py-2 ${system.badge}`}>
+                        <span className="text-base">{concern.icon}</span>
+                        <span className="text-xs font-bold">
+                          {ja ? concern.ja : concern.en}
+                        </span>
+                      </div>
+                      {/* Reason + Yoga */}
+                      <div className="px-3 py-3 space-y-2">
+                        <div>
+                          <p className="text-[10px] font-bold text-gray-400 dark:text-navy-400 uppercase tracking-widest mb-1">
+                            {ja ? '医学的根拠' : 'Medical Basis'}
+                          </p>
+                          <p className="text-xs text-gray-700 dark:text-navy-100 leading-relaxed">
+                            {ja ? link.reasonJa : link.reasonEn}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-gray-400 dark:text-navy-400 uppercase tracking-widest mb-1">
+                            {ja ? 'ヨガによる解消法' : 'Yoga Solution'}
+                          </p>
+                          <p className="text-xs text-gray-700 dark:text-navy-100 leading-relaxed">
+                            {ja ? link.yogaJa : link.yogaEn}
+                          </p>
+                        </div>
+                        <p className="text-[10px] text-gray-400 dark:text-navy-500 italic leading-snug">
+                          📚 {link.evidence}
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Cell biology: locale-appropriate infographic images first */}
           {system.id === 'cell' && (
