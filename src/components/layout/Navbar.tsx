@@ -200,7 +200,7 @@ export function Navbar({ user }: NavbarProps) {
                           onClick={() => { setUserOpen(false); router.push('/wellness/poses/anatomy') }}
                           className={dropdownItem}
                         >
-                          Science & Yoga
+                          Yoga & Science
                         </button>
                       </>
                     )}

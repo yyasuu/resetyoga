@@ -85,7 +85,7 @@ export default async function PosesPage() {
             <span className="text-2xl flex-shrink-0">🫀</span>
             <div className="flex-1 min-w-0">
               <span className="text-sm font-semibold text-white group-hover:text-sage-300 transition-colors">
-                {locale === 'ja' ? 'サイエンス & ヨガ' : 'Science & Yoga'}
+                {locale === 'ja' ? 'ヨガ & サイエンス' : 'Yoga & Science'}
               </span>
               <span className="hidden sm:inline text-sm text-white/40 ml-2">
                 {locale === 'ja' ? '— 11の器官系とヨガの医学的な関係' : '— How yoga interacts with all 11 organ systems'}

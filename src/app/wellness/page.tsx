@@ -153,7 +153,7 @@ export default async function WellnessPage() {
             <span className="text-2xl flex-shrink-0">🔬</span>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-white group-hover:text-sage-300 transition-colors">
-                {locale === 'ja' ? 'サイエンス & ヨガ' : 'Science & Yoga'}
+                {locale === 'ja' ? 'ヨガ & サイエンス' : 'Yoga & Science'}
               </p>
               <p className="text-xs text-white/50 mt-0.5">
                 {locale === 'ja' ? '人体とヨガの医学的な関係' : '11 body systems × yoga research'}
