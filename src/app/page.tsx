@@ -452,12 +452,22 @@ export default async function LandingPage() {
                     <p className="text-xs text-sage-600 dark:text-sage-400 font-semibold tracking-wide mb-1">
                       {previewPose.name_sanskrit}
                     </p>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3 group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
                       {locale === 'ja' ? previewPose.name_ja : previewPose.name_en}
                     </h3>
-                    <p className="text-sm text-gray-500 dark:text-navy-300 mb-3">
-                      {locale === 'ja' ? previewPose.name_en : previewPose.name_ja}
-                    </p>
+                    {(previewPose.concerns ?? []).length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {(previewPose.concerns as string[]).slice(0, 3).map((cId: string) => {
+                          const c = CONCERNS.find(x => x.id === cId)
+                          if (!c) return null
+                          return (
+                            <span key={c.id} className="inline-flex items-center gap-0.5 text-[11px] font-medium text-sage-700 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/30 border border-sage-200 dark:border-sage-800 px-2 py-0.5 rounded-full">
+                              {c.icon} {locale === 'ja' ? c.ja : c.en}
+                            </span>
+                          )
+                        })}
+                      </div>
+                    )}
                     {previewPose.description_ja || previewPose.description_en ? (
                       <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed line-clamp-2">
                         {locale === 'ja' ? previewPose.description_ja : previewPose.description_en}
