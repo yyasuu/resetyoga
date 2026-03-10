@@ -52,8 +52,8 @@ function CellImages({ locale }: { locale: string }) {
     <div className="mb-6 space-y-3">
       <div className="rounded-xl overflow-hidden border border-gray-100 dark:border-navy-700 shadow-sm">
         <Image
-          src={ja ? '/anatomy-body-works-ja.jpg' : '/anatomy-body-works-en.jpg'}
-          alt={ja ? '体の働きと健康' : 'How the Body Works'}
+          src={ja ? '/anatomy-cells-ja.jpg' : '/anatomy-cells-en.jpg'}
+          alt={ja ? '小さな世界から人の体へ' : 'From Atoms to the Human Body'}
           width={1400}
           height={790}
           className="w-full h-auto"
@@ -61,8 +61,8 @@ function CellImages({ locale }: { locale: string }) {
       </div>
       <div className="rounded-xl overflow-hidden border border-gray-100 dark:border-navy-700 shadow-sm">
         <Image
-          src={ja ? '/anatomy-cells-ja.jpg' : '/anatomy-cells-en.jpg'}
-          alt={ja ? '小さな世界から人の体へ' : 'From Atoms to the Human Body'}
+          src={ja ? '/anatomy-body-works-ja.jpg' : '/anatomy-body-works-en.jpg'}
+          alt={ja ? '体の働きと健康' : 'How the Body Works'}
           width={1400}
           height={790}
           className="w-full h-auto"
