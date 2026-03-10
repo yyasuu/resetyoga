@@ -164,10 +164,25 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
         )}
 
         {description && canWatch && (
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-base mb-12">
-            {description}
-          </p>
+          <div
+            className="text-gray-600 dark:text-gray-300 leading-relaxed text-base mb-8 rich-content"
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
         )}
+
+        {/* Rich-text content — shown below video and description */}
+        {canWatch && (() => {
+          const richContent = locale === 'ja'
+            ? (video as any).content_ja
+            : (video as any).content_en
+          if (!richContent) return null
+          return (
+            <div
+              className="prose prose-sm sm:prose dark:prose-invert max-w-none mb-12 rich-content"
+              dangerouslySetInnerHTML={{ __html: richContent }}
+            />
+          )
+        })()}
 
         {/* Guest + free video → soft signup CTA */}
         {!user && !isPremium && (

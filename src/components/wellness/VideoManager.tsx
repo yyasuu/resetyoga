@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Plus, Trash2, Eye, EyeOff, Play, Link2, Upload, Pencil, Sparkles, Lock, Globe2 } from 'lucide-react'
 import { CONCERNS } from '@/lib/concerns'
+import { RichTextEditor } from '@/components/wellness/RichTextEditor'
 
 interface WellnessVideo {
   id: string
@@ -20,6 +21,8 @@ interface WellnessVideo {
   difficulty_level: string | null
   access_level: string
   is_published: boolean
+  content_ja: string | null
+  content_en: string | null
   created_at: string
 }
 
@@ -93,6 +96,8 @@ const EMPTY_FORM = {
   difficulty_level: '',
   access_level: 'public',
   is_published: false,
+  content_ja: '',
+  content_en: '',
 }
 
 const ACCEPTED_TYPES = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo']
@@ -117,6 +122,7 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
   const thumbnailInputRef = useRef<HTMLInputElement>(null)
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false)
 
+
   const openEdit = (video: WellnessVideo) => {
     setEditingId(video.id)
     setForm({
@@ -133,6 +139,8 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
       difficulty_level: video.difficulty_level ?? '',
       access_level: video.access_level ?? 'public',
       is_published: video.is_published,
+      content_ja: video.content_ja ?? '',
+      content_en: video.content_en ?? '',
     })
     setInputMode('url')
     setSelectedFile(null)
@@ -229,19 +237,22 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
     try {
       let videoUrl = form.video_url
 
-      // File upload mode: upload first then use the public URL
+      // File upload mode: upload if a new file was selected, otherwise keep existing URL
       if (inputMode === 'file') {
-        if (!selectedFile) {
+        if (selectedFile) {
+          const uploaded = await uploadFile()
+          if (!uploaded) {
+            setSaving(false)
+            return
+          }
+          videoUrl = uploaded
+        } else if (!editingId) {
+          // New video requires a file
           setError('動画ファイルを選択してください')
           setSaving(false)
           return
         }
-        const uploaded = await uploadFile()
-        if (!uploaded) {
-          setSaving(false)
-          return
-        }
-        videoUrl = uploaded
+        // Edit mode + no new file → keep existing videoUrl
       } else {
         if (!videoUrl) {
           setError('動画URLは必須です')
@@ -258,6 +269,8 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
         description_en: form.description_en || null,
         duration_label: form.duration_label || null,
         difficulty_level: form.difficulty_level || null,
+        content_ja: form.content_ja || null,
+        content_en: form.content_en || null,
       }
 
       // Auto-generate thumbnail from YouTube URL if none
@@ -429,9 +442,11 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
             </div>
           </div>
 
-          {/* Input mode tabs — hidden in edit mode */}
-          <div className={editingId ? 'hidden' : ''}>
-            <label className="block text-xs text-gray-500 dark:text-navy-300 mb-2">動画ソース *</label>
+          {/* Video source — shown in both add and edit mode */}
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-navy-300 mb-2">
+              動画ソース {editingId ? '（URLを変更、またはファイルを差し替え）' : '*'}
+            </label>
             <div className="flex gap-1 p-1 bg-white dark:bg-navy-800 rounded-lg w-fit border border-gray-200 dark:border-navy-600 mb-3">
               <button
                 type="button"
@@ -648,26 +663,68 @@ export function VideoManager({ initialVideos }: { initialVideos: WellnessVideo[]
             )}
           </div>
 
-          {/* Descriptions */}
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">説明（日本語）</label>
-              <textarea
-                value={form.description_ja}
-                onChange={e => setForm({ ...form, description_ja: e.target.value })}
-                rows={2}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white resize-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs text-gray-500 dark:text-navy-300 mb-1">Description (English)</label>
-              <textarea
-                value={form.description_en}
-                onChange={e => setForm({ ...form, description_en: e.target.value })}
-                rows={2}
-                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white resize-none"
-              />
-            </div>
+          {/* Rich-text content — Japanese */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 dark:text-navy-300 mb-1">
+              コンテンツ本文（日本語）
+            </label>
+            <p className="text-[11px] text-gray-400 dark:text-navy-400 mb-2">
+              動画の下に表示されます。文章の途中に画像を挿入できます（Wordと同じ感覚で）。
+            </p>
+            <RichTextEditor
+              key={`content-ja-${editingId ?? 'new'}`}
+              value={form.content_ja}
+              onChange={val => setForm(f => ({ ...f, content_ja: val }))}
+              placeholder="本文を入力…"
+            />
+          </div>
+
+          {/* Rich-text content — English */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 dark:text-navy-300 mb-1">
+              Content body (English)
+            </label>
+            <p className="text-[11px] text-gray-400 dark:text-navy-400 mb-2">
+              Displayed below the video. You can insert images inline within the text.
+            </p>
+            <RichTextEditor
+              key={`content-en-${editingId ?? 'new'}`}
+              value={form.content_en}
+              onChange={val => setForm(f => ({ ...f, content_en: val }))}
+              placeholder="Enter content body…"
+            />
+          </div>
+
+          {/* Descriptions — rich text */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 dark:text-navy-300 mb-1">
+              説明（日本語）
+            </label>
+            <p className="text-[11px] text-gray-400 dark:text-navy-400 mb-2">
+              カードや動画ページに表示される概要。太字・下線・サイズ変更・画像挿入が可能。
+            </p>
+            <RichTextEditor
+              key={`desc-ja-${editingId ?? 'new'}`}
+              value={form.description_ja}
+              onChange={val => setForm(f => ({ ...f, description_ja: val }))}
+              placeholder="動画の概要を入力…"
+              minHeight={140}
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-500 dark:text-navy-300 mb-1">
+              Description (English)
+            </label>
+            <p className="text-[11px] text-gray-400 dark:text-navy-400 mb-2">
+              Summary shown on cards and video pages. Supports bold, underline, font size, and images.
+            </p>
+            <RichTextEditor
+              key={`desc-en-${editingId ?? 'new'}`}
+              value={form.description_en}
+              onChange={val => setForm(f => ({ ...f, description_en: val }))}
+              placeholder="Enter video summary…"
+              minHeight={140}
+            />
           </div>
 
           {/* Access level */}

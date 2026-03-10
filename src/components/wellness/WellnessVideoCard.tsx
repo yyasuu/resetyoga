@@ -44,7 +44,9 @@ export function WellnessVideoCard({ video, gradient, locale, isLoggedIn }: Video
   }
 
   const title = locale === 'ja' ? video.title_ja : video.title_en
-  const description = locale === 'ja' ? video.description_ja : video.description_en
+  const descRaw = locale === 'ja' ? video.description_ja : video.description_en
+  // Strip HTML tags for plain-text card preview
+  const description = descRaw ? descRaw.replace(/<[^>]*>/g, '').trim() : null
 
   return (
     <>

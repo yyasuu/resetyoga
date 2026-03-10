@@ -276,7 +276,8 @@ export function WellnessContent({
                       {locale === 'ja' ? video.title_ja : video.title_en}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-navy-300 leading-relaxed">
-                      {locale === 'ja' ? video.description_ja : video.description_en}
+                      {(locale === 'ja' ? video.description_ja : video.description_en)
+                        ?.replace(/<[^>]*>/g, '').trim()}
                     </p>
                     <p className="text-xs text-sage-500 dark:text-sage-400 mt-3 font-medium">
                       {locale === 'ja' ? '近日公開' : 'Coming soon'}

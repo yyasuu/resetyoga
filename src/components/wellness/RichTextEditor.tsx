@@ -5,6 +5,8 @@ import StarterKit from '@tiptap/starter-kit'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
 import { Image as TipTapImage } from '@tiptap/extension-image'
+import { TextStyle } from '@tiptap/extension-text-style'
+import { Extension } from '@tiptap/core'
 import { useRef, useState } from 'react'
 import {
   Bold, Italic, Underline as UnderlineIcon, Strikethrough,
@@ -13,6 +15,40 @@ import {
   AlignLeft, AlignCenter, AlignRight,
   Undo, Redo, ImagePlus, X, Loader2,
 } from 'lucide-react'
+
+// Inline FontSize extension — avoids subpath import issues
+const FontSizeExt = Extension.create({
+  name: 'fontSize',
+  addGlobalAttributes() {
+    return [{
+      types: ['textStyle'],
+      attributes: {
+        fontSize: {
+          default: null,
+          parseHTML: el => (el as HTMLElement).style.fontSize || null,
+          renderHTML: attrs => attrs.fontSize ? { style: `font-size:${attrs.fontSize}` } : {},
+        },
+      },
+    }]
+  },
+  addCommands() {
+    return {
+      setFontSize: (size: string) => ({ chain }: any) =>
+        chain().setMark('textStyle', { fontSize: size }).run(),
+      unsetFontSize: () => ({ chain }: any) =>
+        chain().setMark('textStyle', { fontSize: null }).removeEmptyTextStyle().run(),
+    } as any
+  },
+})
+
+const FONT_SIZES = [
+  { label: 'XS', px: '11px' },
+  { label: 'S',  px: '13px' },
+  { label: 'M',  px: '15px' },
+  { label: 'L',  px: '18px' },
+  { label: 'XL', px: '22px' },
+  { label: 'XXL', px: '28px' },
+]
 
 // Custom Image extension that preserves style + class attributes
 const CustomImage = TipTapImage.extend({
@@ -37,6 +73,7 @@ interface RichTextEditorProps {
   value: string
   onChange: (html: string) => void
   placeholder?: string
+  minHeight?: number
 }
 
 const ToolbarButton = ({
@@ -203,7 +240,7 @@ function ImagePicker({ onInsert, onClose }: ImagePickerProps) {
   )
 }
 
-export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorProps) {
+export function RichTextEditor({ value, onChange, placeholder, minHeight = 280 }: RichTextEditorProps) {
   const [showPicker, setShowPicker] = useState(false)
 
   const editor = useEditor({
@@ -212,6 +249,8 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         heading: { levels: [1, 2, 3] },
       }),
       Underline,
+      TextStyle,
+      FontSizeExt,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       CustomImage.configure({ inline: false, allowBase64: false }),
     ],
@@ -221,7 +260,8 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     },
     editorProps: {
       attributes: {
-        class: 'min-h-[280px] px-4 py-3 focus:outline-none prose prose-sm dark:prose-invert max-w-none',
+        class: 'px-4 py-3 focus:outline-none prose prose-sm dark:prose-invert max-w-none',
+        style: `min-height:${minHeight}px`,
       },
     },
     immediatelyRender: false,
@@ -238,6 +278,18 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
     <div className="rounded-xl border border-gray-200 dark:border-navy-600 overflow-hidden bg-white dark:bg-navy-800">
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-0.5 px-3 py-2 border-b border-gray-200 dark:border-navy-600 bg-gray-50 dark:bg-navy-750">
+
+        {/* Font size */}
+        <select
+          value={editor.getAttributes('textStyle').fontSize ?? '15px'}
+          onMouseDown={e => e.stopPropagation()}
+          onChange={e => (editor.chain().focus() as any).setFontSize(e.target.value).run()}
+          className="text-xs bg-white dark:bg-navy-700 border border-gray-200 dark:border-navy-600 rounded px-1.5 py-0.5 text-gray-700 dark:text-navy-200 focus:outline-none cursor-pointer"
+        >
+          {FONT_SIZES.map(s => <option key={s.px} value={s.px}>{s.label}</option>)}
+        </select>
+
+        <Divider />
 
         {/* Text style */}
         <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="太字 / Bold">
