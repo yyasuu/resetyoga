@@ -128,24 +128,38 @@ export default async function WellnessPage() {
       </div>
 
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-12">
-        {/* Yoga Pose Library link card */}
-        <section className="mb-10">
+        {/* Quick-access cards: Poses + Science */}
+        <section className="mb-10 grid sm:grid-cols-2 gap-3">
           <Link
             href="/wellness/poses"
             className="flex items-center gap-4 px-5 py-4 bg-white dark:bg-navy-800 rounded-2xl border border-gray-100 dark:border-navy-700 shadow-sm hover:shadow-md transition-shadow group"
           >
             <span className="text-2xl flex-shrink-0">🧘</span>
             <div className="flex-1 min-w-0">
-              <span className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
+              <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors">
                 {locale === 'ja' ? 'ヨガポーズライブラリ' : 'Yoga Pose Library'}
-              </span>
-              <span className="hidden sm:inline text-sm text-gray-400 dark:text-navy-400 ml-2">
-                {locale === 'ja' ? '— お悩み・部位・難易度から検索' : '— Browse by concern, family & difficulty'}
-              </span>
+              </p>
+              <p className="text-xs text-gray-400 dark:text-navy-400 mt-0.5">
+                {locale === 'ja' ? 'お悩み・部位・難易度から検索' : 'Browse by concern, family & difficulty'}
+              </p>
             </div>
-            <span className="text-sm text-gray-400 dark:text-navy-500 group-hover:text-navy-500 dark:group-hover:text-sage-400 transition-colors flex-shrink-0">
-              {locale === 'ja' ? '見る →' : 'View →'}
-            </span>
+            <span className="text-sm text-gray-400 dark:text-navy-500 group-hover:text-navy-500 dark:group-hover:text-sage-400 transition-colors flex-shrink-0">→</span>
+          </Link>
+
+          <Link
+            href="/wellness/poses/anatomy"
+            className="flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-navy-900 to-navy-800 dark:from-navy-800 dark:to-navy-900 rounded-2xl border border-navy-700 dark:border-navy-600 shadow-sm hover:shadow-md transition-shadow group"
+          >
+            <span className="text-2xl flex-shrink-0">🔬</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-white group-hover:text-sage-300 transition-colors">
+                {locale === 'ja' ? 'サイエンス & ヨガ' : 'Science & Yoga'}
+              </p>
+              <p className="text-xs text-white/50 mt-0.5">
+                {locale === 'ja' ? '人体とヨガの医学的な関係' : '11 body systems × yoga research'}
+              </p>
+            </div>
+            <span className="text-sm text-white/40 group-hover:text-sage-400 transition-colors flex-shrink-0">→</span>
           </Link>
         </section>
 

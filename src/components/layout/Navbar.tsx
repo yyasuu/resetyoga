@@ -111,6 +111,13 @@ export function Navbar({ user }: NavbarProps) {
             </Link>
 
             <Link
+              href="/wellness/poses/anatomy"
+              className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-navy-700 dark:hover:text-sage-400 transition-colors"
+            >
+              Science
+            </Link>
+
+            <Link
               href="/premium"
               className="text-sm font-medium text-sage-600 dark:text-sage-400 hover:text-sage-500 dark:hover:text-sage-300 transition-colors flex items-center gap-1"
             >
@@ -167,7 +174,7 @@ export function Navbar({ user }: NavbarProps) {
                   <ChevronDown className={`h-3 w-3 text-gray-500 dark:text-gray-400 transition-transform ${userOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {userOpen && (
-                  <div className="absolute right-0 top-full mt-1 bg-white dark:bg-navy-800 border border-gray-100 dark:border-navy-700 rounded-lg shadow-lg py-1 w-48 z-[200]">
+                  <div className="absolute right-0 top-full mt-1 bg-white dark:bg-navy-800 border border-gray-100 dark:border-navy-700 rounded-lg shadow-lg py-1 w-52 z-[200]">
                     <button
                       onClick={() => { setUserOpen(false); router.push(getDashboardLink()) }}
                       className={dropdownItem}
@@ -180,6 +187,24 @@ export function Navbar({ user }: NavbarProps) {
                     >
                       Wellness Library
                     </button>
+                    {user?.role === 'admin' && (
+                      <>
+                        <div className="my-1 border-t border-gray-100 dark:border-navy-700" />
+                        <button
+                          onClick={() => { setUserOpen(false); router.push('/admin/wellness') }}
+                          className={dropdownItem}
+                        >
+                          Poses 管理
+                        </button>
+                        <button
+                          onClick={() => { setUserOpen(false); router.push('/wellness/poses/anatomy') }}
+                          className={dropdownItem}
+                        >
+                          Science & Yoga
+                        </button>
+                      </>
+                    )}
+                    <div className="my-1 border-t border-gray-100 dark:border-navy-700" />
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors cursor-pointer"
@@ -238,6 +263,13 @@ export function Navbar({ user }: NavbarProps) {
             onClick={() => setMenuOpen(false)}
           >
             Poses
+          </Link>
+          <Link
+            href="/wellness/poses/anatomy"
+            className="block text-gray-600 dark:text-gray-300 font-medium"
+            onClick={() => setMenuOpen(false)}
+          >
+            Science
           </Link>
           <Link
             href="/premium"

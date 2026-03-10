@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 
 export const metadata = {
-  title: 'Human Anatomy & Yoga | Reset Yoga',
+  title: 'Science & Yoga | Reset Yoga',
   description: 'How yoga and meditation interact with every organ system in the body — from cellular biology to the reproductive system.',
 }
 
@@ -37,7 +37,7 @@ export default async function AnatomyPage() {
             {locale === 'ja' ? 'ヨガポーズライブラリ' : 'Yoga Pose Library'}
           </p>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
-            {locale === 'ja' ? '人体とヨガ 解剖学ガイド' : 'Human Anatomy & Yoga'}
+            {locale === 'ja' ? 'サイエンス & ヨガ' : 'Science & Yoga'}
           </h1>
           <p className="text-white/60 max-w-xl mx-auto text-sm leading-relaxed">
             {locale === 'ja'
