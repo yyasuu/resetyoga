@@ -6,6 +6,7 @@ import { cookies } from 'next/headers'
 import Link from 'next/link'
 import { ChevronLeft, Library, ArrowRight, LogIn, Sparkles, Lock } from 'lucide-react'
 import { PremiumPaywall } from '@/components/wellness/PremiumPaywall'
+import { CONCERNS } from '@/lib/concerns'
 
 function getEmbedUrl(url: string): string | null {
   const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)
@@ -108,8 +109,26 @@ export default async function VideoDetailPage({ params }: { params: Promise<{ id
         </div>
 
         {video.duration_label && (
-          <p className="text-sm text-sage-600 dark:text-sage-400 mb-6">{video.duration_label}</p>
+          <p className="text-sm text-sage-600 dark:text-sage-400 mb-4">{video.duration_label}</p>
         )}
+
+        {/* お悩みタグ / Concern tags */}
+        {((video as any).concerns as string[] | null)?.length ? (
+          <div className="flex flex-wrap gap-2 mb-6">
+            {((video as any).concerns as string[]).map((cId) => {
+              const c = CONCERNS.find(x => x.id === cId)
+              if (!c) return null
+              return (
+                <span
+                  key={c.id}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-sage-700 dark:text-sage-400 bg-sage-50 dark:bg-sage-900/30 border border-sage-200 dark:border-sage-800 px-3 py-1 rounded-full"
+                >
+                  {c.icon} {locale === 'ja' ? c.ja : c.en}
+                </span>
+              )
+            })}
+          </div>
+        ) : null}
 
         {/* ── Three states: login gate / paywall / video player ── */}
         {showLoginGate ? (
