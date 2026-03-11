@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/layout/Navbar'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, Save, User, ExternalLink, Camera } from 'lucide-react'
+import { ChevronLeft, Save, User, ExternalLink, Camera, Star } from 'lucide-react'
 import Link from 'next/link'
 import { YOGA_STYLES, LANGUAGES } from '@/types'
 import Image from 'next/image'
@@ -60,6 +60,8 @@ export default function AdminInstructorEditPage() {
   const [instagramUrl, setInstagramUrl] = useState('')
   const [youtubeUrl, setYoutubeUrl] = useState('')
   const [isApproved, setIsApproved] = useState(false)
+  const [reviews, setReviews] = useState<any[]>([])
+  const [reviewSavingId, setReviewSavingId] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -94,6 +96,13 @@ export default function AdminInstructorEditPage() {
         setYoutubeUrl(i.youtube_url ?? '')
         setIsApproved(i.is_approved ?? false)
       }
+
+      const { data: reviewRows } = await supabase
+        .from('reviews')
+        .select('id, rating, comment, created_at, profiles!reviews_student_id_fkey(full_name)')
+        .eq('instructor_id', id)
+        .order('created_at', { ascending: false })
+      setReviews((reviewRows as any[]) || [])
       setLoading(false)
     }
     load()
@@ -181,6 +190,33 @@ export default function AdminInstructorEditPage() {
     } else {
       const json = await res.json()
       setError(json.error ?? 'Save failed')
+    }
+  }
+
+  const updateReviewField = (reviewId: string, field: 'rating' | 'comment', value: string | number) => {
+    setReviews((prev) =>
+      prev.map((r) => (r.id === reviewId ? { ...r, [field]: value } : r))
+    )
+  }
+
+  const handleReviewSave = async (reviewId: string) => {
+    const target = reviews.find((r) => r.id === reviewId)
+    if (!target) return
+    setReviewSavingId(reviewId)
+    const res = await fetch(`/api/admin/reviews/${reviewId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        rating: Number(target.rating),
+        comment: target.comment ?? '',
+      }),
+    })
+    const json = await res.json().catch(() => null)
+    setReviewSavingId(null)
+    if (res.ok) {
+      setSuccess('レビューを更新しました / Review updated')
+    } else {
+      setError(json?.error ?? 'Failed to update review')
     }
   }
 
@@ -414,6 +450,55 @@ export default function AdminInstructorEditPage() {
               </span>
             </label>
           </div>
+        </div>
+
+        <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-6 space-y-4">
+          <h2 className="font-semibold text-gray-900 dark:text-white text-sm flex items-center gap-2">
+            <Star className="h-4 w-4 text-yellow-500" />
+            レビュー編集 / Edit Reviews
+          </h2>
+          {reviews.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-navy-300">レビューはまだありません</p>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map((review) => (
+                <div key={review.id} className="border border-gray-200 dark:border-navy-600 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                      {(review.profiles as any)?.full_name || 'Student'} · {new Date(review.created_at).toLocaleDateString()}
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs text-gray-500 dark:text-navy-300">Rating</label>
+                      <select
+                        value={Number(review.rating)}
+                        onChange={(e) => updateReviewField(review.id, 'rating', Number(e.target.value))}
+                        className="px-2 py-1 text-sm border border-gray-200 dark:border-navy-600 rounded bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
+                      >
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <option key={n} value={n}>{n}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <textarea
+                    value={review.comment || ''}
+                    onChange={(e) => updateReviewField(review.id, 'comment', e.target.value)}
+                    rows={3}
+                    className={inputCls}
+                    placeholder="Review comment"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => handleReviewSave(review.id)}
+                    disabled={reviewSavingId === review.id}
+                    className="bg-sage-600 hover:bg-sage-700 text-white"
+                  >
+                    {reviewSavingId === review.id ? 'Saving...' : 'Save Review'}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {error && (
