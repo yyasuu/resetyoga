@@ -662,7 +662,7 @@ export default async function LandingPage() {
                     )}
                     {instructor.instructor_profiles?.yoga_styles?.length > 0 && (
                       <div className="flex flex-wrap gap-1">
-                        {instructor.instructor_profiles.yoga_styles.slice(0, 3).map((s: string) => (
+                        {instructor.instructor_profiles.yoga_styles.map((s: string) => (
                           <span
                             key={s}
                             className="text-xs bg-sage-50 dark:bg-sage-900/30 text-sage-700 dark:text-sage-300 px-2 py-1 rounded-full border border-sage-100 dark:border-sage-800"
