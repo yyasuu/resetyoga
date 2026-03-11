@@ -187,7 +187,7 @@ export default function InstructorProfilePage() {
       career_history: careerHistory,
       instagram_url: instagramUrl || null,
       youtube_url: youtubeUrl || null,
-      is_approved: isApproved,
+      // NOTE: is_approved is intentionally omitted — only admins may set this
     }, { onConflict: 'id' })
 
     if (ipError) {

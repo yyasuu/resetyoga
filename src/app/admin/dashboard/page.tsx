@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { ApproveInstructorButton } from '@/components/admin/ApproveInstructorButton'
-import { Users, Calendar, BookOpen, Star, FileText, DollarSign, Play } from 'lucide-react'
+import { Users, Calendar, BookOpen, Star, FileText, DollarSign, Play, Pencil } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
@@ -312,9 +312,19 @@ export default async function AdminDashboardPage() {
                         ? Number(instructor.instructor_profiles.rating).toFixed(1)
                         : 'New'}
                     </span>
+                    <span className="text-sm text-gray-400 dark:text-navy-400">
+                      {instructor.instructor_profiles?.years_experience ?? 0} yrs
+                    </span>
                     <span className="text-xs bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 px-2 py-0.5 rounded-full font-medium">
                       {t('approved')}
                     </span>
+                    <Link
+                      href={`/admin/instructors/${instructor.id}`}
+                      className="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-navy-600 text-blue-500 dark:text-blue-400"
+                      title="編集 / Edit profile"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Link>
                   </div>
                 </div>
               ))}
