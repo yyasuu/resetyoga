@@ -205,6 +205,13 @@ export default async function AdminDashboardPage() {
                         : 'No instructor profile yet. Once they save their profile, it can be approved.'}
                     </p>
                   </div>
+                  <Link
+                    href={`/admin/instructors/${instructor.id}`}
+                    className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    {locale === 'ja' ? '編集' : 'Edit'}
+                  </Link>
                 </div>
               ))}
             </div>
@@ -235,10 +242,19 @@ export default async function AdminDashboardPage() {
                       {instructor.instructor_profiles?.languages?.join(', ')}
                     </p>
                   </div>
-                  <ApproveInstructorButton
-                    instructorId={instructor.id}
-                    instructorName={instructor.full_name || ''}
-                  />
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/admin/instructors/${instructor.id}`}
+                      className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <Pencil className="h-4 w-4" />
+                      {locale === 'ja' ? '編集' : 'Edit'}
+                    </Link>
+                    <ApproveInstructorButton
+                      instructorId={instructor.id}
+                      instructorName={instructor.full_name || ''}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
