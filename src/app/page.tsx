@@ -14,20 +14,6 @@ import { POSE_FAMILIES, DIFFICULTY_LEVELS } from '@/lib/poses'
 const canonicalName = (name: string | null | undefined) =>
   (name || '').toLowerCase().replace(/[^a-z]/g, '')
 
-const isDrYogiAthmaSudhan = (name: string | null | undefined) => {
-  const n = canonicalName(name)
-  return (
-    n.includes('yogiathmasudhan') ||
-    n.includes('dryogiathmasudhan') ||
-    (n.includes('yogi') && n.includes('athma') && n.includes('sudhan'))
-  )
-}
-
-const isAiriYukiyoshi = (name: string | null | undefined) => {
-  const n = canonicalName(name)
-  return n.includes('airiyukiyoshi') || (n.includes('airi') && n.includes('yukiyoshi'))
-}
-
 const normalizeDigits = (s: string) =>
   s.replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0))
 
@@ -66,26 +52,34 @@ const toSearchText = (i: FeaturedInstructor) => {
   return canonicalName(`${i.full_name ?? ''} ${ip?.tagline ?? ''} ${ip?.bio ?? ''} ${ip?.career_history ?? ''}`)
 }
 
-const isSudhanInstructor = (i: FeaturedInstructor) => {
-  const n = toSearchText(i)
-  return (
-    n.includes('yogiathmasudhan') ||
-    n.includes('dryogiathmasudhan') ||
-    (n.includes('yogi') && n.includes('athma') && n.includes('sudhan'))
-  )
+const hasAllTokens = (text: string, tokens: string[]) => tokens.every((t) => text.includes(t))
+
+const rankCandidate = (i: FeaturedInstructor, tokens: string[]) => {
+  const text = toSearchText(i)
+  const ip = i.instructor_profiles
+  let score = 0
+  for (const t of tokens) {
+    if (text.includes(t)) score += 10
+  }
+  if (hasAllTokens(text, tokens)) score += 30
+  if ((ip?.bio || '').trim()) score += 4
+  if ((ip?.tagline || '').trim()) score += 2
+  if ((ip?.career_history || '').trim()) score += 2
+  return score
 }
 
-const isAiriInstructor = (i: FeaturedInstructor) => {
-  const n = toSearchText(i)
-  return n.includes('airiyukiyoshi') || (n.includes('airi') && n.includes('yukiyoshi'))
+const pickInstructorByTokens = (list: FeaturedInstructor[], tokens: string[]) => {
+  const candidates = list
+    .map((i) => ({ i, score: rankCandidate(i, tokens) }))
+    .filter((r) => r.score > 0)
+    .sort((a, b) => b.score - a.score)
+  return candidates[0]?.i ?? null
 }
 
 const selectFeaturedGuides = (list: FeaturedInstructor[]) => {
   const items = list.filter((i) => (i.full_name || '').trim().length > 0)
-  const airi = items.find((i) => isAiriInstructor(i))
-  const sudhan =
-    items.find((i) => isSudhanInstructor(i)) ||
-    items.find((i) => canonicalName(i.full_name).includes('yogi'))
+  const airi = pickInstructorByTokens(items, ['airi', 'yukiyoshi'])
+  const sudhan = pickInstructorByTokens(items, ['yogi', 'athma', 'sudhan'])
   const selected = [airi, sudhan].filter((v): v is FeaturedInstructor => Boolean(v))
 
   if (selected.length === 2) return selected
@@ -98,17 +92,8 @@ const selectFeaturedGuides = (list: FeaturedInstructor[]) => {
 const displayYears = (instructor: FeaturedInstructor) => {
   const years = inferYearsExperience(instructor.instructor_profiles ?? {})
   if (years > 0) return years
-  return isSudhanInstructor(instructor) ? 16 : 0
-}
-
-const instructorBlurb = (instructor: FeaturedInstructor) => {
-  const ip = instructor.instructor_profiles
-  const text = ip?.bio || ip?.tagline || ip?.career_history || ''
-  if (text && text.trim().length > 0) return text
-  if (isSudhanInstructor(instructor)) {
-    return 'Specialist instructor with 16 years of teaching experience, focusing on alignment, breathwork, and mindful recovery.'
-  }
-  return ''
+  const text = toSearchText(instructor)
+  return hasAllTokens(text, ['yogi', 'athma', 'sudhan']) ? 16 : 0
 }
 
 export default async function LandingPage() {
@@ -677,9 +662,9 @@ export default async function LandingPage() {
                         </div>
                       </div>
                     </div>
-                    {instructorBlurb(instructor) && (
+                    {(instructor.instructor_profiles?.bio || instructor.instructor_profiles?.tagline || instructor.instructor_profiles?.career_history) && (
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
-                        {instructorBlurb(instructor)}
+                        {instructor.instructor_profiles?.bio || instructor.instructor_profiles?.tagline || instructor.instructor_profiles?.career_history}
                       </p>
                     )}
                     {instructor.instructor_profiles?.yoga_styles?.length > 0 && (
