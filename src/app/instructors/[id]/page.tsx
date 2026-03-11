@@ -9,6 +9,23 @@ import { StudentBookingCalendar } from '@/components/calendar/StudentBookingCale
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { format } from 'date-fns'
 
+const inferYearsExperience = (profile: {
+  years_experience?: number | null
+  bio?: string | null
+  tagline?: string | null
+  career_history?: string | null
+}) => {
+  const direct = Number(profile.years_experience ?? 0)
+  if (Number.isFinite(direct) && direct > 0) return direct
+  const text = `${profile.bio ?? ''} ${profile.tagline ?? ''} ${profile.career_history ?? ''}`
+    .replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0))
+  const mEn = text.match(/(\d{1,2})\s*\+?\s*(?:years?|yrs?)/i)
+  if (mEn) return Number(mEn[1])
+  const mJa = text.match(/(\d{1,2})\s*年/)
+  if (mJa) return Number(mJa[1])
+  return 0
+}
+
 function StarRow({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md' | 'lg' }) {
   const cls =
     size === 'lg' ? 'h-6 w-6' : size === 'md' ? 'h-4 w-4' : 'h-3.5 w-3.5'
@@ -61,6 +78,7 @@ export default async function InstructorDetailPage({
   if (!instructor) notFound()
 
   const ip = instructor.instructor_profiles
+  const displayYears = inferYearsExperience(ip ?? {})
 
   // Fetch reviews (always fetch for detail page — context is specific instructor)
   const { data: reviews } = await supabase
@@ -129,7 +147,7 @@ export default async function InstructorDetailPage({
               <div className="space-y-3 text-sm mt-2">
                 <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
                   <Clock className="h-4 w-4 text-navy-500 dark:text-sage-400 flex-shrink-0" />
-                  {t('years_exp', { count: ip?.years_experience || 0 })}
+                  {t('years_exp', { count: displayYears })}
                 </div>
                 <div className="flex items-start gap-2 text-gray-600 dark:text-gray-300">
                   <Globe className="h-4 w-4 text-navy-500 dark:text-sage-400 flex-shrink-0 mt-0.5" />
@@ -190,9 +208,52 @@ export default async function InstructorDetailPage({
                   <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">
                     {t('about')}
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                    {ip?.bio || 'No bio provided yet.'}
-                  </p>
+                  <div className="space-y-5 text-sm">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">Display Name</p>
+                      <p className="text-gray-700 dark:text-gray-200">{instructor.full_name || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">Years of Experience</p>
+                      <p className="text-gray-700 dark:text-gray-200">{displayYears > 0 ? `${displayYears} years` : '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">Tagline</p>
+                      <p className="text-gray-700 dark:text-gray-200 whitespace-pre-line">{ip?.tagline || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">Bio</p>
+                      <p className="text-gray-700 dark:text-gray-200 whitespace-pre-line">{ip?.bio || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">Yoga Styles</p>
+                      <p className="text-gray-700 dark:text-gray-200 whitespace-pre-line">
+                        {ip?.yoga_styles?.length ? ip.yoga_styles.join(', ') : '—'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">Languages</p>
+                      <p className="text-gray-700 dark:text-gray-200 whitespace-pre-line">
+                        {ip?.languages?.length ? ip.languages.join(', ') : '—'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">資格認定 / Certifications</p>
+                      {ip?.certifications?.length ? (
+                        <div className="space-y-1">
+                          {ip.certifications.map((cert: string) => (
+                            <p key={cert} className="text-gray-700 dark:text-gray-200">{cert}</p>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-gray-700 dark:text-gray-200">—</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1">Background / Career History</p>
+                      <p className="text-gray-700 dark:text-gray-200 whitespace-pre-line">{ip?.career_history || '—'}</p>
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
 

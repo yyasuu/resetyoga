@@ -142,7 +142,7 @@ export function InstructorCard({
         {ip?.yoga_styles && ip.yoga_styles.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-3 items-start">
             <Award className="h-3.5 w-3.5 text-navy-400 dark:text-sage-400 flex-shrink-0 mt-0.5" />
-            {ip.yoga_styles.slice(0, 4).map((s: string) => (
+            {ip.yoga_styles.map((s: string) => (
               <span
                 key={s}
                 className="text-xs bg-navy-50 dark:bg-navy-700 text-navy-600 dark:text-sage-300 px-2 py-0.5 rounded-full border border-navy-100 dark:border-navy-600"
