@@ -15,6 +15,8 @@ interface InstructorCardProps {
       rating: number | null
       total_reviews: number | null
       bio: string | null
+      tagline?: string | null
+      career_history?: string | null
       years_experience: number | null
       yoga_styles: string[] | null
       languages: string[] | null
@@ -54,6 +56,7 @@ export function InstructorCard({
 
   const ip = instructor.instructor_profiles
   const hasRating = (ip?.rating ?? 0) > 0 && (ip?.total_reviews ?? 0) > 0
+  const bioText = ip?.bio?.trim() || ip?.tagline?.trim() || ip?.career_history?.trim() || ''
 
   return (
     <>
@@ -119,9 +122,9 @@ export function InstructorCard({
         </div>
 
         {/* ── Bio ── */}
-        {ip?.bio && (
-          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2 flex-1">
-            {ip.bio}
+        {bioText && (
+          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3 flex-1 whitespace-pre-line">
+            {bioText}
           </p>
         )}
 

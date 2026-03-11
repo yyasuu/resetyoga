@@ -93,17 +93,20 @@ export default async function InstructorsPage({
 
         {instructors && instructors.length > 0 ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {instructors.map((instructor: any) => (
+            {instructors.map((instructor: any) => {
+              const years = Number(instructor.instructor_profiles?.years_experience ?? 0)
+              return (
               <InstructorCard
                 key={instructor.id}
                 instructor={instructor}
                 isStudent={isStudent}
                 yearsExpLabel={t('years_exp', {
-                  count: instructor.instructor_profiles?.years_experience || 0,
+                  count: Number.isFinite(years) ? years : 0,
                 })}
                 viewProfileLabel={t('view_profile')}
               />
-            ))}
+              )
+            })}
           </div>
         ) : (
           <div className="text-center py-20 text-gray-400 dark:text-navy-400 mt-8">

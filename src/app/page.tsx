@@ -11,6 +11,22 @@ import { CheckCircle, Star, Video, Clock, Heart, Sparkles, Globe, Play, BookOpen
 import { CONCERNS } from '@/lib/concerns'
 import { POSE_FAMILIES, DIFFICULTY_LEVELS } from '@/lib/poses'
 
+const isDrYogiAthmaSudhan = (name: string | null | undefined) => {
+  const n = (name || '').toLowerCase().replace(/\s+/g, ' ').trim()
+  return n.includes('yogi') && n.includes('athma') && n.includes('sudhan')
+}
+
+const prioritizeDrYogiInCenter = (list: any[]) => {
+  const items = [...list]
+  const index = items.findIndex((i) => isDrYogiAthmaSudhan(i.full_name))
+  if (index === -1) return items
+
+  const [drYogi] = items.splice(index, 1)
+  const centerIndex = Math.min(1, items.length)
+  items.splice(centerIndex, 0, drYogi)
+  return items
+}
+
 export default async function LandingPage() {
   const t = await getTranslations('landing')
 
@@ -37,8 +53,9 @@ export default async function LandingPage() {
       .select('*, instructor_profiles(*)')
       .eq('role', 'instructor')
       .eq('instructor_profiles.is_approved', true)
-      .limit(6)
-    instructors = instructorData?.filter((i: any) => i.instructor_profiles) || []
+      .limit(24)
+    const approvedInstructors = instructorData?.filter((i: any) => i.instructor_profiles) || []
+    instructors = prioritizeDrYogiInCenter(approvedInstructors).slice(0, 6)
 
     const cookieStore = await cookies()
     locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
@@ -570,14 +587,14 @@ export default async function LandingPage() {
                             {instructor.instructor_profiles?.rating?.toFixed(1) || '5.0'}
                           </span>
                           <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">
-                            {t('years_exp_short', { count: instructor.instructor_profiles?.years_experience || 0 })}
+                            {t('years_exp_short', { count: Number(instructor.instructor_profiles?.years_experience ?? 0) || 0 })}
                           </span>
                         </div>
                       </div>
                     </div>
-                    {instructor.instructor_profiles?.bio && (
+                    {(instructor.instructor_profiles?.bio || instructor.instructor_profiles?.tagline || instructor.instructor_profiles?.career_history) && (
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
-                        {instructor.instructor_profiles.bio}
+                        {instructor.instructor_profiles.bio || instructor.instructor_profiles.tagline || instructor.instructor_profiles.career_history}
                       </p>
                     )}
                     {instructor.instructor_profiles?.yoga_styles?.length > 0 && (
