@@ -78,43 +78,26 @@ export default async function InstructorsPage({
 
   // Build query (admin client so public cards are not affected by user RLS)
   const adminSupabase = await createAdminClient()
-  let ipQuery = adminSupabase
-    .from('instructor_profiles')
-    .select('id, bio, tagline, career_history, years_experience, yoga_styles, languages, rating, total_reviews, is_approved')
-    .eq('is_approved', true)
+  let query = adminSupabase
+    .from('profiles')
+    .select('*, instructor_profiles(*)')
+    .eq('role', 'instructor')
+    .eq('instructor_profiles.is_approved', true)
 
   if (concern) {
-    ipQuery = ipQuery.overlaps('yoga_styles', concern.yogaStyles)
+    query = query.overlaps('instructor_profiles.yoga_styles', concern.yogaStyles)
   } else if (params.style) {
-    ipQuery = ipQuery.contains('yoga_styles', [params.style])
+    query = query.contains('instructor_profiles.yoga_styles', [params.style])
   }
 
   if (params.language) {
-    ipQuery = ipQuery.contains('languages', [params.language])
+    query = query.contains('instructor_profiles.languages', [params.language])
   }
-
-  const { data: ips } = await ipQuery
-  const ids = (ips ?? []).map((ip) => ip.id)
-
-  const { data: profilesData } = ids.length > 0
-    ? await adminSupabase
-        .from('profiles')
-        .select('id, full_name, avatar_url, avatar_position, avatar_zoom, role, created_at')
-        .eq('role', 'instructor')
-        .in('id', ids)
-        .order('created_at', { ascending: false })
-    : { data: [] as any[] }
-
-  const ipMap = new Map((ips ?? []).map((ip) => [ip.id, ip]))
-  let instructors = (profilesData ?? []).map((p) => ({
-    ...p,
-    instructor_profiles: ipMap.get(p.id) ?? null,
-  }))
 
   if (params.q) {
-    const q = params.q.toLowerCase()
-    instructors = instructors.filter((i) => (i.full_name || '').toLowerCase().includes(q))
+    query = query.ilike('full_name', `%${params.q}%`)
   }
+  const { data: instructors } = await query.order('created_at', { ascending: false })
 
   return (
     <div className="min-h-screen bg-linen-50 dark:bg-navy-900">

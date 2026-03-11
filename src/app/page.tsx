@@ -80,30 +80,29 @@ export default async function LandingPage() {
     // Public instructor cards should not depend on user RLS visibility.
     const adminSupabase = await createAdminClient()
 
-    const { data: approvedIps } = await adminSupabase
-      .from('instructor_profiles')
-      .select('id, is_approved, years_experience, bio, tagline, career_history, rating, yoga_styles, created_at')
-      .eq('is_approved', true)
+    const { data: instructorData } = await adminSupabase
+      .from('profiles')
+      .select('*, instructor_profiles(*)')
+      .eq('role', 'instructor')
+      .eq('instructor_profiles.is_approved', true)
+      .order('created_at', { ascending: true })
+      .limit(200)
 
-    const approvedIds = (approvedIps ?? []).map((r) => r.id)
-    const { data: profilesData } = approvedIds.length > 0
-      ? await adminSupabase
-          .from('profiles')
-          .select('id, full_name, avatar_url, avatar_position, avatar_zoom, created_at, role')
-          .eq('role', 'instructor')
-          .in('id', approvedIds)
-      : { data: [] as any[] }
+    const approvedInstructors = (instructorData?.filter((i) => i.instructor_profiles && (i.full_name || '').trim().length > 0) || []) as FeaturedInstructor[]
+    let second = approvedInstructors.find((i) => i.id === SECOND_INSTRUCTOR_ID) ?? null
 
-    const ipMap = new Map((approvedIps ?? []).map((ip) => [ip.id, ip]))
-    const approvedInstructors = ((profilesData ?? [])
-      .map((p) => ({
-        ...p,
-        instructor_profiles: ipMap.get(p.id) ?? null,
-      }))
-      .filter((i) => i.instructor_profiles && (i.full_name || '').trim().length > 0)
-      .sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime())) as FeaturedInstructor[]
+    // Fallback: fetch second instructor by explicit ID in case relation filtering misses it.
+    if (!second) {
+      const { data: secondData } = await adminSupabase
+        .from('profiles')
+        .select('*, instructor_profiles(*)')
+        .eq('id', SECOND_INSTRUCTOR_ID)
+        .single()
+      if (secondData && (secondData.full_name || '').trim().length > 0) {
+        second = secondData as FeaturedInstructor
+      }
+    }
 
-    const second = approvedInstructors.find((i) => i.id === SECOND_INSTRUCTOR_ID) ?? null
     const first = approvedInstructors.find((i) => i.id !== SECOND_INSTRUCTOR_ID) ?? null
     instructors = [first, second].filter((v): v is FeaturedInstructor => Boolean(v))
 
