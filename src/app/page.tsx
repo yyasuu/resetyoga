@@ -11,9 +11,6 @@ import { CheckCircle, Star, Video, Clock, Heart, Sparkles, Globe, Play, BookOpen
 import { CONCERNS } from '@/lib/concerns'
 import { POSE_FAMILIES, DIFFICULTY_LEVELS } from '@/lib/poses'
 
-const canonicalName = (name: string | null | undefined) =>
-  (name || '').toLowerCase().replace(/[^a-z]/g, '')
-
 const normalizeDigits = (s: string) =>
   s.replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0))
 
@@ -47,53 +44,8 @@ type FeaturedInstructor = {
   } | null
 }
 
-const toSearchText = (i: FeaturedInstructor) => {
-  const ip = i.instructor_profiles
-  return canonicalName(`${i.full_name ?? ''} ${ip?.tagline ?? ''} ${ip?.bio ?? ''} ${ip?.career_history ?? ''}`)
-}
-
-const hasAllTokens = (text: string, tokens: string[]) => tokens.every((t) => text.includes(t))
-
-const rankCandidate = (i: FeaturedInstructor, tokens: string[]) => {
-  const text = toSearchText(i)
-  const ip = i.instructor_profiles
-  let score = 0
-  for (const t of tokens) {
-    if (text.includes(t)) score += 10
-  }
-  if (hasAllTokens(text, tokens)) score += 30
-  if ((ip?.bio || '').trim()) score += 4
-  if ((ip?.tagline || '').trim()) score += 2
-  if ((ip?.career_history || '').trim()) score += 2
-  return score
-}
-
-const pickInstructorByTokens = (list: FeaturedInstructor[], tokens: string[]) => {
-  const candidates = list
-    .map((i) => ({ i, score: rankCandidate(i, tokens) }))
-    .filter((r) => r.score > 0)
-    .sort((a, b) => b.score - a.score)
-  return candidates[0]?.i ?? null
-}
-
-const selectFeaturedGuides = (list: FeaturedInstructor[]) => {
-  const items = list.filter((i) => (i.full_name || '').trim().length > 0)
-  const airi = pickInstructorByTokens(items, ['airi', 'yukiyoshi'])
-  const sudhan = pickInstructorByTokens(items, ['yogi', 'athma', 'sudhan'])
-  const selected = [airi, sudhan].filter((v): v is FeaturedInstructor => Boolean(v))
-
-  if (selected.length === 2) return selected
-
-  const selectedIds = new Set(selected.map((i) => i.id))
-  const fallback = items.filter((i) => !selectedIds.has(i.id)).slice(0, Math.max(0, 2 - selected.length))
-  return [...selected, ...fallback]
-}
-
 const displayYears = (instructor: FeaturedInstructor) => {
-  const years = inferYearsExperience(instructor.instructor_profiles ?? {})
-  if (years > 0) return years
-  const text = toSearchText(instructor)
-  return hasAllTokens(text, ['yogi', 'athma', 'sudhan']) ? 16 : 0
+  return inferYearsExperience(instructor.instructor_profiles ?? {})
 }
 
 export default async function LandingPage() {
@@ -122,10 +74,10 @@ export default async function LandingPage() {
       .select('*, instructor_profiles(*)')
       .eq('role', 'instructor')
       .eq('instructor_profiles.is_approved', true)
-      .order('created_at', { ascending: false })
-      .limit(500)
-    const approvedInstructors = (instructorData?.filter((i) => i.instructor_profiles) || []) as FeaturedInstructor[]
-    instructors = selectFeaturedGuides(approvedInstructors)
+      .order('created_at', { ascending: true })
+      .limit(20)
+    const approvedInstructors = (instructorData?.filter((i) => i.instructor_profiles && (i.full_name || '').trim().length > 0) || []) as FeaturedInstructor[]
+    instructors = approvedInstructors.slice(0, 2)
 
     const cookieStore = await cookies()
     locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'

@@ -128,11 +128,9 @@ export function InstructorCard({
         </div>
 
         {/* ── Bio ── */}
-        {bioText && (
-          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3 flex-1 whitespace-pre-line">
-            {bioText}
-          </p>
-        )}
+        <p className={`text-sm mb-4 line-clamp-3 flex-1 whitespace-pre-line ${bioText ? 'text-gray-600 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500 italic'}`}>
+          {bioText || 'Introduction will be updated soon.'}
+        </p>
 
         {/* ── Experience ── */}
         <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-3">
