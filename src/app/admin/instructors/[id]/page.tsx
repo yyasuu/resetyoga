@@ -62,6 +62,24 @@ export default function AdminInstructorEditPage() {
   const [isApproved, setIsApproved] = useState(false)
   const [reviews, setReviews] = useState<any[]>([])
   const [reviewSavingId, setReviewSavingId] = useState<string | null>(null)
+  const [reviewCandidates, setReviewCandidates] = useState<any[]>([])
+  const [newReviewBookingId, setNewReviewBookingId] = useState('')
+  const [newReviewRating, setNewReviewRating] = useState(5)
+  const [newReviewComment, setNewReviewComment] = useState('')
+  const [creatingReview, setCreatingReview] = useState(false)
+
+  const reloadReviewData = async () => {
+    const { data: reviewRows } = await supabase
+      .from('reviews')
+      .select('id, rating, comment, created_at, profiles!reviews_student_id_fkey(full_name)')
+      .eq('instructor_id', id)
+      .order('created_at', { ascending: false })
+    setReviews((reviewRows as any[]) || [])
+
+    const candRes = await fetch(`/api/admin/instructors/${id}/review-candidates`)
+    const candJson = await candRes.json().catch(() => null)
+    setReviewCandidates(candJson?.candidates || [])
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -97,12 +115,7 @@ export default function AdminInstructorEditPage() {
         setIsApproved(i.is_approved ?? false)
       }
 
-      const { data: reviewRows } = await supabase
-        .from('reviews')
-        .select('id, rating, comment, created_at, profiles!reviews_student_id_fkey(full_name)')
-        .eq('instructor_id', id)
-        .order('created_at', { ascending: false })
-      setReviews((reviewRows as any[]) || [])
+      await reloadReviewData()
       setLoading(false)
     }
     load()
@@ -215,8 +228,54 @@ export default function AdminInstructorEditPage() {
     setReviewSavingId(null)
     if (res.ok) {
       setSuccess('レビューを更新しました / Review updated')
+      await reloadReviewData()
     } else {
       setError(json?.error ?? 'Failed to update review')
+    }
+  }
+
+  const handleReviewDelete = async (reviewId: string) => {
+    setReviewSavingId(reviewId)
+    const res = await fetch(`/api/admin/reviews/${reviewId}`, { method: 'DELETE' })
+    const json = await res.json().catch(() => null)
+    setReviewSavingId(null)
+    if (res.ok) {
+      setSuccess('レビューを削除しました / Review deleted')
+      await reloadReviewData()
+    } else {
+      setError(json?.error ?? 'Failed to delete review')
+    }
+  }
+
+  const handleCreateReview = async () => {
+    const candidate = reviewCandidates.find((c) => c.booking_id === newReviewBookingId)
+    if (!candidate) {
+      setError('レビュー作成対象の予約を選択してください / Select a booking')
+      return
+    }
+    setCreatingReview(true)
+    setError('')
+    const res = await fetch('/api/admin/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        instructor_id: id,
+        student_id: candidate.student_id,
+        booking_id: candidate.booking_id,
+        rating: newReviewRating,
+        comment: newReviewComment,
+      }),
+    })
+    const json = await res.json().catch(() => null)
+    setCreatingReview(false)
+    if (res.ok) {
+      setSuccess('レビューを追加しました / Review added')
+      setNewReviewBookingId('')
+      setNewReviewRating(5)
+      setNewReviewComment('')
+      await reloadReviewData()
+    } else {
+      setError(json?.error ?? 'Failed to create review')
     }
   }
 
@@ -457,6 +516,55 @@ export default function AdminInstructorEditPage() {
             <Star className="h-4 w-4 text-yellow-500" />
             レビュー編集 / Edit Reviews
           </h2>
+          <div className="border border-dashed border-gray-300 dark:border-navy-600 rounded-lg p-4 space-y-3">
+            <p className="text-xs font-semibold text-gray-500 dark:text-navy-300 uppercase tracking-wide">新規レビュー作成 / Add Review</p>
+            {reviewCandidates.length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-navy-300">作成可能な完了予約がありません</p>
+            ) : (
+              <>
+                <select
+                  value={newReviewBookingId}
+                  onChange={(e) => setNewReviewBookingId(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 dark:border-navy-600 rounded bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
+                >
+                  <option value="">予約を選択 / Select booking</option>
+                  {reviewCandidates.map((c) => (
+                    <option key={c.booking_id} value={c.booking_id}>
+                      {c.student_name} · {new Date(c.created_at).toLocaleDateString()}
+                    </option>
+                  ))}
+                </select>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-gray-500 dark:text-navy-300">Rating</label>
+                  <select
+                    value={newReviewRating}
+                    onChange={(e) => setNewReviewRating(Number(e.target.value))}
+                    className="px-2 py-1 text-sm border border-gray-200 dark:border-navy-600 rounded bg-white dark:bg-navy-800 text-gray-900 dark:text-white"
+                  >
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <option key={n} value={n}>{n}</option>
+                    ))}
+                  </select>
+                </div>
+                <textarea
+                  value={newReviewComment}
+                  onChange={(e) => setNewReviewComment(e.target.value)}
+                  rows={3}
+                  className={inputCls}
+                  placeholder="Review comment"
+                />
+                <Button
+                  type="button"
+                  onClick={handleCreateReview}
+                  disabled={creatingReview || !newReviewBookingId}
+                  className="bg-navy-600 hover:bg-navy-700 text-white"
+                >
+                  {creatingReview ? 'Creating...' : 'Create Review'}
+                </Button>
+              </>
+            )}
+          </div>
+
           {reviews.length === 0 ? (
             <p className="text-sm text-gray-500 dark:text-navy-300">レビューはまだありません</p>
           ) : (
@@ -487,14 +595,25 @@ export default function AdminInstructorEditPage() {
                     className={inputCls}
                     placeholder="Review comment"
                   />
-                  <Button
-                    type="button"
-                    onClick={() => handleReviewSave(review.id)}
-                    disabled={reviewSavingId === review.id}
-                    className="bg-sage-600 hover:bg-sage-700 text-white"
-                  >
-                    {reviewSavingId === review.id ? 'Saving...' : 'Save Review'}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      onClick={() => handleReviewSave(review.id)}
+                      disabled={reviewSavingId === review.id}
+                      className="bg-sage-600 hover:bg-sage-700 text-white"
+                    >
+                      {reviewSavingId === review.id ? 'Saving...' : 'Save Review'}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => handleReviewDelete(review.id)}
+                      disabled={reviewSavingId === review.id}
+                      className="border-red-300 text-red-600 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

@@ -12,6 +12,25 @@ async function requireAdmin() {
   return { error: null }
 }
 
+const recalcInstructorRating = async (admin: any, instructorId: string) => {
+  const { data: rows, error } = await admin
+    .from('reviews')
+    .select('rating')
+    .eq('instructor_id', instructorId)
+  if (error || !rows) return
+
+  const total = rows.length
+  const avg =
+    total > 0
+      ? Number((rows.reduce((sum: number, r: any) => sum + Number(r.rating || 0), 0) / total).toFixed(2))
+      : 0
+
+  await admin
+    .from('instructor_profiles')
+    .update({ rating: avg, total_reviews: total })
+    .eq('id', instructorId)
+}
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -47,19 +66,38 @@ export async function PATCH(
     return NextResponse.json({ error: updateError?.message || 'Review not found' }, { status: 500 })
   }
 
-  const { data: rows, error: rowsError } = await admin
-    .from('reviews')
-    .select('rating')
-    .eq('instructor_id', updated.instructor_id)
+  await recalcInstructorRating(admin, updated.instructor_id)
 
-  if (!rowsError && rows) {
-    const total = rows.length
-    const avg = total > 0 ? Number((rows.reduce((sum: number, r: any) => sum + Number(r.rating || 0), 0) / total).toFixed(2)) : 0
-    await admin
-      .from('instructor_profiles')
-      .update({ rating: avg, total_reviews: total })
-      .eq('id', updated.instructor_id)
+  return NextResponse.json({ success: true })
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { error } = await requireAdmin()
+  if (error) return error
+
+  const { id } = await params
+  const admin = await createAdminClient()
+
+  const { data: target, error: fetchError } = await admin
+    .from('reviews')
+    .select('id, instructor_id')
+    .eq('id', id)
+    .maybeSingle()
+  if (fetchError || !target) {
+    return NextResponse.json({ error: fetchError?.message || 'Review not found' }, { status: 404 })
   }
 
+  const { error: deleteError } = await admin
+    .from('reviews')
+    .delete()
+    .eq('id', id)
+  if (deleteError) {
+    return NextResponse.json({ error: deleteError.message }, { status: 500 })
+  }
+
+  await recalcInstructorRating(admin, target.instructor_id)
   return NextResponse.json({ success: true })
 }
