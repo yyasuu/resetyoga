@@ -14,6 +14,22 @@ interface SearchParams {
   concern?: string
 }
 
+const canonicalName = (name: string | null | undefined) =>
+  (name || '').toLowerCase().replace(/[^a-z]/g, '')
+
+const isSudhanInstructor = (instructor: {
+  full_name?: string | null
+  instructor_profiles?: { tagline?: string | null; bio?: string | null; career_history?: string | null } | null
+}) => {
+  const ip = instructor.instructor_profiles
+  const n = canonicalName(`${instructor.full_name ?? ''} ${ip?.tagline ?? ''} ${ip?.bio ?? ''} ${ip?.career_history ?? ''}`)
+  return (
+    n.includes('yogiathmasudhan') ||
+    n.includes('dryogiathmasudhan') ||
+    (n.includes('yogi') && n.includes('athma') && n.includes('sudhan'))
+  )
+}
+
 const inferYearsExperience = (profile: {
   years_experience?: number | null
   bio?: string | null
@@ -112,7 +128,8 @@ export default async function InstructorsPage({
         {instructors && instructors.length > 0 ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {instructors.map((instructor) => {
-              const years = inferYearsExperience(instructor.instructor_profiles ?? {})
+              const inferred = inferYearsExperience(instructor.instructor_profiles ?? {})
+              const years = inferred > 0 ? inferred : (isSudhanInstructor(instructor) ? 16 : 0)
               return (
               <InstructorCard
                 key={instructor.id}

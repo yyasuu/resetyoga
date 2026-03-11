@@ -61,10 +61,29 @@ type FeaturedInstructor = {
   } | null
 }
 
+const toSearchText = (i: FeaturedInstructor) => {
+  const ip = i.instructor_profiles
+  return canonicalName(`${i.full_name ?? ''} ${ip?.tagline ?? ''} ${ip?.bio ?? ''} ${ip?.career_history ?? ''}`)
+}
+
+const isSudhanInstructor = (i: FeaturedInstructor) => {
+  const n = toSearchText(i)
+  return (
+    n.includes('yogiathmasudhan') ||
+    n.includes('dryogiathmasudhan') ||
+    (n.includes('yogi') && n.includes('athma') && n.includes('sudhan'))
+  )
+}
+
+const isAiriInstructor = (i: FeaturedInstructor) => {
+  const n = toSearchText(i)
+  return n.includes('airiyukiyoshi') || (n.includes('airi') && n.includes('yukiyoshi'))
+}
+
 const selectFeaturedGuides = (list: FeaturedInstructor[]) => {
-  const items = list.filter((i) => !!i.full_name)
-  const airi = items.find((i) => isAiriYukiyoshi(i.full_name))
-  const sudhan = items.find((i) => isDrYogiAthmaSudhan(i.full_name))
+  const items = list.filter((i) => (i.full_name || '').trim().length > 0)
+  const airi = items.find((i) => isAiriInstructor(i))
+  const sudhan = items.find((i) => isSudhanInstructor(i))
   const selected = [airi, sudhan].filter((v): v is FeaturedInstructor => Boolean(v))
 
   if (selected.length === 2) return selected
@@ -72,6 +91,12 @@ const selectFeaturedGuides = (list: FeaturedInstructor[]) => {
   const selectedIds = new Set(selected.map((i) => i.id))
   const fallback = items.filter((i) => !selectedIds.has(i.id)).slice(0, Math.max(0, 2 - selected.length))
   return [...selected, ...fallback]
+}
+
+const displayYears = (instructor: FeaturedInstructor) => {
+  const years = inferYearsExperience(instructor.instructor_profiles ?? {})
+  if (years > 0) return years
+  return isSudhanInstructor(instructor) ? 16 : 0
 }
 
 export default async function LandingPage() {
@@ -635,7 +660,7 @@ export default async function LandingPage() {
                             {instructor.instructor_profiles?.rating?.toFixed(1) || '5.0'}
                           </span>
                           <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">
-                            {t('years_exp_short', { count: inferYearsExperience(instructor.instructor_profiles ?? {}) })}
+                            {t('years_exp_short', { count: displayYears(instructor) })}
                           </span>
                         </div>
                       </div>

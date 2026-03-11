@@ -70,7 +70,9 @@ export default function InstructorProfilePage() {
   const supabase = createClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const avatarCropRef = useRef<HTMLDivElement>(null)
+  const pointerIdRef = useRef<number | null>(null)
   const draggingRef = useRef(false)
+  const movedRef = useRef(false)
   const dragStartRef = useRef({ x: 0, y: 0, posX: 50, posY: 50 })
 
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -172,6 +174,8 @@ export default function InstructorProfilePage() {
     if (!file) return
     setAvatarFile(file)
     setAvatarPreview(URL.createObjectURL(file))
+    // Slight zoom-in gives room to move vertically/horizontally.
+    setAvatarZoom(1.2)
   }
 
   const startAvatarDrag = (clientX: number, clientY: number) => {
@@ -194,6 +198,7 @@ export default function InstructorProfilePage() {
 
   const endAvatarDrag = () => {
     draggingRef.current = false
+    pointerIdRef.current = null
   }
 
   const handleSave = async () => {
@@ -281,26 +286,33 @@ export default function InstructorProfilePage() {
           <div className="flex items-center gap-5">
             <div
               ref={avatarCropRef}
-              className="relative w-20 h-20 rounded-full bg-gray-100 dark:bg-navy-700 border-2 border-dashed border-gray-300 dark:border-navy-500 flex items-center justify-center cursor-pointer hover:border-navy-400 transition-colors overflow-hidden flex-shrink-0"
-              onClick={() => fileInputRef.current?.click()}
-              onMouseDown={(e) => {
+              className="relative w-20 h-20 rounded-full bg-gray-100 dark:bg-navy-700 border-2 border-dashed border-gray-300 dark:border-navy-500 flex items-center justify-center hover:border-navy-400 transition-colors overflow-hidden flex-shrink-0 cursor-move"
+              onPointerDown={(e) => {
+                if (!avatarPreview) return
+                pointerIdRef.current = e.pointerId
+                movedRef.current = false
+                startAvatarDrag(e.clientX, e.clientY)
+                avatarCropRef.current?.setPointerCapture(e.pointerId)
+              }}
+              onPointerMove={(e) => {
+                if (!draggingRef.current) return
+                movedRef.current = true
+                moveAvatarDrag(e.clientX, e.clientY)
+              }}
+              onPointerUp={(e) => {
+                if (pointerIdRef.current !== null) {
+                  avatarCropRef.current?.releasePointerCapture(pointerIdRef.current)
+                }
+                endAvatarDrag()
+                if (!movedRef.current) fileInputRef.current?.click()
+              }}
+              onPointerCancel={endAvatarDrag}
+              onWheel={(e) => {
                 if (!avatarPreview) return
                 e.preventDefault()
-                startAvatarDrag(e.clientX, e.clientY)
+                const delta = e.deltaY > 0 ? -0.05 : 0.05
+                setAvatarZoom((z) => clamp(z + delta, 1, 3))
               }}
-              onMouseMove={(e) => moveAvatarDrag(e.clientX, e.clientY)}
-              onMouseUp={endAvatarDrag}
-              onMouseLeave={endAvatarDrag}
-              onTouchStart={(e) => {
-                if (!avatarPreview) return
-                const t = e.touches[0]
-                startAvatarDrag(t.clientX, t.clientY)
-              }}
-              onTouchMove={(e) => {
-                const t = e.touches[0]
-                moveAvatarDrag(t.clientX, t.clientY)
-              }}
-              onTouchEnd={endAvatarDrag}
               style={{ touchAction: 'none' }}
             >
               {avatarPreview ? (
@@ -352,10 +364,29 @@ export default function InstructorProfilePage() {
 
           <div>
             <Label className="dark:text-navy-200">Zoom / ズーム</Label>
+            <div className="mt-2 flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="h-8 px-3 dark:border-navy-600 dark:text-navy-200"
+                onClick={() => setAvatarZoom((z) => clamp(z - 0.1, 1, 3))}
+              >
+                -
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-8 px-3 dark:border-navy-600 dark:text-navy-200"
+                onClick={() => setAvatarZoom((z) => clamp(z + 0.1, 1, 3))}
+              >
+                +
+              </Button>
+              <span className="text-xs text-gray-500 dark:text-navy-400">Mouse wheel also works</span>
+            </div>
             <input
               type="range"
               min={1}
-              max={2.5}
+              max={3}
               step={0.05}
               value={avatarZoom}
               onChange={(e) => setAvatarZoom(Number(e.target.value))}
@@ -364,7 +395,7 @@ export default function InstructorProfilePage() {
             <div className="mt-1 flex justify-between text-xs text-gray-400 dark:text-navy-400">
               <span>1.0x</span>
               <span>{avatarZoom.toFixed(2)}x</span>
-              <span>2.5x</span>
+              <span>3.0x</span>
             </div>
           </div>
         </Section>
