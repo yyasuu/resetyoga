@@ -623,9 +623,23 @@ export default async function LandingPage() {
                 <Link key={instructor.id} href={`/instructors/${instructor.id}`} className="block">
                   <div className="border border-gray-200 dark:border-navy-700 rounded-2xl p-4 sm:p-6 hover:shadow-lg hover:border-navy-200 dark:hover:border-navy-500 transition-all cursor-pointer group bg-white dark:bg-navy-800">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-navy-100 to-sage-100 dark:from-navy-700 dark:to-sage-900/40 flex items-center justify-center text-navy-600 dark:text-navy-200 text-lg font-bold flex-shrink-0">
-                        {instructor.full_name?.charAt(0) || '?'}
-                      </div>
+                      {instructor.avatar_url ? (
+                        <Image
+                          src={instructor.avatar_url}
+                          alt={instructor.full_name || 'Instructor'}
+                          width={56}
+                          height={56}
+                          className="w-14 h-14 rounded-full object-cover border-2 border-gray-100 dark:border-navy-600 flex-shrink-0"
+                          style={{
+                            objectPosition: instructor.avatar_position || 'center center',
+                            transform: `scale(${Number(instructor.avatar_zoom ?? 1) || 1})`,
+                          }}
+                        />
+                      ) : (
+                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-navy-100 to-sage-100 dark:from-navy-700 dark:to-sage-900/40 flex items-center justify-center text-navy-600 dark:text-navy-200 text-xl font-bold flex-shrink-0">
+                          {instructor.full_name?.charAt(0) || '?'}
+                        </div>
+                      )}
                       <div className="min-w-0">
                         <h3 className="font-bold text-gray-900 dark:text-gray-100 group-hover:text-navy-600 dark:group-hover:text-sage-400 transition-colors break-words">
                           {instructor.full_name}

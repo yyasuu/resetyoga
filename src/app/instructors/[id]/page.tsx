@@ -4,7 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { Profile } from '@/types'
-import { Star, Clock, Globe, Award } from 'lucide-react'
+import { Star, Clock, Globe, Award, FileText, MessageSquare } from 'lucide-react'
 import { StudentBookingCalendar } from '@/components/calendar/StudentBookingCalendar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { format } from 'date-fns'
@@ -102,7 +102,8 @@ export default async function InstructorDetailPage({
       <Navbar user={currentProfile} />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
+        <Tabs defaultValue="book">
+          <div className="grid lg:grid-cols-3 gap-8">
           {/* ── Left: Profile card ── */}
           <div className="lg:col-span-1">
             <div className="bg-white dark:bg-navy-800 rounded-2xl border border-gray-200 dark:border-navy-700 p-6 sticky top-24">
@@ -173,24 +174,32 @@ export default async function InstructorDetailPage({
                   </div>
                 </div>
               )}
+
+              <div className="mt-6 pt-5 border-t border-gray-100 dark:border-navy-700">
+                <TabsList className="w-full h-auto grid grid-cols-1 gap-3 bg-transparent p-0">
+                  <TabsTrigger
+                    value="about"
+                    className="w-full h-14 justify-start gap-3 rounded-xl border border-navy-200 dark:border-navy-600 bg-navy-50 dark:bg-navy-700 text-navy-700 dark:text-navy-100 text-base font-semibold data-[state=active]:bg-navy-600 data-[state=active]:text-white data-[state=active]:border-navy-600"
+                  >
+                    <FileText className="h-6 w-6" />
+                    Details / About
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="reviews"
+                    className="w-full h-14 justify-start gap-3 rounded-xl border border-sage-200 dark:border-sage-700 bg-sage-50 dark:bg-sage-900/20 text-sage-700 dark:text-sage-200 text-base font-semibold data-[state=active]:bg-sage-600 data-[state=active]:text-white data-[state=active]:border-sage-600"
+                  >
+                    <MessageSquare className="h-6 w-6" />
+                    Reviews
+                  </TabsTrigger>
+                </TabsList>
+              </div>
             </div>
           </div>
 
           {/* ── Right: Tabs ── */}
           <div className="lg:col-span-2">
-            <Tabs defaultValue="book">
               <TabsList className="mb-6 dark:bg-navy-800 dark:border-navy-700">
                 <TabsTrigger value="book">Book a Session</TabsTrigger>
-                <TabsTrigger value="about">{t('about')}</TabsTrigger>
-                {/* Reviews tab — visible to everyone on detail page, but only data shown if student */}
-                <TabsTrigger value="reviews">
-                  {t('reviews')}
-                  {isStudent && ip?.total_reviews > 0 && (
-                    <span className="ml-1.5 text-xs bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 px-1.5 py-0.5 rounded-full font-medium">
-                      {ip.total_reviews}
-                    </span>
-                  )}
-                </TabsTrigger>
               </TabsList>
 
               {/* Book */}
@@ -353,9 +362,9 @@ export default async function InstructorDetailPage({
                   </div>
                 )}
               </TabsContent>
-            </Tabs>
           </div>
-        </div>
+          </div>
+        </Tabs>
       </div>
     </div>
   )

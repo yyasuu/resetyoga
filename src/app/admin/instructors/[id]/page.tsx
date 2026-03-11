@@ -1,18 +1,39 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/layout/Navbar'
 import { Button } from '@/components/ui/button'
-import { ChevronLeft, Save, User, ExternalLink } from 'lucide-react'
+import { ChevronLeft, Save, User, ExternalLink, Camera } from 'lucide-react'
 import Link from 'next/link'
 import { YOGA_STYLES, LANGUAGES } from '@/types'
+import Image from 'next/image'
+
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n))
+
+const parseAvatarPosition = (pos: string | null | undefined) => {
+  const raw = (pos || '').toLowerCase().trim()
+  const map: Record<string, number> = { left: 0, center: 50, right: 100, top: 0, bottom: 100 }
+  const parts = raw.split(/\s+/).filter(Boolean)
+  if (parts.length === 2 && parts[0] in map && parts[1] in map) {
+    return { x: map[parts[0]], y: map[parts[1]] }
+  }
+  const m = raw.match(/^(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/)
+  if (m) return { x: clamp(Number(m[1]), 0, 100), y: clamp(Number(m[2]), 0, 100) }
+  return { x: 50, y: 50 }
+}
 
 export default function AdminInstructorEditPage() {
   const router = useRouter()
   const { id } = useParams<{ id: string }>()
   const supabase = createClient()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const avatarCropRef = useRef<HTMLDivElement>(null)
+  const pointerIdRef = useRef<number | null>(null)
+  const draggingRef = useRef(false)
+  const movedRef = useRef(false)
+  const dragStartRef = useRef({ x: 0, y: 0, posX: 50, posY: 50 })
 
   const [adminProfile, setAdminProfile] = useState<any>(null)
   const [instructorData, setInstructorData] = useState<any>(null)
@@ -24,6 +45,11 @@ export default function AdminInstructorEditPage() {
 
   // Editable fields
   const [fullName, setFullName] = useState('')
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPosX, setAvatarPosX] = useState(50)
+  const [avatarPosY, setAvatarPosY] = useState(50)
+  const [avatarZoom, setAvatarZoom] = useState(1)
   const [yearsExperience, setYearsExperience] = useState(0)
   const [tagline, setTagline] = useState('')
   const [bio, setBio] = useState('')
@@ -50,6 +76,11 @@ export default function AdminInstructorEditPage() {
       setIp(json.instructor_profile)
 
       setFullName(json.profile?.full_name ?? '')
+      if (json.profile?.avatar_url) setAvatarPreview(json.profile.avatar_url)
+      const parsed = parseAvatarPosition(json.profile?.avatar_position)
+      setAvatarPosX(parsed.x)
+      setAvatarPosY(parsed.y)
+      setAvatarZoom(Number(json.profile?.avatar_zoom ?? 1) || 1)
       const i = json.instructor_profile
       if (i) {
         setYearsExperience(i.years_experience ?? 0)
@@ -72,15 +103,66 @@ export default function AdminInstructorEditPage() {
     setter(arr.includes(item) ? arr.filter(x => x !== item) : [...arr, item])
   }
 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setAvatarFile(file)
+    setAvatarPreview(URL.createObjectURL(file))
+    setAvatarZoom(1.2)
+  }
+
+  const startAvatarDrag = (clientX: number, clientY: number) => {
+    draggingRef.current = true
+    dragStartRef.current = { x: clientX, y: clientY, posX: avatarPosX, posY: avatarPosY }
+  }
+
+  const moveAvatarDrag = (clientX: number, clientY: number) => {
+    if (!draggingRef.current) return
+    const frame = avatarCropRef.current
+    if (!frame) return
+    const rect = frame.getBoundingClientRect()
+    if (!rect.width || !rect.height) return
+    const dxPct = ((clientX - dragStartRef.current.x) / rect.width) * 100
+    const dyPct = ((clientY - dragStartRef.current.y) / rect.height) * 100
+    setAvatarPosX(clamp(dragStartRef.current.posX + dxPct, 0, 100))
+    setAvatarPosY(clamp(dragStartRef.current.posY + dyPct, 0, 100))
+  }
+
+  const endAvatarDrag = () => {
+    draggingRef.current = false
+    pointerIdRef.current = null
+  }
+
   const handleSave = async () => {
     setSaving(true)
     setError('')
     setSuccess('')
+    let avatarUrl = instructorData?.avatar_url || null
+
+    if (avatarFile) {
+      const formData = new FormData()
+      formData.append('file', avatarFile)
+      const uploadRes = await fetch(`/api/admin/instructors/${id}/avatar`, {
+        method: 'POST',
+        body: formData,
+      })
+      const uploadJson = await uploadRes.json().catch(() => null)
+      if (!uploadRes.ok) {
+        setSaving(false)
+        setError(uploadJson?.error ?? 'Avatar upload failed')
+        return
+      }
+      avatarUrl = uploadJson?.publicUrl ?? avatarUrl
+    }
+
     const res = await fetch(`/api/admin/instructors/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         full_name: fullName,
+        avatar_url: avatarUrl,
+        avatar_position: `${avatarPosX}% ${avatarPosY}%`,
+        avatar_zoom: avatarZoom,
         years_experience: yearsExperience,
         tagline: tagline || null,
         bio: bio || null,
@@ -139,6 +221,77 @@ export default function AdminInstructorEditPage() {
 
         <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-6 space-y-5">
           <h2 className="font-semibold text-gray-900 dark:text-white text-sm">基本情報</h2>
+
+          <div className="flex items-center gap-5">
+            <div
+              ref={avatarCropRef}
+              className="relative w-20 h-20 rounded-full bg-gray-100 dark:bg-navy-700 border-2 border-dashed border-gray-300 dark:border-navy-500 flex items-center justify-center hover:border-navy-400 transition-colors overflow-hidden flex-shrink-0 cursor-move"
+              onPointerDown={(e) => {
+                if (!avatarPreview) return
+                pointerIdRef.current = e.pointerId
+                movedRef.current = false
+                startAvatarDrag(e.clientX, e.clientY)
+                avatarCropRef.current?.setPointerCapture(e.pointerId)
+              }}
+              onPointerMove={(e) => {
+                if (!draggingRef.current) return
+                movedRef.current = true
+                moveAvatarDrag(e.clientX, e.clientY)
+              }}
+              onPointerUp={() => {
+                if (pointerIdRef.current !== null) {
+                  avatarCropRef.current?.releasePointerCapture(pointerIdRef.current)
+                }
+                endAvatarDrag()
+                if (!movedRef.current) fileInputRef.current?.click()
+              }}
+              onPointerCancel={endAvatarDrag}
+              onWheel={(e) => {
+                if (!avatarPreview) return
+                e.preventDefault()
+                const delta = e.deltaY > 0 ? -0.05 : 0.05
+                setAvatarZoom((z) => clamp(z + delta, 1, 3))
+              }}
+              style={{ touchAction: 'none' }}
+            >
+              {avatarPreview ? (
+                <Image
+                  src={avatarPreview}
+                  alt="avatar"
+                  fill
+                  className="object-cover"
+                  style={{ objectPosition: `${avatarPosX}% ${avatarPosY}%`, transform: `scale(${avatarZoom})` }}
+                />
+              ) : (
+                <Camera className="h-6 w-6 text-gray-400 dark:text-navy-400" />
+              )}
+            </div>
+            <div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-sm text-navy-600 dark:text-sage-400 hover:underline"
+              >
+                写真を変更 / Change photo
+              </button>
+              <p className="text-xs text-gray-400 dark:text-navy-400 mt-1">ドラッグで位置調整 / Drag to reposition</p>
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+            </div>
+          </div>
+
+          <div>
+            <label className={labelCls}>Zoom / ズーム</label>
+            <input
+              type="range"
+              min={1}
+              max={3}
+              step={0.05}
+              value={avatarZoom}
+              onChange={(e) => setAvatarZoom(Number(e.target.value))}
+              className="w-full"
+            />
+            <p className="text-xs text-gray-500 dark:text-navy-400 mt-1">{avatarZoom.toFixed(2)}x</p>
+          </div>
 
           <div>
             <label className={labelCls}>表示名 / Display Name</label>

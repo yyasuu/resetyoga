@@ -21,7 +21,7 @@ export async function PATCH(
   const body = await request.json()
   const admin = await createAdminClient()
 
-  const allowedProfileFields = ['full_name', 'timezone']
+  const allowedProfileFields = ['full_name', 'timezone', 'avatar_url', 'avatar_position', 'avatar_zoom']
   const allowedIpFields = [
     'tagline', 'bio', 'yoga_styles', 'languages', 'years_experience',
     'certifications', 'career_history', 'instagram_url', 'youtube_url', 'is_approved',
