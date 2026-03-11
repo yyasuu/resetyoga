@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { Profile } from '@/types'
@@ -76,8 +76,9 @@ export default async function InstructorsPage({
     ? CONCERNS.find((c) => c.id === params.concern) ?? null
     : null
 
-  // Build query
-  let query = supabase
+  // Build query (admin client so public cards are not affected by user RLS)
+  const adminSupabase = await createAdminClient()
+  let query = adminSupabase
     .from('profiles')
     .select('*, instructor_profiles(*)')
     .eq('role', 'instructor')

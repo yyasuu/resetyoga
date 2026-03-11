@@ -11,6 +11,8 @@ import { CheckCircle, Star, Video, Clock, Heart, Sparkles, Globe, Play, BookOpen
 import { CONCERNS } from '@/lib/concerns'
 import { POSE_FAMILIES, DIFFICULTY_LEVELS } from '@/lib/poses'
 
+const SECOND_INSTRUCTOR_ID = '5ea101c5-e9dc-48be-b347-f6769f219b55'
+
 const normalizeDigits = (s: string) =>
   s.replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0))
 
@@ -69,21 +71,25 @@ export default async function LandingPage() {
       profile = data
     }
 
-    const { data: instructorData } = await supabase
+    // Public instructor cards should not depend on user RLS visibility.
+    const adminSupabase = await createAdminClient()
+
+    const { data: instructorData } = await adminSupabase
       .from('profiles')
       .select('*, instructor_profiles(*)')
       .eq('role', 'instructor')
       .eq('instructor_profiles.is_approved', true)
       .order('created_at', { ascending: true })
-      .limit(20)
+      .limit(200)
     const approvedInstructors = (instructorData?.filter((i) => i.instructor_profiles && (i.full_name || '').trim().length > 0) || []) as FeaturedInstructor[]
-    instructors = approvedInstructors.slice(0, 2)
+    const second = approvedInstructors.find((i) => i.id === SECOND_INSTRUCTOR_ID) ?? null
+    const first = approvedInstructors.find((i) => i.id !== SECOND_INSTRUCTOR_ID) ?? null
+    instructors = [first, second].filter((v): v is FeaturedInstructor => Boolean(v))
 
     const cookieStore = await cookies()
     locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
 
     // Use admin client to bypass RLS — these are public preview cards
-    const adminSupabase = await createAdminClient()
     const [{ data: vData }, { data: aData }, { data: pData }] = await Promise.all([
       adminSupabase
         .from('wellness_videos')
