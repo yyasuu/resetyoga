@@ -662,14 +662,15 @@ export default async function LandingPage() {
                     )}
                     {instructor.instructor_profiles?.certifications?.length > 0 && (
                       <div className="mb-3">
-                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
-                          資格・認定 / Certifications
+                        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 mb-1">
+                          {locale === 'ja' ? '資格・認定' : 'Certifications'}
                         </p>
                         <div className="space-y-0.5">
                           {instructor.instructor_profiles.certifications.slice(0, 5).map((cert: string) => (
-                            <p key={cert} className="text-xs text-gray-600 dark:text-gray-300">
-                              {cert}
-                            </p>
+                            <div key={cert} className="flex items-start gap-1.5 text-xs text-gray-600 dark:text-gray-300">
+                              <span className="flex-shrink-0">•</span>
+                              <span className="flex-1">{cert}</span>
+                            </div>
                           ))}
                         </div>
                       </div>
