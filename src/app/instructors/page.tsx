@@ -14,6 +14,21 @@ interface SearchParams {
   concern?: string
 }
 
+const inferYearsExperience = (profile: {
+  years_experience?: number | null
+  bio?: string | null
+  tagline?: string | null
+  career_history?: string | null
+}) => {
+  const direct = Number(profile.years_experience ?? 0)
+  if (Number.isFinite(direct) && direct > 0) return direct
+
+  const text = `${profile.bio ?? ''} ${profile.tagline ?? ''} ${profile.career_history ?? ''}`
+  const m = text.match(/(\d{1,2})\s*\+?\s*(?:years?|yrs?)/i)
+  if (m) return Number(m[1])
+  return 0
+}
+
 export default async function InstructorsPage({
   searchParams,
 }: {
@@ -93,8 +108,8 @@ export default async function InstructorsPage({
 
         {instructors && instructors.length > 0 ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {instructors.map((instructor: any) => {
-              const years = Number(instructor.instructor_profiles?.years_experience ?? 0)
+            {instructors.map((instructor) => {
+              const years = inferYearsExperience(instructor.instructor_profiles ?? {})
               return (
               <InstructorCard
                 key={instructor.id}

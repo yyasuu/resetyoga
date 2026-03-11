@@ -21,13 +21,19 @@ import { YOGA_STYLES, LANGUAGES, TIMEZONES, Profile, InstructorProfile, Instruct
 import { Camera, Plus, X, Instagram, Youtube, Landmark, User, BookOpen, Award, CreditCard } from 'lucide-react'
 import Image from 'next/image'
 
-const AVATAR_POSITIONS = [
-  { value: 'center center', label: 'Center / 中央' },
-  { value: 'center top', label: 'Top / 上寄せ' },
-  { value: 'center bottom', label: 'Bottom / 下寄せ' },
-  { value: 'left center', label: 'Left / 左寄せ' },
-  { value: 'right center', label: 'Right / 右寄せ' },
-] as const
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n))
+
+const parseAvatarPosition = (pos: string | null | undefined) => {
+  const raw = (pos || '').toLowerCase().trim()
+  const map: Record<string, number> = { left: 0, center: 50, right: 100, top: 0, bottom: 100 }
+  const parts = raw.split(/\s+/).filter(Boolean)
+  if (parts.length === 2 && parts[0] in map && parts[1] in map) {
+    return { x: map[parts[0]], y: map[parts[1]] }
+  }
+  const m = raw.match(/^(\d+(?:\.\d+)?)%\s+(\d+(?:\.\d+)?)%$/)
+  if (m) return { x: clamp(Number(m[1]), 0, 100), y: clamp(Number(m[2]), 0, 100) }
+  return { x: 50, y: 50 }
+}
 
 function TagButton({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
   return (
@@ -63,6 +69,9 @@ export default function InstructorProfilePage() {
   const router = useRouter()
   const supabase = createClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const avatarCropRef = useRef<HTMLDivElement>(null)
+  const draggingRef = useRef(false)
+  const dragStartRef = useRef({ x: 0, y: 0, posX: 50, posY: 50 })
 
   const [profile, setProfile] = useState<Profile | null>(null)
   const [saving, setSaving] = useState(false)
@@ -72,7 +81,9 @@ export default function InstructorProfilePage() {
   const [timezone, setTimezone] = useState('Asia/Tokyo')
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
-  const [avatarPosition, setAvatarPosition] = useState<string>('center center')
+  const [avatarPosX, setAvatarPosX] = useState(50)
+  const [avatarPosY, setAvatarPosY] = useState(50)
+  const [avatarZoom, setAvatarZoom] = useState(1)
 
   // Instructor profile
   const [isApproved, setIsApproved] = useState(false)
@@ -113,7 +124,10 @@ export default function InstructorProfilePage() {
         setFullName(p.full_name || '')
         setTimezone(p.timezone || 'Asia/Tokyo')
         if (p.avatar_url) setAvatarPreview(p.avatar_url)
-        setAvatarPosition(p.avatar_position || 'center center')
+        const parsed = parseAvatarPosition(p.avatar_position)
+        setAvatarPosX(parsed.x)
+        setAvatarPosY(parsed.y)
+        setAvatarZoom(Number(p.avatar_zoom ?? 1) || 1)
       }
       if (ip) {
         const i = ip as InstructorProfile
@@ -160,6 +174,28 @@ export default function InstructorProfilePage() {
     setAvatarPreview(URL.createObjectURL(file))
   }
 
+  const startAvatarDrag = (clientX: number, clientY: number) => {
+    draggingRef.current = true
+    dragStartRef.current = { x: clientX, y: clientY, posX: avatarPosX, posY: avatarPosY }
+  }
+
+  const moveAvatarDrag = (clientX: number, clientY: number) => {
+    if (!draggingRef.current) return
+    const frame = avatarCropRef.current
+    if (!frame) return
+    const rect = frame.getBoundingClientRect()
+    if (!rect.width || !rect.height) return
+
+    const dxPct = ((clientX - dragStartRef.current.x) / rect.width) * 100
+    const dyPct = ((clientY - dragStartRef.current.y) / rect.height) * 100
+    setAvatarPosX(clamp(dragStartRef.current.posX + dxPct, 0, 100))
+    setAvatarPosY(clamp(dragStartRef.current.posY + dyPct, 0, 100))
+  }
+
+  const endAvatarDrag = () => {
+    draggingRef.current = false
+  }
+
   const handleSave = async () => {
     setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
@@ -184,7 +220,8 @@ export default function InstructorProfilePage() {
       full_name: fullName,
       timezone,
       avatar_url: avatarUrl,
-      avatar_position: avatarPosition,
+      avatar_position: `${avatarPosX}% ${avatarPosY}%`,
+      avatar_zoom: avatarZoom,
     }).eq('id', user.id)
 
     const { error: ipError } = await supabase.from('instructor_profiles').upsert({
@@ -243,11 +280,37 @@ export default function InstructorProfilePage() {
           {/* Avatar */}
           <div className="flex items-center gap-5">
             <div
+              ref={avatarCropRef}
               className="relative w-20 h-20 rounded-full bg-gray-100 dark:bg-navy-700 border-2 border-dashed border-gray-300 dark:border-navy-500 flex items-center justify-center cursor-pointer hover:border-navy-400 transition-colors overflow-hidden flex-shrink-0"
               onClick={() => fileInputRef.current?.click()}
+              onMouseDown={(e) => {
+                if (!avatarPreview) return
+                e.preventDefault()
+                startAvatarDrag(e.clientX, e.clientY)
+              }}
+              onMouseMove={(e) => moveAvatarDrag(e.clientX, e.clientY)}
+              onMouseUp={endAvatarDrag}
+              onMouseLeave={endAvatarDrag}
+              onTouchStart={(e) => {
+                if (!avatarPreview) return
+                const t = e.touches[0]
+                startAvatarDrag(t.clientX, t.clientY)
+              }}
+              onTouchMove={(e) => {
+                const t = e.touches[0]
+                moveAvatarDrag(t.clientX, t.clientY)
+              }}
+              onTouchEnd={endAvatarDrag}
+              style={{ touchAction: 'none' }}
             >
               {avatarPreview ? (
-                <Image src={avatarPreview} alt="avatar" fill className="object-cover" style={{ objectPosition: avatarPosition }} />
+                <Image
+                  src={avatarPreview}
+                  alt="avatar"
+                  fill
+                  className="object-cover"
+                  style={{ objectPosition: `${avatarPosX}% ${avatarPosY}%`, transform: `scale(${avatarZoom})` }}
+                />
               ) : (
                 <Camera className="h-6 w-6 text-gray-400 dark:text-navy-400" />
               )}
@@ -261,6 +324,9 @@ export default function InstructorProfilePage() {
                 {t('change_photo')}
               </button>
               <p className="text-xs text-gray-400 dark:text-navy-400 mt-1">{t('photo_hint')}</p>
+              {avatarPreview && (
+                <p className="text-xs text-gray-500 dark:text-navy-400 mt-1">Drag to adjust photo position / ドラッグで位置調整</p>
+              )}
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
             </div>
           </div>
@@ -285,17 +351,21 @@ export default function InstructorProfilePage() {
           </div>
 
           <div>
-            <Label className="dark:text-navy-200">Photo Position / 写真の位置</Label>
-            <Select value={avatarPosition} onValueChange={setAvatarPosition}>
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {AVATAR_POSITIONS.map((pos) => (
-                  <SelectItem key={pos.value} value={pos.value}>{pos.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label className="dark:text-navy-200">Zoom / ズーム</Label>
+            <input
+              type="range"
+              min={1}
+              max={2.5}
+              step={0.05}
+              value={avatarZoom}
+              onChange={(e) => setAvatarZoom(Number(e.target.value))}
+              className="w-full mt-2"
+            />
+            <div className="mt-1 flex justify-between text-xs text-gray-400 dark:text-navy-400">
+              <span>1.0x</span>
+              <span>{avatarZoom.toFixed(2)}x</span>
+              <span>2.5x</span>
+            </div>
           </div>
         </Section>
 

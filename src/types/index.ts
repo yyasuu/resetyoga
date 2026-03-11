@@ -6,6 +6,7 @@ export interface Profile {
   full_name: string | null
   avatar_url: string | null
   avatar_position?: string | null
+  avatar_zoom?: number | null
   role: UserRole
   timezone: string
   created_at: string

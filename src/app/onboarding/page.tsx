@@ -98,13 +98,7 @@ const STEP_LABELS = [
   { en: 'Terms', ja: '利用規約' },
 ]
 
-const AVATAR_POSITIONS = [
-  { value: 'center center', label: 'Center / 中央' },
-  { value: 'center top', label: 'Top / 上寄せ' },
-  { value: 'center bottom', label: 'Bottom / 下寄せ' },
-  { value: 'left center', label: 'Left / 左寄せ' },
-  { value: 'right center', label: 'Right / 右寄せ' },
-] as const
+const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n))
 
 function ProgressStepper({ current, total }: { current: number; total: number }) {
   return (
@@ -300,6 +294,9 @@ function OnboardingForm() {
 
   const supabase = createClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const avatarCropRef = useRef<HTMLDivElement>(null)
+  const draggingRef = useRef(false)
+  const dragStartRef = useRef({ x: 0, y: 0, posX: 50, posY: 50 })
 
   const [step, setStep] = useState(1)
   const [role, setRole] = useState<'instructor' | 'student'>(initialRole)
@@ -350,7 +347,9 @@ function OnboardingForm() {
   const [fullName, setFullName] = useState('')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
-  const [avatarPosition, setAvatarPosition] = useState<string>('center center')
+  const [avatarPosX, setAvatarPosX] = useState(50)
+  const [avatarPosY, setAvatarPosY] = useState(50)
+  const [avatarZoom, setAvatarZoom] = useState(1)
 
   // Step 3
   const [tagline, setTagline] = useState('')
@@ -460,6 +459,28 @@ function OnboardingForm() {
     setAvatarPreview(URL.createObjectURL(file))
   }
 
+  const startAvatarDrag = (clientX: number, clientY: number) => {
+    draggingRef.current = true
+    dragStartRef.current = { x: clientX, y: clientY, posX: avatarPosX, posY: avatarPosY }
+  }
+
+  const moveAvatarDrag = (clientX: number, clientY: number) => {
+    if (!draggingRef.current) return
+    const frame = avatarCropRef.current
+    if (!frame) return
+    const rect = frame.getBoundingClientRect()
+    if (!rect.width || !rect.height) return
+
+    const dxPct = ((clientX - dragStartRef.current.x) / rect.width) * 100
+    const dyPct = ((clientY - dragStartRef.current.y) / rect.height) * 100
+    setAvatarPosX(clamp(dragStartRef.current.posX + dxPct, 0, 100))
+    setAvatarPosY(clamp(dragStartRef.current.posY + dyPct, 0, 100))
+  }
+
+  const endAvatarDrag = () => {
+    draggingRef.current = false
+  }
+
   // Validate before advancing each step
   const validateStep = (s: number): boolean => {
     const errs: Record<string, string> = {}
@@ -548,7 +569,8 @@ function OnboardingForm() {
       const profileUpdate: Record<string, unknown> = { role, timezone }
       if (fullName) profileUpdate.full_name = fullName
       if (avatarUrl) profileUpdate.avatar_url = avatarUrl
-      profileUpdate.avatar_position = avatarPosition
+      profileUpdate.avatar_position = `${avatarPosX}% ${avatarPosY}%`
+      profileUpdate.avatar_zoom = avatarZoom
 
       const { error: profileError } = await supabase.from('profiles').update(profileUpdate).eq('id', user.id)
       if (profileError) { toast.error('Profile save failed: ' + profileError.message); setLoading(false); return }
@@ -789,36 +811,72 @@ function OnboardingForm() {
             {/* Photo upload */}
             <div className="flex flex-col items-center mb-6">
               <div
+                ref={avatarCropRef}
                 className="relative w-28 h-28 rounded-full bg-gray-100 dark:bg-navy-700 border-2 border-dashed border-gray-300 dark:border-navy-500 flex items-center justify-center cursor-pointer hover:border-navy-400 transition-colors overflow-hidden"
                 onClick={() => fileInputRef.current?.click()}
+                onMouseDown={(e) => {
+                  if (!avatarPreview) return
+                  e.preventDefault()
+                  startAvatarDrag(e.clientX, e.clientY)
+                }}
+                onMouseMove={(e) => moveAvatarDrag(e.clientX, e.clientY)}
+                onMouseUp={endAvatarDrag}
+                onMouseLeave={endAvatarDrag}
+                onTouchStart={(e) => {
+                  if (!avatarPreview) return
+                  const t = e.touches[0]
+                  startAvatarDrag(t.clientX, t.clientY)
+                }}
+                onTouchMove={(e) => {
+                  const t = e.touches[0]
+                  moveAvatarDrag(t.clientX, t.clientY)
+                }}
+                onTouchEnd={endAvatarDrag}
+                style={{ touchAction: 'none' }}
               >
                 {avatarPreview
-                  ? <Image src={avatarPreview} alt="preview" fill className="object-cover" style={{ objectPosition: avatarPosition }} />
+                  ? (
+                    <Image
+                      src={avatarPreview}
+                      alt="preview"
+                      fill
+                      className="object-cover"
+                      style={{ objectPosition: `${avatarPosX}% ${avatarPosY}%`, transform: `scale(${avatarZoom})` }}
+                    />
+                  )
                   : <Camera className="h-8 w-8 text-gray-400 dark:text-navy-400" />}
               </div>
               <button type="button" onClick={() => fileInputRef.current?.click()} className="mt-3 text-sm text-navy-600 dark:text-sage-400 hover:underline">
                 Upload Photo / 写真をアップロード
               </button>
               <p className="text-xs text-gray-400 dark:text-navy-500 mt-1">JPG / PNG / WebP · Max 5MB · Recommended: 400×400px</p>
+              {avatarPreview && (
+                <p className="text-xs text-gray-500 dark:text-navy-400 mt-1">Drag photo to adjust face position / ドラッグで位置調整</p>
+              )}
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
             </div>
 
             <div className="mb-6">
               <FieldLabel
-                label="Photo Position / 写真の位置"
-                htmlFor="avatar-position"
-                tooltip="Adjust where your face appears inside the circular frame."
+                label="Zoom / ズーム"
+                htmlFor="avatar-zoom"
+                tooltip="Zoom in/out to frame your face. Position is saved with your profile."
               />
-              <Select value={avatarPosition} onValueChange={setAvatarPosition}>
-                <SelectTrigger id="avatar-position" className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {AVATAR_POSITIONS.map((pos) => (
-                    <SelectItem key={pos.value} value={pos.value}>{pos.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <input
+                id="avatar-zoom"
+                type="range"
+                min={1}
+                max={2.5}
+                step={0.05}
+                value={avatarZoom}
+                onChange={(e) => setAvatarZoom(Number(e.target.value))}
+                className="w-full mt-2"
+              />
+              <div className="mt-1 flex justify-between text-xs text-gray-400 dark:text-navy-400">
+                <span>1.0x</span>
+                <span>{avatarZoom.toFixed(2)}x</span>
+                <span>2.5x</span>
+              </div>
             </div>
 
             <div data-error={!!errors.fullName || undefined}>

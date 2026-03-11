@@ -7,30 +7,61 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { Profile } from '@/types'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, Star, Video, Clock, Heart, Sparkles, Globe, Play, BookOpen, Layers, ArrowRight } from 'lucide-react'
+import { CheckCircle, Star, Video, Clock, Heart, Sparkles, Globe, Play, BookOpen, ArrowRight } from 'lucide-react'
 import { CONCERNS } from '@/lib/concerns'
 import { POSE_FAMILIES, DIFFICULTY_LEVELS } from '@/lib/poses'
 
+const canonicalName = (name: string | null | undefined) =>
+  (name || '').toLowerCase().replace(/[^a-z]/g, '')
+
 const isDrYogiAthmaSudhan = (name: string | null | undefined) => {
-  const n = (name || '').toLowerCase().replace(/\s+/g, ' ').trim()
-  return n.includes('yogi') && n.includes('athma') && n.includes('sudhan')
+  const n = canonicalName(name)
+  return n.includes('yogiathmasudhan') || n.includes('dryogiathmasudhan')
 }
 
 const isAiriYukiyoshi = (name: string | null | undefined) => {
-  const n = (name || '').toLowerCase().replace(/\s+/g, ' ').trim()
-  return n.includes('airi') && n.includes('yukiyoshi')
+  const n = canonicalName(name)
+  return n.includes('airiyukiyoshi')
 }
 
-const selectFeaturedGuides = (list: any[]) => {
+const inferYearsExperience = (profile: {
+  years_experience?: number | null
+  bio?: string | null
+  tagline?: string | null
+  career_history?: string | null
+}) => {
+  const direct = Number(profile.years_experience ?? 0)
+  if (Number.isFinite(direct) && direct > 0) return direct
+
+  const text = `${profile.bio ?? ''} ${profile.tagline ?? ''} ${profile.career_history ?? ''}`
+  const m = text.match(/(\d{1,2})\s*\+?\s*(?:years?|yrs?)/i)
+  if (m) return Number(m[1])
+  return 0
+}
+
+type FeaturedInstructor = {
+  id: string
+  full_name: string | null
+  instructor_profiles: {
+    years_experience?: number | null
+    bio?: string | null
+    tagline?: string | null
+    career_history?: string | null
+    rating?: number | null
+    yoga_styles?: string[] | null
+  } | null
+}
+
+const selectFeaturedGuides = (list: FeaturedInstructor[]) => {
   const items = [...list]
   const airi = items.find((i) => isAiriYukiyoshi(i.full_name))
   const sudhan = items.find((i) => isDrYogiAthmaSudhan(i.full_name))
-  const selected = [airi, sudhan].filter(Boolean)
+  const selected = [airi, sudhan].filter((v): v is FeaturedInstructor => Boolean(v))
 
   if (selected.length === 2) return selected
 
-  const selectedIds = new Set(selected.map((i: any) => i.id))
-  const fallback = items.filter((i: any) => !selectedIds.has(i.id)).slice(0, Math.max(0, 2 - selected.length))
+  const selectedIds = new Set(selected.map((i) => i.id))
+  const fallback = items.filter((i) => !selectedIds.has(i.id)).slice(0, Math.max(0, 2 - selected.length))
   return [...selected, ...fallback]
 }
 
@@ -38,7 +69,7 @@ export default async function LandingPage() {
   const t = await getTranslations('landing')
 
   let profile: Profile | null = null
-  let instructors: any[] = []
+  let instructors: FeaturedInstructor[] = []
   let user: { id: string } | null = null
   let previewVideo: any = null
   let previewArticles: any[] = []
@@ -61,7 +92,7 @@ export default async function LandingPage() {
       .eq('role', 'instructor')
       .eq('instructor_profiles.is_approved', true)
       .limit(100)
-    const approvedInstructors = instructorData?.filter((i: any) => i.instructor_profiles) || []
+    const approvedInstructors = (instructorData?.filter((i) => i.instructor_profiles) || []) as FeaturedInstructor[]
     instructors = selectFeaturedGuides(approvedInstructors)
 
     const cookieStore = await cookies()
@@ -594,7 +625,7 @@ export default async function LandingPage() {
                             {instructor.instructor_profiles?.rating?.toFixed(1) || '5.0'}
                           </span>
                           <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">
-                            {t('years_exp_short', { count: Number(instructor.instructor_profiles?.years_experience ?? 0) || 0 })}
+                            {t('years_exp_short', { count: inferYearsExperience(instructor.instructor_profiles ?? {}) })}
                           </span>
                         </div>
                       </div>

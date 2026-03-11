@@ -96,7 +96,10 @@ export default async function InstructorDetailPage({
                   width={80}
                   height={80}
                   className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-gray-100 dark:border-navy-600"
-                  style={{ objectPosition: instructor.avatar_position || 'center center' }}
+                  style={{
+                    objectPosition: instructor.avatar_position || 'center center',
+                    transform: `scale(${Number(instructor.avatar_zoom ?? 1) || 1})`,
+                  }}
                 />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-navy-400 to-purple-500 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
