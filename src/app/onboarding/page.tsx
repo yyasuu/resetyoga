@@ -98,6 +98,14 @@ const STEP_LABELS = [
   { en: 'Terms', ja: '利用規約' },
 ]
 
+const AVATAR_POSITIONS = [
+  { value: 'center center', label: 'Center / 中央' },
+  { value: 'center top', label: 'Top / 上寄せ' },
+  { value: 'center bottom', label: 'Bottom / 下寄せ' },
+  { value: 'left center', label: 'Left / 左寄せ' },
+  { value: 'right center', label: 'Right / 右寄せ' },
+] as const
+
 function ProgressStepper({ current, total }: { current: number; total: number }) {
   return (
     <div className="mb-8">
@@ -342,6 +350,7 @@ function OnboardingForm() {
   const [fullName, setFullName] = useState('')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [avatarPosition, setAvatarPosition] = useState<string>('center center')
 
   // Step 3
   const [tagline, setTagline] = useState('')
@@ -539,6 +548,7 @@ function OnboardingForm() {
       const profileUpdate: Record<string, unknown> = { role, timezone }
       if (fullName) profileUpdate.full_name = fullName
       if (avatarUrl) profileUpdate.avatar_url = avatarUrl
+      profileUpdate.avatar_position = avatarPosition
 
       const { error: profileError } = await supabase.from('profiles').update(profileUpdate).eq('id', user.id)
       if (profileError) { toast.error('Profile save failed: ' + profileError.message); setLoading(false); return }
@@ -783,7 +793,7 @@ function OnboardingForm() {
                 onClick={() => fileInputRef.current?.click()}
               >
                 {avatarPreview
-                  ? <Image src={avatarPreview} alt="preview" fill className="object-cover" />
+                  ? <Image src={avatarPreview} alt="preview" fill className="object-cover" style={{ objectPosition: avatarPosition }} />
                   : <Camera className="h-8 w-8 text-gray-400 dark:text-navy-400" />}
               </div>
               <button type="button" onClick={() => fileInputRef.current?.click()} className="mt-3 text-sm text-navy-600 dark:text-sage-400 hover:underline">
@@ -791,6 +801,24 @@ function OnboardingForm() {
               </button>
               <p className="text-xs text-gray-400 dark:text-navy-500 mt-1">JPG / PNG / WebP · Max 5MB · Recommended: 400×400px</p>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+            </div>
+
+            <div className="mb-6">
+              <FieldLabel
+                label="Photo Position / 写真の位置"
+                htmlFor="avatar-position"
+                tooltip="Adjust where your face appears inside the circular frame."
+              />
+              <Select value={avatarPosition} onValueChange={setAvatarPosition}>
+                <SelectTrigger id="avatar-position" className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {AVATAR_POSITIONS.map((pos) => (
+                    <SelectItem key={pos.value} value={pos.value}>{pos.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div data-error={!!errors.fullName || undefined}>

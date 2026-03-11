@@ -11,6 +11,7 @@ interface InstructorCardProps {
     id: string
     full_name: string | null
     avatar_url: string | null
+    avatar_position?: string | null
     instructor_profiles: {
       rating: number | null
       total_reviews: number | null
@@ -76,6 +77,7 @@ export function InstructorCard({
               width={64}
               height={64}
               className="w-16 h-16 rounded-full object-cover flex-shrink-0 border-2 border-gray-100 dark:border-navy-600"
+              style={{ objectPosition: instructor.avatar_position || 'center center' }}
             />
           ) : (
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-navy-400 to-purple-500 flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">

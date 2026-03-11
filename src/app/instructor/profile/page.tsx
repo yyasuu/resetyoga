@@ -21,6 +21,14 @@ import { YOGA_STYLES, LANGUAGES, TIMEZONES, Profile, InstructorProfile, Instruct
 import { Camera, Plus, X, Instagram, Youtube, Landmark, User, BookOpen, Award, CreditCard } from 'lucide-react'
 import Image from 'next/image'
 
+const AVATAR_POSITIONS = [
+  { value: 'center center', label: 'Center / 中央' },
+  { value: 'center top', label: 'Top / 上寄せ' },
+  { value: 'center bottom', label: 'Bottom / 下寄せ' },
+  { value: 'left center', label: 'Left / 左寄せ' },
+  { value: 'right center', label: 'Right / 右寄せ' },
+] as const
+
 function TagButton({ label, selected, onClick }: { label: string; selected: boolean; onClick: () => void }) {
   return (
     <button
@@ -64,6 +72,7 @@ export default function InstructorProfilePage() {
   const [timezone, setTimezone] = useState('Asia/Tokyo')
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPosition, setAvatarPosition] = useState<string>('center center')
 
   // Instructor profile
   const [isApproved, setIsApproved] = useState(false)
@@ -104,6 +113,7 @@ export default function InstructorProfilePage() {
         setFullName(p.full_name || '')
         setTimezone(p.timezone || 'Asia/Tokyo')
         if (p.avatar_url) setAvatarPreview(p.avatar_url)
+        setAvatarPosition(p.avatar_position || 'center center')
       }
       if (ip) {
         const i = ip as InstructorProfile
@@ -174,6 +184,7 @@ export default function InstructorProfilePage() {
       full_name: fullName,
       timezone,
       avatar_url: avatarUrl,
+      avatar_position: avatarPosition,
     }).eq('id', user.id)
 
     const { error: ipError } = await supabase.from('instructor_profiles').upsert({
@@ -236,7 +247,7 @@ export default function InstructorProfilePage() {
               onClick={() => fileInputRef.current?.click()}
             >
               {avatarPreview ? (
-                <Image src={avatarPreview} alt="avatar" fill className="object-cover" />
+                <Image src={avatarPreview} alt="avatar" fill className="object-cover" style={{ objectPosition: avatarPosition }} />
               ) : (
                 <Camera className="h-6 w-6 text-gray-400 dark:text-navy-400" />
               )}
@@ -268,6 +279,20 @@ export default function InstructorProfilePage() {
               <SelectContent>
                 {TIMEZONES.map((tz) => (
                   <SelectItem key={tz.value} value={tz.value}>{tz.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className="dark:text-navy-200">Photo Position / 写真の位置</Label>
+            <Select value={avatarPosition} onValueChange={setAvatarPosition}>
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {AVATAR_POSITIONS.map((pos) => (
+                  <SelectItem key={pos.value} value={pos.value}>{pos.label}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

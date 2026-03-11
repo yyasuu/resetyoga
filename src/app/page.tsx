@@ -16,15 +16,22 @@ const isDrYogiAthmaSudhan = (name: string | null | undefined) => {
   return n.includes('yogi') && n.includes('athma') && n.includes('sudhan')
 }
 
-const prioritizeDrYogiInCenter = (list: any[]) => {
-  const items = [...list]
-  const index = items.findIndex((i) => isDrYogiAthmaSudhan(i.full_name))
-  if (index === -1) return items
+const isAiriYukiyoshi = (name: string | null | undefined) => {
+  const n = (name || '').toLowerCase().replace(/\s+/g, ' ').trim()
+  return n.includes('airi') && n.includes('yukiyoshi')
+}
 
-  const [drYogi] = items.splice(index, 1)
-  const centerIndex = Math.min(1, items.length)
-  items.splice(centerIndex, 0, drYogi)
-  return items
+const selectFeaturedGuides = (list: any[]) => {
+  const items = [...list]
+  const airi = items.find((i) => isAiriYukiyoshi(i.full_name))
+  const sudhan = items.find((i) => isDrYogiAthmaSudhan(i.full_name))
+  const selected = [airi, sudhan].filter(Boolean)
+
+  if (selected.length === 2) return selected
+
+  const selectedIds = new Set(selected.map((i: any) => i.id))
+  const fallback = items.filter((i: any) => !selectedIds.has(i.id)).slice(0, Math.max(0, 2 - selected.length))
+  return [...selected, ...fallback]
 }
 
 export default async function LandingPage() {
@@ -53,9 +60,9 @@ export default async function LandingPage() {
       .select('*, instructor_profiles(*)')
       .eq('role', 'instructor')
       .eq('instructor_profiles.is_approved', true)
-      .limit(24)
+      .limit(100)
     const approvedInstructors = instructorData?.filter((i: any) => i.instructor_profiles) || []
-    instructors = prioritizeDrYogiInCenter(approvedInstructors).slice(0, 6)
+    instructors = selectFeaturedGuides(approvedInstructors)
 
     const cookieStore = await cookies()
     locale = cookieStore.get('NEXT_LOCALE')?.value === 'ja' ? 'ja' : 'en'
@@ -564,12 +571,12 @@ export default async function LandingPage() {
       {/* ── Featured Instructors ─────────────────────────────────────── */}
       {instructors.length > 0 && (
         <section className="relative z-10 py-20 px-4 bg-sage-50 dark:bg-navy-900">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('instructors_label')}</p>
             <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">
               {t('instructors_title')}
             </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid sm:grid-cols-2 gap-6">
               {instructors.map((instructor: any) => (
                 <Link key={instructor.id} href={`/instructors/${instructor.id}`} className="block">
                   <div className="border border-gray-200 dark:border-navy-700 rounded-2xl p-4 sm:p-6 hover:shadow-lg hover:border-navy-200 dark:hover:border-navy-500 transition-all cursor-pointer group bg-white dark:bg-navy-800">
