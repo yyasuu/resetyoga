@@ -24,8 +24,11 @@ const inferYearsExperience = (profile: {
   if (Number.isFinite(direct) && direct > 0) return direct
 
   const text = `${profile.bio ?? ''} ${profile.tagline ?? ''} ${profile.career_history ?? ''}`
-  const m = text.match(/(\d{1,2})\s*\+?\s*(?:years?|yrs?)/i)
-  if (m) return Number(m[1])
+    .replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0))
+  const mEn = text.match(/(\d{1,2})\s*\+?\s*(?:years?|yrs?)/i)
+  if (mEn) return Number(mEn[1])
+  const mJa = text.match(/(\d{1,2})\s*年/)
+  if (mJa) return Number(mJa[1])
   return 0
 }
 

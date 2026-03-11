@@ -16,13 +16,20 @@ const canonicalName = (name: string | null | undefined) =>
 
 const isDrYogiAthmaSudhan = (name: string | null | undefined) => {
   const n = canonicalName(name)
-  return n.includes('yogiathmasudhan') || n.includes('dryogiathmasudhan')
+  return (
+    n.includes('yogiathmasudhan') ||
+    n.includes('dryogiathmasudhan') ||
+    (n.includes('yogi') && n.includes('athma') && n.includes('sudhan'))
+  )
 }
 
 const isAiriYukiyoshi = (name: string | null | undefined) => {
   const n = canonicalName(name)
-  return n.includes('airiyukiyoshi')
+  return n.includes('airiyukiyoshi') || (n.includes('airi') && n.includes('yukiyoshi'))
 }
+
+const normalizeDigits = (s: string) =>
+  s.replace(/[０-９]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 0xfee0))
 
 const inferYearsExperience = (profile: {
   years_experience?: number | null
@@ -33,9 +40,11 @@ const inferYearsExperience = (profile: {
   const direct = Number(profile.years_experience ?? 0)
   if (Number.isFinite(direct) && direct > 0) return direct
 
-  const text = `${profile.bio ?? ''} ${profile.tagline ?? ''} ${profile.career_history ?? ''}`
-  const m = text.match(/(\d{1,2})\s*\+?\s*(?:years?|yrs?)/i)
-  if (m) return Number(m[1])
+  const text = normalizeDigits(`${profile.bio ?? ''} ${profile.tagline ?? ''} ${profile.career_history ?? ''}`)
+  const mEn = text.match(/(\d{1,2})\s*\+?\s*(?:years?|yrs?)/i)
+  if (mEn) return Number(mEn[1])
+  const mJa = text.match(/(\d{1,2})\s*年/)
+  if (mJa) return Number(mJa[1])
   return 0
 }
 
@@ -53,7 +62,7 @@ type FeaturedInstructor = {
 }
 
 const selectFeaturedGuides = (list: FeaturedInstructor[]) => {
-  const items = [...list]
+  const items = list.filter((i) => !!i.full_name)
   const airi = items.find((i) => isAiriYukiyoshi(i.full_name))
   const sudhan = items.find((i) => isDrYogiAthmaSudhan(i.full_name))
   const selected = [airi, sudhan].filter((v): v is FeaturedInstructor => Boolean(v))
@@ -91,7 +100,8 @@ export default async function LandingPage() {
       .select('*, instructor_profiles(*)')
       .eq('role', 'instructor')
       .eq('instructor_profiles.is_approved', true)
-      .limit(100)
+      .order('created_at', { ascending: false })
+      .limit(500)
     const approvedInstructors = (instructorData?.filter((i) => i.instructor_profiles) || []) as FeaturedInstructor[]
     instructors = selectFeaturedGuides(approvedInstructors)
 
