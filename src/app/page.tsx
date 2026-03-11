@@ -47,6 +47,7 @@ type FeaturedInstructor = {
     bio?: string | null
     tagline?: string | null
     career_history?: string | null
+    certifications?: string[] | null
     rating?: number | null
     yoga_styles?: string[] | null
   } | null
@@ -644,6 +645,20 @@ export default async function LandingPage() {
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
                         {instructor.instructor_profiles?.bio || instructor.instructor_profiles?.tagline || instructor.instructor_profiles?.career_history}
                       </p>
+                    )}
+                    {instructor.instructor_profiles?.certifications?.length > 0 && (
+                      <div className="mb-3">
+                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
+                          資格・認定 / Certifications
+                        </p>
+                        <div className="space-y-0.5">
+                          {instructor.instructor_profiles.certifications.slice(0, 5).map((cert: string) => (
+                            <p key={cert} className="text-xs text-gray-600 dark:text-gray-300">
+                              {cert}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
                     )}
                     {instructor.instructor_profiles?.yoga_styles?.length > 0 && (
                       <div className="flex flex-wrap gap-1">

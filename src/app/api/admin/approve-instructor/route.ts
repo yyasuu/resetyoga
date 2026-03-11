@@ -36,20 +36,43 @@ export async function POST(request: NextRequest) {
     .from('instructor_profiles')
     .select('is_approved')
     .eq('id', instructorId)
-    .single()
+    .maybeSingle()
 
   if (current?.is_approved) {
     return NextResponse.json({ success: true, alreadyApproved: true })
   }
 
-  // Upsert approval so "missing instructor_profiles row" doesn't cause infinite approve loop.
-  const { error: upsertError } = await adminSupabase
+  // Prefer update first; if row doesn't exist, insert minimal safe defaults.
+  const { data: updated, error: updateError } = await adminSupabase
     .from('instructor_profiles')
-    .upsert({ id: instructorId, is_approved: true }, { onConflict: 'id' })
+    .update({ is_approved: true })
+    .eq('id', instructorId)
+    .select('id')
+    .maybeSingle()
 
-  if (upsertError) {
-    console.error('Failed to approve instructor in DB:', upsertError)
-    return NextResponse.json({ error: upsertError.message }, { status: 500 })
+  if (updateError) {
+    console.error('Failed to approve instructor in DB (update):', updateError)
+    return NextResponse.json({ error: updateError.message }, { status: 500 })
+  }
+
+  if (!updated) {
+    const { error: insertError } = await adminSupabase
+      .from('instructor_profiles')
+      .insert({
+        id: instructorId,
+        bio: null,
+        yoga_styles: [],
+        languages: [],
+        years_experience: 0,
+        is_approved: true,
+        rating: 0,
+        total_reviews: 0,
+      })
+
+    if (insertError) {
+      console.error('Failed to approve instructor in DB (insert):', insertError)
+      return NextResponse.json({ error: insertError.message }, { status: 500 })
+    }
   }
 
   try {

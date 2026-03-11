@@ -32,13 +32,18 @@ export function ApproveInstructorButton({ instructorId, instructorName }: Props)
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ instructorId }),  // name/email fetched server-side
     })
+    const payload = await res.json().catch(() => null)
 
     if (!res.ok) {
-      toast.error('Failed to approve instructor')
+      toast.error(payload?.error || 'Failed to approve instructor')
       setLoading(false)
     } else {
       setApproved(true)
-      toast.success(`${instructorName} approved! Approval email sent.`)
+      if (payload?.alreadyApproved) {
+        toast.success(`${instructorName} is already approved.`)
+      } else {
+        toast.success(`${instructorName} approved! Approval email sent.`)
+      }
       router.refresh()
     }
   }

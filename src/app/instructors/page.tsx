@@ -78,58 +78,86 @@ export default async function InstructorsPage({
     ? CONCERNS.find((c) => c.id === params.concern) ?? null
     : null
 
-  // Build query (admin client so public cards are not affected by user RLS)
+  // Query instructor_profiles first, then join profiles by ID.
+  // This avoids ambiguous nested join behavior and guarantees bio source integrity.
   const adminSupabase = await createAdminClient()
-  let query = adminSupabase
-    .from('profiles')
-    .select('*, instructor_profiles(*)')
-    .eq('role', 'instructor')
-    .eq('instructor_profiles.is_approved', true)
+  let ipQuery = adminSupabase
+    .from('instructor_profiles')
+    .select('id, bio, tagline, career_history, years_experience, yoga_styles, languages, is_approved, created_at')
+    .eq('is_approved', true)
 
   if (concern) {
-    query = query.overlaps('instructor_profiles.yoga_styles', concern.yogaStyles)
+    ipQuery = ipQuery.overlaps('yoga_styles', concern.yogaStyles)
   } else if (params.style) {
-    query = query.contains('instructor_profiles.yoga_styles', [params.style])
+    ipQuery = ipQuery.contains('yoga_styles', [params.style])
   }
 
   if (params.language) {
-    query = query.contains('instructor_profiles.languages', [params.language])
+    ipQuery = ipQuery.contains('languages', [params.language])
   }
 
-  if (params.q) {
-    query = query.ilike('full_name', `%${params.q}%`)
+  const { data: ipRows } = await ipQuery.order('created_at', { ascending: false })
+  const approvedProfileIds = (ipRows || []).map((row: any) => row.id)
+
+  let instructors: any[] = []
+  if (approvedProfileIds.length > 0) {
+    let profileQuery = adminSupabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, avatar_position, avatar_zoom, role, created_at')
+      .eq('role', 'instructor')
+      .in('id', approvedProfileIds)
+
+    if (params.q) {
+      profileQuery = profileQuery.ilike('full_name', `%${params.q}%`)
+    }
+
+    const { data: profileRows } = await profileQuery
+    const profileMap = new Map((profileRows || []).map((p: any) => [p.id, p]))
+
+    instructors = (ipRows || [])
+      .map((ip: any) => {
+        const p = profileMap.get(ip.id)
+        if (!p) return null
+        return {
+          ...p,
+          instructor_profiles: ip,
+        }
+      })
+      .filter(Boolean)
   }
-  const { data: instructorsRaw } = await query.order('created_at', { ascending: false })
 
-  // Always prioritize the known second instructor row by ID to avoid same-name/mismatched rows.
-  const { data: pinnedInstructor } = await adminSupabase
-    .from('profiles')
-    .select('*, instructor_profiles(*)')
-    .eq('id', SECOND_INSTRUCTOR_ID)
-    .eq('role', 'instructor')
-    .single()
+  const hasFilter = Boolean(params.style || params.language || params.q || params.concern)
+  if (!hasFilter) {
+    const { data: pinnedProfile } = await adminSupabase
+      .from('profiles')
+      .select('id, full_name, avatar_url, avatar_position, avatar_zoom, role, created_at')
+      .eq('id', SECOND_INSTRUCTOR_ID)
+      .eq('role', 'instructor')
+      .maybeSingle()
 
-  const instructors = [...(instructorsRaw || [])]
-  if (pinnedInstructor?.instructor_profiles?.is_approved) {
-    const pinnedName = canonicalName(pinnedInstructor.full_name)
-    const filtered = instructors.filter((i: any) => {
-      if (i.id === SECOND_INSTRUCTOR_ID) return false
-      const nameMatches = pinnedName && canonicalName(i.full_name) === pinnedName
-      const iHasNoIntro = !(
-        i.instructor_profiles?.bio?.trim() ||
-        i.instructor_profiles?.tagline?.trim() ||
-        i.instructor_profiles?.career_history?.trim()
-      )
-      return !(nameMatches && iHasNoIntro)
-    })
-    filtered.push(pinnedInstructor)
-    filtered.sort((a: any, b: any) => {
-      const at = new Date(a.created_at || 0).getTime()
-      const bt = new Date(b.created_at || 0).getTime()
-      return bt - at
-    })
-    // Preserve original query limit characteristics.
-    instructors.splice(0, instructors.length, ...filtered.slice(0, Math.max(filtered.length, instructors.length || 0)))
+    const { data: pinnedIp } = await adminSupabase
+      .from('instructor_profiles')
+      .select('id, bio, tagline, career_history, years_experience, yoga_styles, languages, is_approved, created_at')
+      .eq('id', SECOND_INSTRUCTOR_ID)
+      .eq('is_approved', true)
+      .maybeSingle()
+
+    if (pinnedProfile && pinnedIp) {
+      const pinned = { ...pinnedProfile, instructor_profiles: pinnedIp }
+      const pinnedName = canonicalName(pinned.full_name)
+      const filtered = instructors.filter((i: any) => {
+        if (i.id === SECOND_INSTRUCTOR_ID) return false
+        const nameMatches = pinnedName && canonicalName(i.full_name) === pinnedName
+        const iHasNoIntro = !(
+          i.instructor_profiles?.bio?.trim() ||
+          i.instructor_profiles?.tagline?.trim() ||
+          i.instructor_profiles?.career_history?.trim()
+        )
+        return !(nameMatches && iHasNoIntro)
+      })
+      filtered.push(pinned)
+      instructors = filtered
+    }
   }
 
   return (
