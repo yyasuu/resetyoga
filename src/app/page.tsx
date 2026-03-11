@@ -696,9 +696,10 @@ export default async function LandingPage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-navy-300 dark:border-navy-500 text-navy-700 dark:text-navy-200 hover:bg-navy-50 dark:hover:bg-navy-800 rounded-full px-8"
+                  className="border-navy-300 dark:border-navy-500 text-navy-700 dark:text-navy-200 hover:bg-navy-50 dark:hover:bg-navy-800 rounded-full px-8 inline-flex items-center gap-2"
                 >
                   {t('instructors_btn')}
+                  <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
             </div>
