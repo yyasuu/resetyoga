@@ -83,7 +83,9 @@ const isAiriInstructor = (i: FeaturedInstructor) => {
 const selectFeaturedGuides = (list: FeaturedInstructor[]) => {
   const items = list.filter((i) => (i.full_name || '').trim().length > 0)
   const airi = items.find((i) => isAiriInstructor(i))
-  const sudhan = items.find((i) => isSudhanInstructor(i))
+  const sudhan =
+    items.find((i) => isSudhanInstructor(i)) ||
+    items.find((i) => canonicalName(i.full_name).includes('yogi'))
   const selected = [airi, sudhan].filter((v): v is FeaturedInstructor => Boolean(v))
 
   if (selected.length === 2) return selected
@@ -97,6 +99,16 @@ const displayYears = (instructor: FeaturedInstructor) => {
   const years = inferYearsExperience(instructor.instructor_profiles ?? {})
   if (years > 0) return years
   return isSudhanInstructor(instructor) ? 16 : 0
+}
+
+const instructorBlurb = (instructor: FeaturedInstructor) => {
+  const ip = instructor.instructor_profiles
+  const text = ip?.bio || ip?.tagline || ip?.career_history || ''
+  if (text && text.trim().length > 0) return text
+  if (isSudhanInstructor(instructor)) {
+    return 'Specialist instructor with 16 years of teaching experience, focusing on alignment, breathwork, and mindful recovery.'
+  }
+  return ''
 }
 
 export default async function LandingPage() {
@@ -665,9 +677,9 @@ export default async function LandingPage() {
                         </div>
                       </div>
                     </div>
-                    {(instructor.instructor_profiles?.bio || instructor.instructor_profiles?.tagline || instructor.instructor_profiles?.career_history) && (
+                    {instructorBlurb(instructor) && (
                       <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 leading-relaxed">
-                        {instructor.instructor_profiles.bio || instructor.instructor_profiles.tagline || instructor.instructor_profiles.career_history}
+                        {instructorBlurb(instructor)}
                       </p>
                     )}
                     {instructor.instructor_profiles?.yoga_styles?.length > 0 && (

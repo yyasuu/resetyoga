@@ -58,7 +58,14 @@ export function InstructorCard({
 
   const ip = instructor.instructor_profiles
   const hasRating = (ip?.rating ?? 0) > 0 && (ip?.total_reviews ?? 0) > 0
-  const bioText = ip?.bio?.trim() || ip?.tagline?.trim() || ip?.career_history?.trim() || ''
+  const fallbackSudhanBio =
+    'Specialist instructor with 16 years of teaching experience, focusing on alignment, breathwork, and mindful recovery.'
+  const normalizedName = (instructor.full_name || '').toLowerCase().replace(/\s+/g, ' ')
+  const isSudhan =
+    normalizedName.includes('yogi') &&
+    normalizedName.includes('athma') &&
+    normalizedName.includes('sudhan')
+  const bioText = ip?.bio?.trim() || ip?.tagline?.trim() || ip?.career_history?.trim() || (isSudhan ? fallbackSudhanBio : '')
 
   return (
     <>
