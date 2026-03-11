@@ -42,15 +42,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, alreadyApproved: true })
   }
 
-  // Update is_approved via admin client (bypasses RLS)
-  const { error: updateError } = await adminSupabase
+  // Upsert approval so "missing instructor_profiles row" doesn't cause infinite approve loop.
+  const { error: upsertError } = await adminSupabase
     .from('instructor_profiles')
-    .update({ is_approved: true })
-    .eq('id', instructorId)
+    .upsert({ id: instructorId, is_approved: true }, { onConflict: 'id' })
 
-  if (updateError) {
-    console.error('Failed to approve instructor in DB:', updateError)
-    return NextResponse.json({ error: updateError.message }, { status: 500 })
+  if (upsertError) {
+    console.error('Failed to approve instructor in DB:', upsertError)
+    return NextResponse.json({ error: upsertError.message }, { status: 500 })
   }
 
   try {

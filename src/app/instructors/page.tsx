@@ -14,6 +14,8 @@ interface SearchParams {
   concern?: string
 }
 
+const SECOND_INSTRUCTOR_ID = '5ea101c5-e9dc-48be-b347-f6769f219b55'
+
 const canonicalName = (name: string | null | undefined) =>
   (name || '').toLowerCase().replace(/[^a-z]/g, '')
 
@@ -97,7 +99,38 @@ export default async function InstructorsPage({
   if (params.q) {
     query = query.ilike('full_name', `%${params.q}%`)
   }
-  const { data: instructors } = await query.order('created_at', { ascending: false })
+  const { data: instructorsRaw } = await query.order('created_at', { ascending: false })
+
+  // Always prioritize the known second instructor row by ID to avoid same-name/mismatched rows.
+  const { data: pinnedInstructor } = await adminSupabase
+    .from('profiles')
+    .select('*, instructor_profiles(*)')
+    .eq('id', SECOND_INSTRUCTOR_ID)
+    .eq('role', 'instructor')
+    .single()
+
+  const instructors = [...(instructorsRaw || [])]
+  if (pinnedInstructor?.instructor_profiles?.is_approved) {
+    const pinnedName = canonicalName(pinnedInstructor.full_name)
+    const filtered = instructors.filter((i: any) => {
+      if (i.id === SECOND_INSTRUCTOR_ID) return false
+      const nameMatches = pinnedName && canonicalName(i.full_name) === pinnedName
+      const iHasNoIntro = !(
+        i.instructor_profiles?.bio?.trim() ||
+        i.instructor_profiles?.tagline?.trim() ||
+        i.instructor_profiles?.career_history?.trim()
+      )
+      return !(nameMatches && iHasNoIntro)
+    })
+    filtered.push(pinnedInstructor)
+    filtered.sort((a: any, b: any) => {
+      const at = new Date(a.created_at || 0).getTime()
+      const bt = new Date(b.created_at || 0).getTime()
+      return bt - at
+    })
+    // Preserve original query limit characteristics.
+    instructors.splice(0, instructors.length, ...filtered.slice(0, Math.max(filtered.length, instructors.length || 0)))
+  }
 
   return (
     <div className="min-h-screen bg-linen-50 dark:bg-navy-900">
