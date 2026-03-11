@@ -289,6 +289,7 @@ export default function InstructorProfilePage() {
               className="relative w-20 h-20 rounded-full bg-gray-100 dark:bg-navy-700 border-2 border-dashed border-gray-300 dark:border-navy-500 flex items-center justify-center hover:border-navy-400 transition-colors overflow-hidden flex-shrink-0 cursor-move"
               onPointerDown={(e) => {
                 if (!avatarPreview) return
+                e.preventDefault()
                 pointerIdRef.current = e.pointerId
                 movedRef.current = false
                 startAvatarDrag(e.clientX, e.clientY)
@@ -311,7 +312,7 @@ export default function InstructorProfilePage() {
                 if (!avatarPreview) return
                 e.preventDefault()
                 const delta = e.deltaY > 0 ? -0.05 : 0.05
-                setAvatarZoom((z) => clamp(z + delta, 1, 3))
+                setAvatarZoom((z) => clamp(z + delta, 0.5, 3))
               }}
               style={{ touchAction: 'none' }}
             >
@@ -369,7 +370,7 @@ export default function InstructorProfilePage() {
                 type="button"
                 variant="outline"
                 className="h-8 px-3 dark:border-navy-600 dark:text-navy-200"
-                onClick={() => setAvatarZoom((z) => clamp(z - 0.1, 1, 3))}
+                onClick={() => setAvatarZoom((z) => clamp(z - 0.1, 0.5, 3))}
               >
                 -
               </Button>
@@ -385,7 +386,7 @@ export default function InstructorProfilePage() {
             </div>
             <input
               type="range"
-              min={1}
+              min={0.5}
               max={3}
               step={0.05}
               value={avatarZoom}
@@ -393,9 +394,35 @@ export default function InstructorProfilePage() {
               className="w-full mt-2"
             />
             <div className="mt-1 flex justify-between text-xs text-gray-400 dark:text-navy-400">
-              <span>1.0x</span>
+              <span>0.5x</span>
               <span>{avatarZoom.toFixed(2)}x</span>
               <span>3.0x</span>
+            </div>
+            <div className="mt-3 space-y-2">
+              <div>
+                <Label className="dark:text-navy-200 text-xs">Horizontal / 左右</Label>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={avatarPosX}
+                  onChange={(e) => setAvatarPosX(Number(e.target.value))}
+                  className="w-full mt-1"
+                />
+              </div>
+              <div>
+                <Label className="dark:text-navy-200 text-xs">Vertical / 上下</Label>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={avatarPosY}
+                  onChange={(e) => setAvatarPosY(Number(e.target.value))}
+                  className="w-full mt-1"
+                />
+              </div>
             </div>
           </div>
         </Section>
