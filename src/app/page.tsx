@@ -210,13 +210,16 @@ export default async function LandingPage() {
 
       {/* ── Manifesto ────────────────────────────────────────────────── */}
       <section className="relative z-10 py-24 px-4 bg-linen-50 dark:bg-navy-900">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center">
           <div className="w-px h-16 bg-sage-200 dark:bg-sage-800 mx-auto mb-16" />
-          <p className="text-lg sm:text-xl text-navy-700 dark:text-linen-100 leading-loose font-light whitespace-nowrap">
+          <p className="text-3xl sm:text-4xl text-navy-800 dark:text-linen-100 leading-tight font-extrabold whitespace-nowrap">
             {t('manifesto_line1')}
           </p>
-          <p className="text-base sm:text-lg text-sage-600 dark:text-sage-400 leading-loose font-light mt-3 whitespace-nowrap">
+          <p className="text-xl sm:text-2xl text-sage-700 dark:text-sage-300 leading-relaxed font-medium mt-4 whitespace-nowrap">
             {t('manifesto_line2')}
+          </p>
+          <p className="text-base sm:text-lg text-navy-700/90 dark:text-navy-200 leading-relaxed mt-6 max-w-4xl mx-auto">
+            {t('mission_body')}
           </p>
           <div className="w-px h-16 bg-sage-200 dark:bg-sage-800 mx-auto mt-16" />
         </div>
