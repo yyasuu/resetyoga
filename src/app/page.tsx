@@ -141,7 +141,7 @@ export default async function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen font-playfair">
       <Navbar user={profile} />
 
       {/* ── Fixed hero background (shows only behind hero section) ───── */}
@@ -212,14 +212,40 @@ export default async function LandingPage() {
       <section className="relative z-10 py-24 px-4 bg-linen-50 dark:bg-navy-900">
         <div className="max-w-5xl mx-auto text-center">
           <div className="w-px h-16 bg-sage-200 dark:bg-sage-800 mx-auto mb-16" />
-          <p className="text-3xl sm:text-4xl text-navy-800 dark:text-linen-100 leading-tight font-extrabold whitespace-nowrap">
-            {t('manifesto_line1')}
+          <p className="text-6xl sm:text-7xl lg:text-8xl text-navy-800 dark:text-linen-100 leading-tight font-extrabold">
+            {locale === 'ja' ? (
+              <>
+                パーソナルヨガを、
+                <br className="sm:hidden" />
+                暮らしの中に。
+              </>
+            ) : (
+              t('manifesto_line1')
+            )}
           </p>
-          <p className="text-xl sm:text-2xl text-sage-700 dark:text-sage-300 leading-relaxed font-medium mt-4 whitespace-nowrap">
-            {t('manifesto_line2')}
+          <p className="text-xl sm:text-2xl text-sage-700 dark:text-sage-300 leading-relaxed font-medium mt-4">
+            {locale === 'ja' ? (
+              <>
+                忙しさの合間に、
+                <br className="sm:hidden" />
+                心と体をやさしくほどき、
+                <br className="sm:hidden" />
+                リセットを習慣化します。
+              </>
+            ) : (
+              t('manifesto_line2')
+            )}
           </p>
-          <p className="text-base sm:text-lg text-navy-700/90 dark:text-navy-200 leading-relaxed mt-6 max-w-4xl mx-auto">
-            {t('mission_body')}
+          <p className="text-base sm:text-lg text-navy-700/60 dark:text-navy-300 leading-relaxed mt-6 max-w-4xl mx-auto">
+            {locale === 'ja' ? (
+              <>
+                ウェルネスは贅沢品ではなく、すべての人に必要なものだと私たちは信じています。
+                <br />
+                Reset Yogaは世界水準のヨガを、誰でも、どこでも、いつでも届けます。
+              </>
+            ) : (
+              t('mission_body')
+            )}
           </p>
           <div className="w-px h-16 bg-sage-200 dark:bg-sage-800 mx-auto mt-16" />
         </div>
@@ -230,7 +256,15 @@ export default async function LandingPage() {
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest mb-4">{t('pain_label')}</p>
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10 break-keep">
-            {t('pain_title')}
+            {locale === 'ja' ? (
+              <>
+                忙しい毎日に、
+                <br className="sm:hidden" />
+                自分の時間は後回しになっていませんか？
+              </>
+            ) : (
+              t('pain_title')
+            )}
           </h2>
           <div className="divide-y divide-sage-100 dark:divide-navy-800 max-w-lg mx-auto mt-10">
             {[t('pain_1'), t('pain_2'), t('pain_3'), t('pain_4')].map((text) => (
@@ -323,7 +357,15 @@ export default async function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('free_content_label')}</p>
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-4">
-            {t('free_content_title')}
+            {locale === 'ja' ? (
+              <>
+                ヨガ以外にも、
+                <br className="sm:hidden" />
+                あなたを整えるコンテンツを
+              </>
+            ) : (
+              t('free_content_title')
+            )}
           </h2>
           <p className="text-center text-gray-500 dark:text-navy-400 mb-12">{t('free_content_subtitle')}</p>
 
@@ -580,7 +622,15 @@ export default async function LandingPage() {
         <div className="max-w-5xl mx-auto">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest text-center mb-4">{t('testimonials_label')}</p>
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">
-            {t('testimonials_title')}
+            {locale === 'ja' ? (
+              <>
+                初めての方が
+                <br className="sm:hidden" />
+                変わっていきます
+              </>
+            ) : (
+              t('testimonials_title')
+            )}
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
@@ -797,7 +847,15 @@ export default async function LandingPage() {
         <div className="max-w-2xl mx-auto text-center">
           <Sparkles className="h-10 w-10 text-sage-300 mx-auto mb-6" />
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-4 leading-tight break-keep">
-            {t('final_cta_title')}
+            {locale === 'ja' ? (
+              <>
+                今日から、自分のための45分を
+                <br className="sm:hidden" />
+                始めませんか？
+              </>
+            ) : (
+              t('final_cta_title')
+            )}
           </h2>
           <p className="text-navy-200 text-lg mb-10">
             {t('final_cta_subtitle')}

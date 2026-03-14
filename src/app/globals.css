@@ -7,7 +7,7 @@
 
 /* ─── Typography ──────────────────────────────────────────────────────────── */
 @theme {
-  --font-playfair: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-playfair: var(--font-playfair), var(--font-noto-serif-jp), "Playfair Display", "Noto Serif JP", Georgia, serif;
 }
 
 /* ─── Reset Yoga brand color palettes ─────────────────────────────────────── */

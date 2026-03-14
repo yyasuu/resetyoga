@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Playfair_Display } from 'next/font/google'
+import { Noto_Serif_JP, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
@@ -11,6 +11,13 @@ const playfair = Playfair_Display({
   weight: ['400', '500', '600', '700', '800'],
   style: ['normal', 'italic'],
   variable: '--font-playfair',
+  display: 'swap',
+})
+
+const notoSerifJp = Noto_Serif_JP({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-noto-serif-jp',
   display: 'swap',
 })
 
@@ -31,7 +38,7 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${playfair.variable} font-playfair`} suppressHydrationWarning>
+      <body className={`${playfair.variable} ${notoSerifJp.variable} font-playfair`} suppressHydrationWarning>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

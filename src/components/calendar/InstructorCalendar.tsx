@@ -40,6 +40,7 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
   const [editHour, setEditHour] = useState('9')
   const [editMinute, setEditMinute] = useState('00')
   const [editAmPm, setEditAmPm] = useState<'AM' | 'PM'>('AM')
+  const [clickedBase, setClickedBase] = useState<{ start: Date; end: Date } | null>(null)
 
   const toDateInput = (d: Date) => {
     const y = d.getFullYear()
@@ -89,7 +90,12 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
   }, [fetchSlots])
 
   const handleDateClick = (info: any) => {
-    const clickedDate = info.date
+    const clickedDate = new Date(info.date)
+    clickedDate.setSeconds(0, 0)
+    if (info.allDay) {
+      // Month view click has no hour context, so start from a practical default.
+      clickedDate.setHours(9, 0, 0, 0)
+    }
     const now = new Date()
 
     if (clickedDate < now) {
@@ -99,6 +105,7 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
 
     const start = clickedDate
     const end = addMinutes(start, 45)
+    setClickedBase({ start, end })
     setPendingSlot({ start, end })
     setEditDate(toDateInput(start))
     const h24 = start.getHours()
@@ -173,6 +180,7 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
 
     setConfirmAddOpen(false)
     setPendingSlot(null)
+    setClickedBase(null)
     setLoading(false)
   }
 
@@ -253,7 +261,16 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
       />
 
       {/* Confirm Add Dialog */}
-      <Dialog open={confirmAddOpen} onOpenChange={setConfirmAddOpen}>
+      <Dialog
+        open={confirmAddOpen}
+        onOpenChange={(open) => {
+          setConfirmAddOpen(open)
+          if (!open) {
+            setPendingSlot(null)
+            setClickedBase(null)
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Teaching Slot</DialogTitle>
@@ -386,6 +403,23 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
             <Button variant="outline" onClick={() => setConfirmAddOpen(false)}>
               Cancel
             </Button>
+            {clickedBase && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setEditDate(toDateInput(clickedBase.start))
+                  const h24 = clickedBase.start.getHours()
+                  const isPm = h24 >= 12
+                  const h12 = h24 % 12 || 12
+                  setEditHour(String(h12))
+                  setEditMinute(String(clickedBase.start.getMinutes()).padStart(2, '0'))
+                  setEditAmPm(isPm ? 'PM' : 'AM')
+                }}
+              >
+                Use Clicked Time
+              </Button>
+            )}
             <Button
               className="bg-navy-600 hover:bg-navy-700"
               onClick={confirmAddSlot}
