@@ -212,7 +212,7 @@ export default async function LandingPage() {
       <section className="relative z-10 py-24 px-4 bg-linen-50 dark:bg-navy-900">
         <div className="max-w-5xl mx-auto text-center">
           <div className="w-px h-16 bg-sage-200 dark:bg-sage-800 mx-auto mb-16" />
-          <p className="text-6xl sm:text-7xl lg:text-8xl text-navy-800 dark:text-linen-100 leading-tight font-extrabold">
+          <p className="text-[2.7rem] sm:text-5xl lg:text-6xl text-navy-800 dark:text-linen-100 leading-tight font-extrabold">
             {locale === 'ja' ? (
               <>
                 パーソナルヨガを、
@@ -253,9 +253,9 @@ export default async function LandingPage() {
 
       {/* ── Pain Points ──────────────────────────────────────────────── */}
       <section className="relative z-10 py-20 px-4 bg-sage-50 dark:bg-navy-900">
-        <div className="max-w-3xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest mb-4">{t('pain_label')}</p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10 break-keep">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10 break-keep sm:whitespace-nowrap">
             {locale === 'ja' ? (
               <>
                 忙しい毎日に、
@@ -359,8 +359,6 @@ export default async function LandingPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-4">
             {locale === 'ja' ? (
               <>
-                ヨガ以外にも、
-                <br className="sm:hidden" />
                 あなたを整えるコンテンツを
               </>
             ) : (
@@ -624,9 +622,11 @@ export default async function LandingPage() {
           <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-12">
             {locale === 'ja' ? (
               <>
-                初めての方が
-                <br className="sm:hidden" />
-                変わっていきます
+                <span className="hidden sm:inline">初めての方が変わっていきます</span>
+                <span className="sm:hidden block max-w-xs mx-auto">
+                  <span className="block text-left">初めての方が</span>
+                  <span className="block text-right">変わっていきます</span>
+                </span>
               </>
             ) : (
               t('testimonials_title')
