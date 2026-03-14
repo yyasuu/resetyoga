@@ -194,6 +194,21 @@ export function Navbar({ user }: NavbarProps) {
                     >
                       Wellness Library
                     </button>
+                    {user?.role === 'instructor' ? (
+                      <button
+                        onClick={() => { setUserOpen(false); router.push('/instructor/profile') }}
+                        className={dropdownItem}
+                      >
+                        Profile Settings / プロフィール
+                      </button>
+                    ) : user?.role === 'student' ? (
+                      <button
+                        onClick={() => { setUserOpen(false); router.push('/account') }}
+                        className={dropdownItem}
+                      >
+                        Account Settings / 設定
+                      </button>
+                    ) : null}
                     {user?.role === 'admin' && (
                       <>
                         <div className="my-1 border-t border-gray-100 dark:border-navy-700" />
@@ -315,6 +330,23 @@ export function Navbar({ user }: NavbarProps) {
               >
                 Wellness Library
               </Link>
+              {user?.role === 'instructor' ? (
+                <Link
+                  href="/instructor/profile"
+                  className="block text-gray-600 dark:text-gray-300 font-medium"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Profile Settings / プロフィール
+                </Link>
+              ) : user?.role === 'student' ? (
+                <Link
+                  href="/account"
+                  className="block text-gray-600 dark:text-gray-300 font-medium"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Account Settings / 設定
+                </Link>
+              ) : null}
               <button onClick={handleLogout} className="block text-red-600 dark:text-red-400 font-medium">
                 {t('logout')}
               </button>

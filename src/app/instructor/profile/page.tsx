@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Navbar } from '@/components/layout/Navbar'
@@ -16,8 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { TimezoneCombobox } from '@/components/ui/timezone-combobox'
 import { toast } from 'sonner'
-import { YOGA_STYLES, LANGUAGES, getTimezoneOptions, Profile, InstructorProfile, InstructorPayoutInfo } from '@/types'
+import { YOGA_STYLES, LANGUAGES, Profile, InstructorProfile, InstructorPayoutInfo } from '@/types'
 import { Camera, Plus, X, Instagram, Youtube, Landmark, User, BookOpen, Award, CreditCard } from 'lucide-react'
 import Image from 'next/image'
 
@@ -111,7 +112,6 @@ export default function InstructorProfilePage() {
   const [ifscCode, setIfscCode] = useState('')
   const [accountNumber, setAccountNumber] = useState('')
   const [accountHolderName, setAccountHolderName] = useState('')
-  const timezoneOptions = useMemo(() => getTimezoneOptions(), [])
 
   useEffect(() => {
     const load = async () => {
@@ -352,16 +352,11 @@ export default function InstructorProfilePage() {
 
           <div>
             <Label className="dark:text-navy-200">{tOnb('your_timezone')}</Label>
-            <Select value={timezone} onValueChange={setTimezone}>
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {timezoneOptions.map((tz) => (
-                  <SelectItem key={tz.value} value={tz.value}>{tz.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <TimezoneCombobox
+              value={timezone}
+              onValueChange={setTimezone}
+              className="mt-1"
+            />
           </div>
 
           <div>
@@ -606,7 +601,7 @@ export default function InstructorProfilePage() {
         </Section>
 
         <Button
-          className="w-full bg-navy-600 hover:bg-navy-700 h-12 text-base rounded-full"
+          className="w-full bg-navy-600 hover:bg-navy-700 text-white h-12 text-base rounded-full"
           onClick={handleSave}
           disabled={saving}
         >

@@ -4,7 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { Profile } from '@/types'
-import { Star, Clock, Globe, Award, FileText, MessageSquare } from 'lucide-react'
+import { Star, Clock, Globe, Award, FileText, MessageSquare, CalendarDays } from 'lucide-react'
 import { StudentBookingCalendar } from '@/components/calendar/StudentBookingCalendar'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { format } from 'date-fns'
@@ -179,17 +179,24 @@ export default async function InstructorDetailPage({
                 <TabsList className="w-full h-auto grid grid-cols-1 gap-3 bg-transparent p-0">
                   <TabsTrigger
                     value="about"
-                    className="w-full h-14 justify-start gap-3 rounded-xl border border-navy-200 dark:border-navy-600 bg-navy-50 dark:bg-navy-700 text-navy-700 dark:text-navy-100 text-base font-semibold data-[state=active]:bg-navy-600 data-[state=active]:text-white data-[state=active]:border-navy-600"
+                    className="w-full h-14 justify-start gap-3 rounded-xl border border-navy-200 dark:border-navy-600 bg-navy-50 dark:bg-navy-700 text-navy-700 dark:text-gray-100 text-base font-semibold data-[state=active]:bg-navy-600 data-[state=active]:text-white data-[state=active]:border-navy-600 dark:data-[state=active]:bg-navy-600 dark:data-[state=active]:text-white dark:data-[state=active]:border-navy-600"
                   >
                     <FileText className="h-6 w-6" />
                     Details / About
                   </TabsTrigger>
                   <TabsTrigger
                     value="reviews"
-                    className="w-full h-14 justify-start gap-3 rounded-xl border border-sage-200 dark:border-sage-700 bg-sage-50 dark:bg-sage-900/20 text-sage-700 dark:text-sage-200 text-base font-semibold data-[state=active]:bg-sage-600 data-[state=active]:text-white data-[state=active]:border-sage-600"
+                    className="w-full h-14 justify-start gap-3 rounded-xl border border-sage-200 dark:border-sage-700 bg-sage-50 dark:bg-sage-900/20 text-sage-700 dark:text-gray-100 text-base font-semibold data-[state=active]:bg-sage-600 data-[state=active]:text-white data-[state=active]:border-sage-600 dark:data-[state=active]:bg-sage-600 dark:data-[state=active]:text-white dark:data-[state=active]:border-sage-600"
                   >
                     <MessageSquare className="h-6 w-6" />
                     Reviews
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="book"
+                    className="lg:hidden w-full h-14 justify-start gap-3 rounded-xl border border-indigo-200 dark:border-indigo-700 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-gray-100 text-base font-semibold data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:border-indigo-600 dark:data-[state=active]:bg-indigo-600 dark:data-[state=active]:text-white dark:data-[state=active]:border-indigo-600"
+                  >
+                    <CalendarDays className="h-6 w-6" />
+                    Book a Session
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -198,9 +205,11 @@ export default async function InstructorDetailPage({
 
           {/* ── Right: Tabs ── */}
           <div className="lg:col-span-2">
-              <TabsList className="mb-6 dark:bg-navy-800 dark:border-navy-700">
-                <TabsTrigger value="book">Book a Session</TabsTrigger>
-              </TabsList>
+              <div className="hidden lg:block mb-6">
+                <TabsList className="dark:bg-navy-800 dark:border-navy-700">
+                  <TabsTrigger value="book">Book a Session</TabsTrigger>
+                </TabsList>
+              </div>
 
               {/* Book */}
               <TabsContent value="book">

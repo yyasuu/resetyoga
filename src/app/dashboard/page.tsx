@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
-import { Calendar, Search, Video, AlertCircle, FileText, BookOpen } from 'lucide-react'
+import { Calendar, Search, Video, AlertCircle, FileText, BookOpen, Settings } from 'lucide-react'
 import { cookies } from 'next/headers'
 import { StudentSubscription } from '@/types'
 import { AccountCancelButton } from '@/components/account/AccountCancelButton'
@@ -238,6 +238,12 @@ export default async function StudentDashboardPage() {
                   <Button variant="outline" className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700">
                     <FileText className="h-4 w-4 text-gray-500 dark:text-navy-400" />
                     {locale === 'ja' ? '生徒利用規約' : 'Student Terms'}
+                  </Button>
+                </Link>
+                <Link href="/account">
+                  <Button variant="outline" className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700">
+                    <Settings className="h-4 w-4 text-gray-500 dark:text-navy-400" />
+                    {locale === 'ja' ? 'アカウント設定' : 'Account Settings'}
                   </Button>
                 </Link>
                 <AccountCancelButton role="student" />

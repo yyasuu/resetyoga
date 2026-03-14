@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, Suspense, useMemo } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslations } from 'next-intl'
@@ -14,8 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { TimezoneCombobox } from '@/components/ui/timezone-combobox'
 import { toast } from 'sonner'
-import { YOGA_STYLES, LANGUAGES, getTimezoneOptions } from '@/types'
+import { YOGA_STYLES, LANGUAGES } from '@/types'
 import {
   GraduationCap, BookOpen, CheckCircle, Camera, Plus, X,
   ChevronLeft, ChevronRight, Instagram, Youtube, Landmark,
@@ -392,7 +393,6 @@ function OnboardingForm() {
   }
 
   const [stripeNeedsLogin, setStripeNeedsLogin] = useState(false)
-  const timezoneOptions = useMemo(() => getTimezoneOptions(), [])
 
   const handleStripeConnect = async () => {
     setStripeConnecting(true)
@@ -723,16 +723,12 @@ function OnboardingForm() {
                 htmlFor="timezone"
                 tooltip="Select the timezone where you live or teach. This helps us show your availability correctly to students around the world."
               />
-              <Select value={timezone} onValueChange={setTimezone}>
-                <SelectTrigger className="mt-1" id="timezone">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {timezoneOptions.map(tz => (
-                    <SelectItem key={tz.value} value={tz.value}>{tz.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <TimezoneCombobox
+                id="timezone"
+                value={timezone}
+                onValueChange={setTimezone}
+                className="mt-1"
+              />
             </div>
 
             {role === 'instructor' && (

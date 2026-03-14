@@ -34,9 +34,9 @@ export default async function AvailabilityPage() {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900">{t('availability_title')}</h1>
           <p className="text-gray-500 mt-1">{t('availability_desc')}</p>
-          <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-navy-700 bg-navy-50 border border-navy-200 rounded-full px-3 py-1">
+          <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-navy-700 dark:text-navy-200 bg-navy-50 dark:bg-navy-800 border border-navy-200 dark:border-navy-600 rounded-full px-3 py-1">
             🌏 Your schedule timezone: <strong>{instructorTimezone}</strong>
-            <a href="/instructor/profile#timezone" className="ml-1 text-xs text-navy-500 hover:underline">Change →</a>
+            <a href="/instructor/profile#timezone" className="ml-1 text-xs text-navy-500 dark:text-sage-400 hover:underline">Change →</a>
           </p>
         </div>
 
