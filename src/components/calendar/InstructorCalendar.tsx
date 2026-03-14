@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { TimeSlot } from '@/types'
-import { addMinutes, format } from 'date-fns'
+import { addMinutes, addWeeks, addMonths, format } from 'date-fns'
 
 interface InstructorCalendarProps {
   instructorId: string
@@ -34,6 +34,8 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
   const [confirmAddOpen, setConfirmAddOpen] = useState(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [repeatType, setRepeatType] = useState<'none' | 'weekly' | 'monthly'>('none')
+  const [repeatCount, setRepeatCount] = useState(4)
 
   const fetchSlots = useCallback(async () => {
     const { data: slots } = await supabase
@@ -75,7 +77,18 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
     const start = clickedDate
     const end = addMinutes(start, 45)
     setPendingSlot({ start, end })
+    setRepeatType('none')
+    setRepeatCount(4)
     setConfirmAddOpen(true)
+  }
+
+  const getOccurrenceStarts = () => {
+    if (!pendingSlot) return []
+    if (repeatType === 'none') return [pendingSlot.start]
+    const count = Math.max(1, Math.min(repeatCount, 24))
+    return Array.from({ length: count }, (_, i) =>
+      repeatType === 'weekly' ? addWeeks(pendingSlot.start, i) : addMonths(pendingSlot.start, i)
+    )
   }
 
   const handleEventClick = (info: any) => {
@@ -89,20 +102,34 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
   const confirmAddSlot = async () => {
     if (!pendingSlot) return
     setLoading(true)
+    const starts = getOccurrenceStarts()
+    let ok = 0
+    let ng = 0
+    let firstError = ''
 
-    const res = await fetch('/api/availability/create', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ startTime: pendingSlot.start.toISOString() }),
-    })
-    const json = await res.json()
-
-    if (!res.ok) {
-      toast.error(json.error || 'Failed to add slot')
-    } else {
-      toast.success(t('slot_added'))
-      await fetchSlots()
+    for (const start of starts) {
+      const res = await fetch('/api/availability/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ startTime: start.toISOString() }),
+      })
+      const json = await res.json().catch(() => null)
+      if (res.ok) {
+        ok += 1
+      } else {
+        ng += 1
+        if (!firstError) firstError = json?.error || 'Failed to add slot'
+      }
     }
+
+    if (ng === 0) {
+      toast.success(ok > 1 ? `${ok} slots added` : t('slot_added'))
+    } else if (ok > 0) {
+      toast.warning(`${ok} slots added, ${ng} failed${firstError ? ` (${firstError})` : ''}`)
+    } else {
+      toast.error(firstError || 'Failed to add slots')
+    }
+    await fetchSlots()
 
     setConfirmAddOpen(false)
     setPendingSlot(null)
@@ -199,6 +226,67 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
               <p className="text-navy-600 font-medium">
                 {format(pendingSlot.start, 'h:mm a')} – {format(pendingSlot.end, 'h:mm a')}
               </p>
+
+              <div className="mt-4 rounded-xl border border-gray-200 p-3 space-y-3">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Repeat / 繰り返し</p>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setRepeatType('none')}
+                    className={`px-3 py-2 rounded-lg text-sm border ${repeatType === 'none' ? 'bg-navy-600 text-white border-navy-600' : 'border-gray-200 text-gray-700 hover:border-navy-300'}`}
+                  >
+                    Once
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRepeatType('weekly')}
+                    className={`px-3 py-2 rounded-lg text-sm border ${repeatType === 'weekly' ? 'bg-navy-600 text-white border-navy-600' : 'border-gray-200 text-gray-700 hover:border-navy-300'}`}
+                  >
+                    Weekly
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRepeatType('monthly')}
+                    className={`px-3 py-2 rounded-lg text-sm border ${repeatType === 'monthly' ? 'bg-navy-600 text-white border-navy-600' : 'border-gray-200 text-gray-700 hover:border-navy-300'}`}
+                  >
+                    Monthly
+                  </button>
+                </div>
+
+                {repeatType !== 'none' && (
+                  <div className="space-y-2">
+                    <label className="text-xs text-gray-500">How many times? / 回数</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={1}
+                        max={24}
+                        value={repeatCount}
+                        onChange={(e) => setRepeatCount(Number(e.target.value))}
+                        className="w-20 px-2 py-1.5 border border-gray-200 rounded-md text-sm"
+                      />
+                      <div className="flex gap-1.5">
+                        {[4, 8, 12].map((n) => (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => setRepeatCount(n)}
+                            className={`px-2 py-1 rounded-md text-xs border ${repeatCount === n ? 'bg-sage-600 text-white border-sage-600' : 'border-gray-200 text-gray-600'}`}
+                          >
+                            {n}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="text-xs text-gray-500">
+                  {repeatType === 'none'
+                    ? '1 slot will be created.'
+                    : `${Math.max(1, Math.min(repeatCount, 24))} slots will be created (${repeatType}).`}
+                </div>
+              </div>
             </div>
           )}
           <DialogFooter>
