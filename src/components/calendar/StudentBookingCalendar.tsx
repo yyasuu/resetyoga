@@ -32,7 +32,7 @@ interface StudentBookingCalendarProps {
 export function StudentBookingCalendar({
   instructorId,
   instructorName,
-  studentTimezone = 'local',
+  studentTimezone = 'Asia/Tokyo',
 }: StudentBookingCalendarProps) {
   const t = useTranslations('instructors')
   const tBook = useTranslations('booking')
@@ -215,8 +215,8 @@ export function StudentBookingCalendar({
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <div className="mb-3 flex items-center gap-2 text-sm text-gray-600 flex-wrap">
+      <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-4">
+        <div className="mb-3 flex items-center gap-2 text-sm text-gray-600 dark:text-navy-200 flex-wrap">
           <div className="w-4 h-4 rounded bg-green-500 flex-shrink-0" />
           <span>Available 45-min slot — click to book</span>
           {studentTimezone !== 'local' && (
@@ -226,29 +226,31 @@ export function StudentBookingCalendar({
           )}
         </div>
 
-        <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, luxonPlugin]}
-          initialView="timeGridWeek"
-          timeZone={studentTimezone}
-          headerToolbar={{
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek',
-          }}
-          events={events}
-          eventClick={handleEventClick}
-          slotMinTime="00:00:00"
-          slotMaxTime="24:00:00"
-          slotDuration="00:15:00"
-          height="auto"
-          nowIndicator={true}
-          eventContent={(eventInfo) => (
-            <div className="px-1 py-0.5 overflow-hidden cursor-pointer">
-              <p className="font-semibold text-xs">{eventInfo.event.title}</p>
-              <p className="text-xs opacity-80">45 min</p>
-            </div>
-          )}
-        />
+        <div className="booking-fc">
+          <FullCalendar
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, luxonPlugin]}
+            initialView="timeGridWeek"
+            timeZone={studentTimezone}
+            headerToolbar={{
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,timeGridWeek',
+            }}
+            events={events}
+            eventClick={handleEventClick}
+            slotMinTime="00:00:00"
+            slotMaxTime="24:00:00"
+            slotDuration="00:15:00"
+            height="auto"
+            nowIndicator={true}
+            eventContent={(eventInfo) => (
+              <div className="px-1 py-0.5 overflow-hidden cursor-pointer">
+                <p className="font-semibold text-xs">{eventInfo.event.title}</p>
+                <p className="text-xs opacity-80">45 min</p>
+              </div>
+            )}
+          />
+        </div>
       </div>
 
       {/* Confirm Booking Dialog */}

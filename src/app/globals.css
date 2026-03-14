@@ -250,6 +250,60 @@
 .rich-content hr { border: none; border-top: 2px solid theme('colors.gray.200'); margin: 1.5rem 0; }
 .dark .rich-content hr { border-top-color: theme('colors.slate.600'); }
 
+/* ─── FullCalendar dark mode (student + instructor booking calendars) ───── */
+.dark .booking-fc .fc,
+.dark .instructor-fc .fc {
+  --fc-border-color: rgb(71 85 105 / 0.55);
+  --fc-neutral-bg-color: rgb(30 41 59 / 0.6);
+  --fc-page-bg-color: rgb(15 23 42);
+  --fc-list-event-hover-bg-color: rgb(30 41 59);
+  --fc-today-bg-color: rgb(20 83 45 / 0.22);
+  color: rgb(226 232 240);
+}
+
+.dark .booking-fc .fc-theme-standard td,
+.dark .booking-fc .fc-theme-standard th,
+.dark .instructor-fc .fc-theme-standard td,
+.dark .instructor-fc .fc-theme-standard th {
+  border-color: rgb(71 85 105 / 0.55);
+}
+
+.dark .booking-fc .fc-col-header-cell,
+.dark .instructor-fc .fc-col-header-cell {
+  background: rgb(15 23 42);
+}
+
+.dark .booking-fc .fc-timegrid-slot,
+.dark .booking-fc .fc-scrollgrid,
+.dark .instructor-fc .fc-timegrid-slot,
+.dark .instructor-fc .fc-scrollgrid {
+  background: rgb(15 23 42);
+}
+
+.dark .booking-fc .fc-toolbar-title,
+.dark .booking-fc .fc-col-header-cell-cushion,
+.dark .booking-fc .fc-timegrid-axis-cushion,
+.dark .booking-fc .fc-timegrid-slot-label-cushion,
+.dark .instructor-fc .fc-toolbar-title,
+.dark .instructor-fc .fc-col-header-cell-cushion,
+.dark .instructor-fc .fc-timegrid-axis-cushion,
+.dark .instructor-fc .fc-timegrid-slot-label-cushion {
+  color: rgb(226 232 240);
+}
+
+.dark .booking-fc .fc-button-primary,
+.dark .instructor-fc .fc-button-primary {
+  background-color: rgb(30 41 59);
+  border-color: rgb(71 85 105);
+  color: rgb(226 232 240);
+}
+
+.dark .booking-fc .fc-button-primary:hover,
+.dark .instructor-fc .fc-button-primary:hover {
+  background-color: rgb(51 65 85);
+  border-color: rgb(100 116 139);
+}
+
 /* ─── Base layer ──────────────────────────────────────────────────────────── */
 @layer base {
   * {

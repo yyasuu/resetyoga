@@ -227,19 +227,19 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
   const previewEnd = previewStart ? addMinutes(previewStart, 45) : null
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+    <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-4 sm:p-6">
       <div className="mb-4 flex flex-wrap gap-4 text-sm">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-green-500" />
-          <span className="text-gray-600">Available (click to remove)</span>
+          <span className="text-gray-600 dark:text-navy-200">Available (click to remove)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-navy-500" />
-          <span className="text-gray-600">Booked by student</span>
+          <span className="text-gray-600 dark:text-navy-200">Booked by student</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-dashed border-gray-300" />
-          <span className="text-gray-600">Click empty time to add 45-min slot</span>
+          <span className="text-gray-600 dark:text-navy-200">Click empty time to add 45-min slot</span>
         </div>
         {timezone !== 'local' && (
           <div className="ml-auto flex items-center gap-1.5 text-xs text-navy-600 bg-navy-50 border border-navy-200 rounded-full px-3 py-1">
@@ -248,33 +248,35 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
         )}
       </div>
 
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, luxonPlugin]}
-        initialView="timeGridWeek"
-        timeZone={timezone}
-        headerToolbar={{
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay',
-        }}
-        events={events}
-        dateClick={handleDateClick}
-        eventClick={handleEventClick}
-        slotMinTime="00:00:00"
-        slotMaxTime="24:00:00"
-        slotDuration="00:15:00"
-        slotLabelInterval="01:00"
-        height="auto"
-        nowIndicator={true}
-        selectable={false}
-        eventContent={(eventInfo) => (
-          <div className="px-1 py-0.5 overflow-hidden">
-            <p className="font-semibold text-xs leading-tight">{eventInfo.event.title}</p>
-            <p className="text-xs opacity-80">45 min</p>
-          </div>
-        )}
-      />
+      <div className="instructor-fc">
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, luxonPlugin]}
+          initialView="timeGridWeek"
+          timeZone={timezone}
+          headerToolbar={{
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay',
+          }}
+          events={events}
+          dateClick={handleDateClick}
+          eventClick={handleEventClick}
+          slotMinTime="00:00:00"
+          slotMaxTime="24:00:00"
+          slotDuration="00:15:00"
+          slotLabelInterval="01:00"
+          height="auto"
+          nowIndicator={true}
+          selectable={false}
+          eventContent={(eventInfo) => (
+            <div className="px-1 py-0.5 overflow-hidden">
+              <p className="font-semibold text-xs leading-tight">{eventInfo.event.title}</p>
+              <p className="text-xs opacity-80">45 min</p>
+            </div>
+          )}
+        />
+      </div>
 
       {/* Confirm Add Dialog */}
       <Dialog

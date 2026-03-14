@@ -207,7 +207,7 @@ export default async function InstructorDetailPage({
                 <StudentBookingCalendar
                   instructorId={id}
                   instructorName={instructor.full_name || 'Instructor'}
-                  studentTimezone={currentProfile?.timezone ?? 'UTC'}
+                  studentTimezone={currentProfile?.timezone ?? 'Asia/Tokyo'}
                 />
               </TabsContent>
 
