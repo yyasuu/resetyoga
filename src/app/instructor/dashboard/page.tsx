@@ -214,7 +214,7 @@ export default async function InstructorDashboardPage() {
                 <p>{locale === 'ja' ? '予定のセッションはありません' : 'No upcoming sessions'}</p>
                 <Link href="/instructor/availability" className="mt-3 inline-block">
                   <Button size="sm" className="bg-navy-600 hover:bg-navy-700 text-white">
-                    {locale === 'ja' ? '空き枠を追加' : 'Set Availability'}
+                    {locale === 'ja' ? 'レッスン枠を追加' : 'Add Teaching Slots'}
                   </Button>
                 </Link>
               </div>
@@ -231,7 +231,7 @@ export default async function InstructorDashboardPage() {
                 <Link href="/instructor/availability">
                   <Button variant="outline" className="w-full justify-start gap-2 dark:border-navy-600 dark:text-gray-200 dark:hover:bg-navy-700">
                     <Calendar className="h-4 w-4 text-navy-600 dark:text-navy-400" />
-                    {locale === 'ja' ? '空き枠を管理' : 'Manage Availability'}
+                    {locale === 'ja' ? 'レッスン枠を管理' : 'Manage Teaching Slots'}
                   </Button>
                 </Link>
                 <Link href="/instructor/bookings">

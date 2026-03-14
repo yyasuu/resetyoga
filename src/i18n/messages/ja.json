@@ -251,8 +251,8 @@
   "instructor": {
     "dashboard_title": "講師ダッシュボード",
     "upcoming_bookings": "予定されているクラス",
-    "availability": "空き時間の管理",
-    "availability_title": "空き時間を設定する",
+    "availability": "レッスン枠を管理",
+    "availability_title": "レッスン枠を作成・管理",
     "availability_desc": "カレンダーをクリックして45分の授業枠を追加できます。生徒がこの枠を予約できます。",
     "add_slot": "カレンダーの任意の時間をクリックして枠を追加",
     "slot_added": "枠を追加しました",

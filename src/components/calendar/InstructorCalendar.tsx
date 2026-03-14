@@ -36,6 +36,29 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
   const [loading, setLoading] = useState(false)
   const [repeatType, setRepeatType] = useState<'none' | 'weekly' | 'monthly'>('none')
   const [repeatCount, setRepeatCount] = useState(4)
+  const [editDate, setEditDate] = useState('')
+  const [editHour, setEditHour] = useState('9')
+  const [editMinute, setEditMinute] = useState('00')
+  const [editAmPm, setEditAmPm] = useState<'AM' | 'PM'>('AM')
+
+  const toDateInput = (d: Date) => {
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+
+  const buildStartFromInputs = () => {
+    if (!editDate) return null
+    const [y, m, d] = editDate.split('-').map(Number)
+    if (!y || !m || !d) return null
+    let h = Number(editHour)
+    const mm = Number(editMinute)
+    if (!Number.isFinite(h) || !Number.isFinite(mm)) return null
+    if (h === 12) h = 0
+    if (editAmPm === 'PM') h += 12
+    return new Date(y, m - 1, d, h, mm, 0, 0)
+  }
 
   const fetchSlots = useCallback(async () => {
     const { data: slots } = await supabase
@@ -77,17 +100,25 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
     const start = clickedDate
     const end = addMinutes(start, 45)
     setPendingSlot({ start, end })
+    setEditDate(toDateInput(start))
+    const h24 = start.getHours()
+    const isPm = h24 >= 12
+    const h12 = h24 % 12 || 12
+    setEditHour(String(h12))
+    setEditMinute(String(start.getMinutes()).padStart(2, '0'))
+    setEditAmPm(isPm ? 'PM' : 'AM')
     setRepeatType('none')
     setRepeatCount(4)
     setConfirmAddOpen(true)
   }
 
   const getOccurrenceStarts = () => {
-    if (!pendingSlot) return []
-    if (repeatType === 'none') return [pendingSlot.start]
+    const baseStart = buildStartFromInputs()
+    if (!baseStart) return []
+    if (repeatType === 'none') return [baseStart]
     const count = Math.max(1, Math.min(repeatCount, 24))
     return Array.from({ length: count }, (_, i) =>
-      repeatType === 'weekly' ? addWeeks(pendingSlot.start, i) : addMonths(pendingSlot.start, i)
+      repeatType === 'weekly' ? addWeeks(baseStart, i) : addMonths(baseStart, i)
     )
   }
 
@@ -101,6 +132,15 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
 
   const confirmAddSlot = async () => {
     if (!pendingSlot) return
+    const baseStart = buildStartFromInputs()
+    if (!baseStart) {
+      toast.error('Please set valid date/time')
+      return
+    }
+    if (baseStart < new Date()) {
+      toast.error('Cannot add slots in the past')
+      return
+    }
     setLoading(true)
     const starts = getOccurrenceStarts()
     let ok = 0
@@ -158,6 +198,9 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
     setSelectedSlot(null)
     setLoading(false)
   }
+
+  const previewStart = buildStartFromInputs() ?? pendingSlot?.start ?? null
+  const previewEnd = previewStart ? addMinutes(previewStart, 45) : null
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
@@ -220,12 +263,62 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
               <p className="text-gray-700">
                 Add a 45-minute available slot on:
               </p>
-              <p className="font-bold text-gray-900 mt-2">
-                {format(pendingSlot.start, 'EEEE, MMMM d, yyyy')}
-              </p>
-              <p className="text-navy-600 font-medium">
-                {format(pendingSlot.start, 'h:mm a')} – {format(pendingSlot.end, 'h:mm a')}
-              </p>
+              {previewStart && previewEnd && (
+                <>
+                  <p className="font-bold text-gray-900 mt-2">
+                    {format(previewStart, 'EEEE, MMMM d, yyyy')}
+                  </p>
+                  <p className="text-navy-600 font-medium">
+                    {format(previewStart, 'h:mm a')} – {format(previewEnd, 'h:mm a')}
+                  </p>
+                </>
+              )}
+
+              <div className="mt-4 rounded-xl border border-gray-200 p-3 space-y-3">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Date & Time / 日付と時間</p>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs text-gray-500">Date</label>
+                    <input
+                      type="date"
+                      value={editDate}
+                      onChange={(e) => setEditDate(e.target.value)}
+                      className="mt-1 w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">Time</label>
+                    <div className="mt-1 grid grid-cols-3 gap-2">
+                      <select
+                        value={editHour}
+                        onChange={(e) => setEditHour(e.target.value)}
+                        className="px-2 py-2 border border-gray-200 rounded-lg text-sm"
+                      >
+                        {Array.from({ length: 12 }, (_, i) => String(i + 1)).map((h) => (
+                          <option key={h} value={h}>{h}</option>
+                        ))}
+                      </select>
+                      <select
+                        value={editMinute}
+                        onChange={(e) => setEditMinute(e.target.value)}
+                        className="px-2 py-2 border border-gray-200 rounded-lg text-sm"
+                      >
+                        {['00', '15', '30', '45'].map((m) => (
+                          <option key={m} value={m}>{m}</option>
+                        ))}
+                      </select>
+                      <select
+                        value={editAmPm}
+                        onChange={(e) => setEditAmPm((e.target.value as 'AM' | 'PM'))}
+                        className="px-2 py-2 border border-gray-200 rounded-lg text-sm"
+                      >
+                        <option value="AM">AM</option>
+                        <option value="PM">PM</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <div className="mt-4 rounded-xl border border-gray-200 p-3 space-y-3">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Repeat / 繰り返し</p>
