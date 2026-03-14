@@ -125,6 +125,13 @@ export function Navbar({ user }: NavbarProps) {
             </Link>
 
             <Link
+              href="/vision"
+              className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-navy-700 dark:hover:text-sage-400 transition-colors"
+            >
+              Vision
+            </Link>
+
+            <Link
               href="/corporate"
               className="text-sm font-medium text-navy-600 dark:text-navy-300 hover:text-navy-800 dark:hover:text-sage-400 transition-colors"
             >
@@ -277,6 +284,13 @@ export function Navbar({ user }: NavbarProps) {
             onClick={() => setMenuOpen(false)}
           >
             ✦ Premium
+          </Link>
+          <Link
+            href="/vision"
+            className="block text-gray-600 dark:text-gray-300 font-medium"
+            onClick={() => setMenuOpen(false)}
+          >
+            Vision
           </Link>
           <Link
             href="/corporate"
