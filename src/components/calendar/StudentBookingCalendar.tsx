@@ -5,6 +5,7 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
+import luxonPlugin from '@fullcalendar/luxon3'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
@@ -226,7 +227,7 @@ export function StudentBookingCalendar({
         </div>
 
         <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, luxonPlugin]}
           initialView="timeGridWeek"
           timeZone={studentTimezone}
           headerToolbar={{
