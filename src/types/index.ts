@@ -151,3 +151,18 @@ export const TIMEZONES = [
   { value: 'Asia/Singapore', label: 'Singapore (SGT)' },
   { value: 'Asia/Dubai', label: 'Dubai (GST)' },
 ] as const
+
+export function getTimezoneOptions(): Array<{ value: string; label: string }> {
+  const intlWithSupportedValues = Intl as unknown as {
+    supportedValuesOf?: (key: 'timeZone') => string[]
+  }
+  if (typeof intlWithSupportedValues.supportedValuesOf === 'function') {
+    const values = intlWithSupportedValues.supportedValuesOf('timeZone')
+    const unique = Array.from(new Set(['UTC', ...values]))
+    return unique.map((tz) => ({
+      value: tz,
+      label: tz === 'UTC' ? 'UTC' : tz.replaceAll('_', ' '),
+    }))
+  }
+  return TIMEZONES.map((tz) => ({ value: tz.value, label: tz.label }))
+}

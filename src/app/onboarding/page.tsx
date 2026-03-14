@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, Suspense } from 'react'
+import { useState, useRef, useEffect, Suspense, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslations } from 'next-intl'
@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { YOGA_STYLES, LANGUAGES, TIMEZONES } from '@/types'
+import { YOGA_STYLES, LANGUAGES, getTimezoneOptions } from '@/types'
 import {
   GraduationCap, BookOpen, CheckCircle, Camera, Plus, X,
   ChevronLeft, ChevronRight, Instagram, Youtube, Landmark,
@@ -392,6 +392,7 @@ function OnboardingForm() {
   }
 
   const [stripeNeedsLogin, setStripeNeedsLogin] = useState(false)
+  const timezoneOptions = useMemo(() => getTimezoneOptions(), [])
 
   const handleStripeConnect = async () => {
     setStripeConnecting(true)
@@ -727,7 +728,7 @@ function OnboardingForm() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {TIMEZONES.map(tz => (
+                  {timezoneOptions.map(tz => (
                     <SelectItem key={tz.value} value={tz.value}>{tz.label}</SelectItem>
                   ))}
                 </SelectContent>

@@ -255,7 +255,7 @@ export default async function LandingPage() {
       <section className="relative z-10 py-20 px-4 bg-sage-50 dark:bg-navy-900">
         <div className="max-w-5xl mx-auto text-center">
           <p className="text-sm font-semibold text-sage-600 dark:text-sage-400 uppercase tracking-widest mb-4">{t('pain_label')}</p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10 break-keep sm:whitespace-nowrap">
+          <h2 className="text-[1.35rem] sm:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-10 break-keep sm:whitespace-nowrap">
             {locale === 'ja' ? (
               <>
                 忙しい毎日に、

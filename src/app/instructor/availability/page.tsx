@@ -36,7 +36,7 @@ export default async function AvailabilityPage() {
           <p className="text-gray-500 mt-1">{t('availability_desc')}</p>
           <p className="mt-2 inline-flex items-center gap-1.5 text-sm text-navy-700 bg-navy-50 border border-navy-200 rounded-full px-3 py-1">
             🌏 Your schedule timezone: <strong>{instructorTimezone}</strong>
-            <a href="/settings/profile" className="ml-1 text-xs text-navy-500 hover:underline">Change →</a>
+            <a href="/instructor/profile#timezone" className="ml-1 text-xs text-navy-500 hover:underline">Change →</a>
           </p>
         </div>
 

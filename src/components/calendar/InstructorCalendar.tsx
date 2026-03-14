@@ -17,7 +17,8 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { TimeSlot } from '@/types'
-import { addMinutes, addWeeks, addMonths, format } from 'date-fns'
+import { addMinutes, addWeeks, addMonths } from 'date-fns'
+import { fromZonedTime, toZonedTime, formatInTimeZone } from 'date-fns-tz'
 
 interface InstructorCalendarProps {
   instructorId: string
@@ -41,6 +42,8 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
   const [editMinute, setEditMinute] = useState('00')
   const [editAmPm, setEditAmPm] = useState<'AM' | 'PM'>('AM')
   const [clickedBase, setClickedBase] = useState<{ start: Date; end: Date } | null>(null)
+  const effectiveTimezone =
+    timezone === 'local' ? Intl.DateTimeFormat().resolvedOptions().timeZone : timezone
 
   const toDateInput = (d: Date) => {
     const y = d.getFullYear()
@@ -58,7 +61,9 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
     if (!Number.isFinite(h) || !Number.isFinite(mm)) return null
     if (h === 12) h = 0
     if (editAmPm === 'PM') h += 12
-    return new Date(y, m - 1, d, h, mm, 0, 0)
+    const hh = String(h).padStart(2, '0')
+    const wallTime = `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}T${hh}:${String(mm).padStart(2, '0')}:00`
+    return fromZonedTime(wallTime, effectiveTimezone)
   }
 
   const fetchSlots = useCallback(async () => {
@@ -90,11 +95,17 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
   }, [fetchSlots])
 
   const handleDateClick = (info: any) => {
-    const clickedDate = new Date(info.date)
+    const clickedDate = new Date(info.dateStr || info.date)
     clickedDate.setSeconds(0, 0)
     if (info.allDay) {
       // Month view click has no hour context, so start from a practical default.
-      clickedDate.setHours(9, 0, 0, 0)
+      const isoDate = (info.dateStr || '').slice(0, 10)
+      if (isoDate) {
+        const fallback = fromZonedTime(`${isoDate}T09:00:00`, effectiveTimezone)
+        clickedDate.setTime(fallback.getTime())
+      } else {
+        clickedDate.setHours(9, 0, 0, 0)
+      }
     }
     const now = new Date()
 
@@ -107,12 +118,13 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
     const end = addMinutes(start, 45)
     setClickedBase({ start, end })
     setPendingSlot({ start, end })
-    setEditDate(toDateInput(start))
-    const h24 = start.getHours()
+    const zonedStart = toZonedTime(start, effectiveTimezone)
+    setEditDate(toDateInput(zonedStart))
+    const h24 = zonedStart.getHours()
     const isPm = h24 >= 12
     const h12 = h24 % 12 || 12
     setEditHour(String(h12))
-    setEditMinute(String(start.getMinutes()).padStart(2, '0'))
+    setEditMinute(String(zonedStart.getMinutes()).padStart(2, '0'))
     setEditAmPm(isPm ? 'PM' : 'AM')
     setRepeatType('none')
     setRepeatCount(4)
@@ -120,13 +132,16 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
   }
 
   const getOccurrenceStarts = () => {
-    const baseStart = buildStartFromInputs()
-    if (!baseStart) return []
-    if (repeatType === 'none') return [baseStart]
+    const baseUtc = buildStartFromInputs()
+    if (!baseUtc) return []
+    if (repeatType === 'none') return [baseUtc]
+    const baseZoned = toZonedTime(baseUtc, effectiveTimezone)
     const count = Math.max(1, Math.min(repeatCount, 24))
-    return Array.from({ length: count }, (_, i) =>
-      repeatType === 'weekly' ? addWeeks(baseStart, i) : addMonths(baseStart, i)
-    )
+    return Array.from({ length: count }, (_, i) => {
+      const zoned =
+        repeatType === 'weekly' ? addWeeks(baseZoned, i) : addMonths(baseZoned, i)
+      return fromZonedTime(zoned, effectiveTimezone)
+    })
   }
 
   const handleEventClick = (info: any) => {
@@ -283,10 +298,10 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
               {previewStart && previewEnd && (
                 <>
                   <p className="font-bold text-gray-900 mt-2">
-                    {format(previewStart, 'EEEE, MMMM d, yyyy')}
+                    {formatInTimeZone(previewStart, effectiveTimezone, 'EEEE, MMMM d, yyyy')}
                   </p>
                   <p className="text-navy-600 font-medium">
-                    {format(previewStart, 'h:mm a')} – {format(previewEnd, 'h:mm a')}
+                    {formatInTimeZone(previewStart, effectiveTimezone, 'h:mm a')} – {formatInTimeZone(previewEnd, effectiveTimezone, 'h:mm a')}
                   </p>
                 </>
               )}
@@ -408,12 +423,13 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  setEditDate(toDateInput(clickedBase.start))
-                  const h24 = clickedBase.start.getHours()
+                  const zonedStart = toZonedTime(clickedBase.start, effectiveTimezone)
+                  setEditDate(toDateInput(zonedStart))
+                  const h24 = zonedStart.getHours()
                   const isPm = h24 >= 12
                   const h12 = h24 % 12 || 12
                   setEditHour(String(h12))
-                  setEditMinute(String(clickedBase.start.getMinutes()).padStart(2, '0'))
+                  setEditMinute(String(zonedStart.getMinutes()).padStart(2, '0'))
                   setEditAmPm(isPm ? 'PM' : 'AM')
                 }}
               >
@@ -439,7 +455,7 @@ export function InstructorCalendar({ instructorId, timezone = 'local' }: Instruc
           </DialogHeader>
           {selectedSlot && (
             <p className="text-gray-700 py-2">
-              {format(new Date(selectedSlot.start_time), 'EEEE, MMMM d, yyyy • h:mm a')} – 45 min
+              {formatInTimeZone(new Date(selectedSlot.start_time), effectiveTimezone, 'EEEE, MMMM d, yyyy • h:mm a')} – 45 min
             </p>
           )}
           <DialogFooter>
