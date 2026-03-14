@@ -314,13 +314,13 @@ export default async function LandingPage() {
           <p className="text-sage-600 text-xs font-bold tracking-[0.2em] uppercase mb-6">
             {t('mission_label')}
           </p>
-          <h2 className="text-xl sm:text-2xl font-extrabold text-navy-800 leading-relaxed mb-6 font-[family-name:var(--font-playfair)]">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-navy-800 leading-tight mb-6 font-[family-name:var(--font-playfair)]">
             {t('manifesto_line1')}
           </h2>
           <p className="text-xl sm:text-2xl text-navy-700 max-w-3xl mx-auto leading-relaxed mb-8 font-[family-name:var(--font-playfair)]">
             {t('manifesto_line2')}
           </p>
-          <p className="text-xl sm:text-2xl text-navy-700/90 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-navy-700/90 max-w-4xl mx-auto leading-relaxed">
             {t('mission_body')}
           </p>
           <div className="w-px h-20 bg-gradient-to-b from-sage-400 via-sage-300 to-transparent mx-auto mt-12" />
