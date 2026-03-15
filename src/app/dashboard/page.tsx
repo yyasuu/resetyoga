@@ -5,7 +5,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { getTranslations } from 'next-intl/server'
 import { format } from 'date-fns'
 import { Button } from '@/components/ui/button'
-import { Calendar, Search, Video, AlertCircle, FileText, BookOpen, Settings } from 'lucide-react'
+import { Calendar, Search, Video, AlertCircle, FileText, BookOpen, Settings, GraduationCap, ArrowRight } from 'lucide-react'
 import { cookies } from 'next/headers'
 import { StudentSubscription } from '@/types'
 import { AccountCancelButton } from '@/components/account/AccountCancelButton'
@@ -143,6 +143,26 @@ export default async function StudentDashboardPage() {
             ) : null}
           </div>
         )}
+
+        {/* Become an Instructor CTA */}
+        <Link href="/apply-instructor" className="block mb-6">
+          <div className="rounded-xl border border-sage-200 dark:border-sage-800 bg-sage-50 dark:bg-sage-900/20 px-5 py-4 flex items-center justify-between gap-4 hover:bg-sage-100 dark:hover:bg-sage-900/30 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-sage-100 dark:bg-sage-900/40 flex items-center justify-center shrink-0">
+                <GraduationCap className="h-5 w-5 text-sage-600 dark:text-sage-400" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-sage-800 dark:text-sage-300">
+                  {locale === 'ja' ? '講師として教えませんか？' : 'Are you a yoga teacher?'}
+                </p>
+                <p className="text-xs text-sage-600 dark:text-sage-500">
+                  {locale === 'ja' ? '3ステップで講師申請できます。' : 'Apply to teach in 3 easy steps.'}
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="h-4 w-4 text-sage-500 dark:text-sage-400 shrink-0" />
+          </div>
+        </Link>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Upcoming Sessions */}
