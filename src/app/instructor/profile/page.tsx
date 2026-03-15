@@ -601,7 +601,8 @@ export default function InstructorProfilePage() {
         </Section>
 
         <Button
-          className="w-full bg-navy-600 hover:bg-navy-700 text-white h-12 text-base rounded-full"
+          variant="navy"
+          className="w-full h-12 text-base rounded-full"
           onClick={handleSave}
           disabled={saving}
         >

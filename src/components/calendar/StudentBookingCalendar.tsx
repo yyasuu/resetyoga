@@ -164,16 +164,17 @@ export function StudentBookingCalendar({
     <div>
       {/* Card required: trial user without payment method on file */}
       {subscription?.status === 'trial' && !hasCard && userId && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold text-amber-900">Register a card to book your free sessions</p>
-            <p className="text-sm text-amber-700 mt-1">
+        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4 mb-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+          <div className="min-w-0">
+            <p className="font-semibold text-amber-900 dark:text-amber-200">Register a card to book your free sessions</p>
+            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
               A payment method is required to activate your trial. You will not be charged.
             </p>
             <Button
+              variant="navy"
               size="sm"
-              className="mt-2 bg-amber-600 hover:bg-amber-700"
+              className="mt-2"
               onClick={() => router.push('/subscription?add_card=true')}
             >
               Register Payment Method
@@ -184,13 +185,14 @@ export function StudentBookingCalendar({
 
       {/* No sessions left: quota exhausted */}
       {!canBook && userId && !(subscription?.status === 'trial' && !hasCard) && (
-        <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-orange-500 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold text-orange-900">{t('requires_subscription')}</p>
+        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-xl p-4 mb-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-orange-500 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+          <div className="min-w-0">
+            <p className="font-semibold text-orange-900 dark:text-orange-200">{t('requires_subscription')}</p>
             <Button
+              variant="navy"
               size="sm"
-              className="mt-2 bg-orange-600 hover:bg-orange-700"
+              className="mt-2"
               onClick={() => router.push('/subscription')}
             >
               Subscribe for $19.99/month
