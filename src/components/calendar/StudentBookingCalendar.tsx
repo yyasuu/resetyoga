@@ -161,20 +161,22 @@ export function StudentBookingCalendar({
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Card required: trial user without payment method on file */}
       {subscription?.status === 'trial' && !hasCard && userId && (
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-xl p-4 mb-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-amber-500 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-          <div className="min-w-0">
-            <p className="font-semibold text-amber-900 dark:text-amber-200">Register a card to book your free sessions</p>
-            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+        <div className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-900/20 sm:flex-row sm:items-start sm:gap-4 sm:p-5">
+          <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 sm:mt-0.5" />
+          <div className="min-w-0 space-y-3">
+            <p className="font-semibold leading-snug text-amber-950 dark:text-amber-200">
+              Register a card to book your free sessions
+            </p>
+            <p className="text-sm text-amber-700 dark:text-amber-300">
               A payment method is required to activate your trial. You will not be charged.
             </p>
             <Button
               variant="navy"
               size="sm"
-              className="mt-2"
+              className="h-auto min-h-10 w-full whitespace-normal px-4 py-2.5 text-center leading-snug sm:w-auto"
               onClick={() => router.push('/subscription?add_card=true')}
             >
               Register Payment Method
@@ -185,14 +187,14 @@ export function StudentBookingCalendar({
 
       {/* No sessions left: quota exhausted */}
       {!canBook && userId && !(subscription?.status === 'trial' && !hasCard) && (
-        <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 rounded-xl p-4 mb-4 flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-orange-500 dark:text-orange-400 flex-shrink-0 mt-0.5" />
-          <div className="min-w-0">
+        <div className="flex flex-col gap-3 rounded-2xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-700 dark:bg-orange-900/20 sm:flex-row sm:items-start sm:gap-4 sm:p-5">
+          <AlertCircle className="h-5 w-5 text-orange-500 dark:text-orange-400 flex-shrink-0 sm:mt-0.5" />
+          <div className="min-w-0 space-y-3">
             <p className="font-semibold text-orange-900 dark:text-orange-200">{t('requires_subscription')}</p>
             <Button
               variant="navy"
               size="sm"
-              className="mt-2"
+              className="h-auto min-h-10 w-full whitespace-normal px-4 py-2.5 text-center leading-snug sm:w-auto"
               onClick={() => router.push('/subscription')}
             >
               Subscribe for $19.99/month
@@ -202,7 +204,7 @@ export function StudentBookingCalendar({
       )}
 
       {!userId && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
           <p className="text-blue-800 font-medium">
             Please{' '}
             <a href="/login" className="underline font-bold">

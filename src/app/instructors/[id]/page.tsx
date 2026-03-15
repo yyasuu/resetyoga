@@ -200,28 +200,28 @@ export default async function InstructorDetailPage({
           {/* ── Right: Tabs ── */}
           <div className="lg:col-span-2 min-w-0">
               {/* Mobile-only nav strip — sits directly above tab content, guaranteed no overlap */}
-              <div className="lg:hidden mb-6">
-                <TabsList className="w-full grid grid-cols-3 gap-2 bg-white dark:bg-navy-800 border border-gray-200 dark:border-navy-700 rounded-2xl p-2 h-auto">
+              <div className="lg:hidden mb-10">
+                <TabsList className="flex h-auto w-full flex-col items-stretch justify-start gap-3 rounded-2xl border border-gray-200 bg-white p-3 dark:border-navy-700 dark:bg-navy-800">
                   <TabsTrigger
                     value="about"
-                    className="flex flex-col items-center justify-center gap-1 h-16 rounded-xl border border-navy-200 dark:border-navy-600 bg-navy-50 dark:bg-navy-700 text-navy-700 dark:text-white text-xs font-semibold data-[state=active]:bg-navy-600 data-[state=active]:text-white data-[state=active]:border-navy-600 dark:data-[state=active]:bg-navy-600 dark:data-[state=active]:text-white dark:data-[state=active]:border-navy-600"
+                    className="!flex-none !h-auto flex w-full min-h-[4.75rem] shrink-0 items-center justify-start gap-3 rounded-xl border border-navy-200 bg-navy-50 px-4 py-4 text-left text-sm font-semibold whitespace-normal text-navy-700 dark:border-navy-500 dark:bg-navy-700 dark:text-white data-[state=active]:border-navy-600 data-[state=active]:bg-navy-600 data-[state=active]:text-white dark:data-[state=active]:border-navy-600 dark:data-[state=active]:bg-navy-600 dark:data-[state=active]:text-white"
                   >
                     <FileText className="h-5 w-5 flex-shrink-0" />
                     <span>About</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="reviews"
-                    className="flex flex-col items-center justify-center gap-1 h-16 rounded-xl border border-sage-300 dark:border-sage-500 bg-sage-100 dark:bg-sage-600 text-sage-800 dark:text-white text-xs font-semibold data-[state=active]:bg-sage-600 data-[state=active]:text-white data-[state=active]:border-sage-600 dark:data-[state=active]:bg-sage-500 dark:data-[state=active]:text-white dark:data-[state=active]:border-sage-500"
+                    className="!flex-none !h-auto flex w-full min-h-[4.75rem] shrink-0 items-center justify-start gap-3 rounded-xl border border-sage-300 bg-sage-100 px-4 py-4 text-left text-sm font-semibold whitespace-normal text-sage-900 dark:border-sage-700 dark:bg-sage-200 dark:text-sage-950 data-[state=active]:border-sage-600 data-[state=active]:bg-sage-600 data-[state=active]:text-white dark:data-[state=active]:border-sage-500 dark:data-[state=active]:bg-sage-500 dark:data-[state=active]:text-white"
                   >
-                    <MessageSquare className="h-5 w-5 flex-shrink-0" />
+                    <MessageSquare className="h-5 w-5 flex-shrink-0 text-sage-950 dark:text-sage-950" />
                     <span>Reviews</span>
                   </TabsTrigger>
                   <TabsTrigger
                     value="book"
-                    className="flex flex-col items-center justify-center gap-1 h-16 rounded-xl border border-indigo-200 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-800 text-indigo-700 dark:text-white text-xs font-semibold data-[state=active]:bg-indigo-600 data-[state=active]:text-white data-[state=active]:border-indigo-600 dark:data-[state=active]:bg-indigo-600 dark:data-[state=active]:text-white dark:data-[state=active]:border-indigo-600"
+                    className="!flex-none !h-auto flex w-full min-h-[4.75rem] shrink-0 items-center justify-start gap-3 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-4 text-left text-sm font-semibold whitespace-normal text-indigo-700 dark:border-indigo-500 dark:bg-indigo-900/60 dark:text-indigo-100 data-[state=active]:border-indigo-600 data-[state=active]:bg-indigo-600 data-[state=active]:text-white dark:data-[state=active]:border-indigo-600 dark:data-[state=active]:bg-indigo-600 dark:data-[state=active]:text-white"
                   >
                     <CalendarDays className="h-5 w-5 flex-shrink-0" />
-                    <span>Book</span>
+                    <span>Book a Session</span>
                   </TabsTrigger>
                 </TabsList>
               </div>
@@ -234,7 +234,7 @@ export default async function InstructorDetailPage({
               </div>
 
               {/* Book */}
-              <TabsContent value="book">
+              <TabsContent value="book" className="mt-4 lg:mt-0">
                 <StudentBookingCalendar
                   instructorId={id}
                   instructorName={instructor.full_name || 'Instructor'}
@@ -243,7 +243,7 @@ export default async function InstructorDetailPage({
               </TabsContent>
 
               {/* About */}
-              <TabsContent value="about">
+              <TabsContent value="about" className="mt-4 lg:mt-0">
                 <div className="bg-white dark:bg-navy-800 rounded-xl border border-gray-200 dark:border-navy-700 p-6">
                   <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">
                     {t('about')}
@@ -298,7 +298,7 @@ export default async function InstructorDetailPage({
               </TabsContent>
 
               {/* Reviews */}
-              <TabsContent value="reviews">
+              <TabsContent value="reviews" className="mt-4 lg:mt-0">
                 {isStudent ? (
                   <div className="space-y-4">
                     {/* Rating summary (Amazon-style breakdown) */}
