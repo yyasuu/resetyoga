@@ -44,7 +44,7 @@ export function SwitchToStudentButton() {
   }
 
   return (
-    <div className="mb-6">
+    <div className="mt-6">
       {!open ? (
         <button
           onClick={() => setOpen(true)}
