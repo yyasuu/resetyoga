@@ -109,11 +109,17 @@ export async function POST(request: NextRequest) {
       // ── customer.subscription.updated ──────────────────────────────────────
       case 'customer.subscription.updated': {
         const sub = event.data.object as Stripe.Subscription
+        // If cancel_at_period_end is set, Stripe still reports status='active'
+        // but the user has cancelled — keep our DB as 'canceled' so the cancel
+        // API's immediate write is not overwritten back to 'active'.
+        const newStatus = sub.cancel_at_period_end
+          ? 'canceled'
+          : sub.status === 'active'
+            ? 'active'
+            : (sub.status as string)
         await supabaseAdmin
           .from('student_subscriptions')
-          .update({
-            status: sub.status === 'active' ? 'active' : (sub.status as string),
-          })
+          .update({ status: newStatus })
           .eq('stripe_subscription_id', sub.id)
         break
       }
