@@ -98,7 +98,7 @@ export default async function InstructorDetailPage({
   })
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-navy-950">
+    <div className="min-h-screen bg-gray-50 dark:bg-navy-900">
       <Navbar user={currentProfile} />
 
       <div className="max-w-6xl mx-auto px-4 py-8">

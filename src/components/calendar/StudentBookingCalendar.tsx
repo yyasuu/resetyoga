@@ -164,13 +164,13 @@ export function StudentBookingCalendar({
     <div className="space-y-6">
       {/* Card required: trial user without payment method on file */}
       {subscription?.status === 'trial' && !hasCard && userId && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-900/20 sm:flex-row sm:items-start sm:gap-4 sm:p-5">
-          <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 sm:mt-0.5" />
+        <div className="flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-500 dark:bg-amber-900/70 sm:flex-row sm:items-start sm:gap-4 sm:p-5">
+          <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-200 flex-shrink-0 sm:mt-0.5" />
           <div className="min-w-0 space-y-3">
-            <p className="font-semibold leading-snug text-amber-950 dark:text-amber-200">
+            <p className="font-semibold leading-snug text-amber-950 dark:text-amber-100">
               Register a card to book your free sessions
             </p>
-            <p className="text-sm text-amber-700 dark:text-amber-300">
+            <p className="text-sm text-amber-700 dark:text-amber-200">
               A payment method is required to activate your trial. You will not be charged.
             </p>
             <Button
@@ -187,10 +187,10 @@ export function StudentBookingCalendar({
 
       {/* No sessions left: quota exhausted */}
       {!canBook && userId && !(subscription?.status === 'trial' && !hasCard) && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-700 dark:bg-orange-900/20 sm:flex-row sm:items-start sm:gap-4 sm:p-5">
-          <AlertCircle className="h-5 w-5 text-orange-500 dark:text-orange-400 flex-shrink-0 sm:mt-0.5" />
+        <div className="flex flex-col gap-3 rounded-2xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-500 dark:bg-orange-900/70 sm:flex-row sm:items-start sm:gap-4 sm:p-5">
+          <AlertCircle className="h-5 w-5 text-orange-500 dark:text-orange-200 flex-shrink-0 sm:mt-0.5" />
           <div className="min-w-0 space-y-3">
-            <p className="font-semibold text-orange-900 dark:text-orange-200">{t('requires_subscription')}</p>
+            <p className="font-semibold text-orange-900 dark:text-orange-100">{t('requires_subscription')}</p>
             <Button
               variant="navy"
               size="sm"
@@ -204,8 +204,8 @@ export function StudentBookingCalendar({
       )}
 
       {!userId && (
-        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4">
-          <p className="text-blue-800 font-medium">
+        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-700 dark:bg-blue-950">
+          <p className="text-blue-800 dark:text-blue-200 font-medium">
             Please{' '}
             <a href="/login" className="underline font-bold">
               log in
@@ -224,7 +224,7 @@ export function StudentBookingCalendar({
           <div className="w-4 h-4 rounded bg-green-500 flex-shrink-0" />
           <span>Available 45-min slot — click to book</span>
           {studentTimezone !== 'local' && (
-            <span className="ml-auto flex items-center gap-1.5 text-xs text-navy-600 bg-navy-50 border border-navy-200 rounded-full px-3 py-1">
+            <span className="ml-auto flex items-center gap-1.5 text-xs text-navy-600 bg-navy-50 border border-navy-200 rounded-full px-3 py-1 dark:bg-navy-800 dark:border-navy-700 dark:text-navy-200">
               🌏 {studentTimezone}
             </span>
           )}
