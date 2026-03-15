@@ -116,6 +116,9 @@ export default async function InstructorDashboardPage() {
           </Link>
         </div>
 
+        {/* Switch to Student */}
+        <SwitchToStudentButton />
+
         {/* Stats */}
         <div className="grid sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-white dark:bg-navy-800 rounded-xl p-6 border border-gray-200 dark:border-navy-700">
@@ -271,7 +274,6 @@ export default async function InstructorDashboardPage() {
                     {locale === 'ja' ? '講師利用規約' : 'Instructor Terms'}
                   </Button>
                 </Link>
-                <SwitchToStudentButton />
                 <AccountCancelButton role="instructor" />
               </div>
             </div>
