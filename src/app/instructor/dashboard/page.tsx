@@ -9,6 +9,7 @@ import { Calendar, Users, Star, Video, ChevronRight, FileText, DollarSign, BookO
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { AccountCancelButton } from '@/components/account/AccountCancelButton'
+import { SwitchToStudentButton } from '@/components/instructor/SwitchToStudentButton'
 
 export default async function InstructorDashboardPage() {
   const supabase = await createClient()
@@ -270,6 +271,7 @@ export default async function InstructorDashboardPage() {
                     {locale === 'ja' ? '講師利用規約' : 'Instructor Terms'}
                   </Button>
                 </Link>
+                <SwitchToStudentButton />
                 <AccountCancelButton role="instructor" />
               </div>
             </div>
