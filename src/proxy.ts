@@ -24,15 +24,12 @@ const publicPaths = [
 ]
 
 function isPublicPath(pathname: string): boolean {
-  return publicPaths.some(
-    (p) => pathname === p || pathname.startsWith(p + '/')
-  )
+  return publicPaths.some((p) => pathname === p || pathname.startsWith(p + '/'))
 }
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Skip static files and API webhook
   if (
     pathname.startsWith('/_next') ||
     pathname.includes('.') ||
@@ -41,7 +38,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // If Supabase is not configured, pass through
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return NextResponse.next()
   }
@@ -71,57 +67,45 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // If not authenticated and accessing a protected path, redirect to login
   if (!user && !isPublicPath(pathname)) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // Role-based routing for authenticated users
   if (user) {
-    // Redirect away from auth pages
-    if (pathname === '/login' || pathname === '/register') {
+    const needsRoleCheck =
+      pathname === '/login' ||
+      pathname === '/register' ||
+      pathname.startsWith('/instructor/') ||
+      pathname.startsWith('/admin/')
+
+    if (needsRoleCheck) {
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single()
+      const role = profile?.role
 
-      if (profile?.role) {
-        const url = request.nextUrl.clone()
-        url.pathname =
-          profile.role === 'instructor'
-            ? '/instructor/dashboard'
-            : profile.role === 'admin'
-            ? '/admin/dashboard'
-            : '/dashboard'
-        return NextResponse.redirect(url)
+      if (pathname === '/login' || pathname === '/register') {
+        if (role) {
+          const url = request.nextUrl.clone()
+          url.pathname =
+            role === 'instructor' ? '/instructor/dashboard' :
+            role === 'admin'      ? '/admin/dashboard' :
+                                    '/dashboard'
+          return NextResponse.redirect(url)
+        }
       }
-    }
 
-    // Protect instructor routes
-    if (pathname.startsWith('/instructor/')) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-      if (profile?.role !== 'instructor' && profile?.role !== 'admin') {
+      if (pathname.startsWith('/instructor/') && role !== 'instructor' && role !== 'admin') {
         const url = request.nextUrl.clone()
         url.pathname = '/dashboard'
         return NextResponse.redirect(url)
       }
-    }
 
-    // Protect admin routes
-    if (pathname.startsWith('/admin/')) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-      if (profile?.role !== 'admin') {
+      if (pathname.startsWith('/admin/') && role !== 'admin') {
         const url = request.nextUrl.clone()
         url.pathname = '/dashboard'
         return NextResponse.redirect(url)

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Navbar } from '@/components/layout/Navbar'
@@ -34,9 +34,9 @@ export default async function InstructorDashboardPage() {
     .single()
 
   // Stripe payout connection status
-  const supabaseAdmin = await import('@/lib/supabase/server').then(m => m.createAdminClient())
+  const adminClient = await createAdminClient()
 
-  const { data: payoutInfo } = await (await supabaseAdmin)
+  const { data: payoutInfo } = await adminClient
     .from('instructor_payout_info')
     .select('stripe_account_id, stripe_onboarding_complete')
     .eq('id', user.id)
@@ -44,7 +44,7 @@ export default async function InstructorDashboardPage() {
 
   const stripeConnected = !!(payoutInfo?.stripe_account_id && payoutInfo?.stripe_onboarding_complete)
 
-  const { data: recentPayouts } = await (await supabaseAdmin)
+  const { data: recentPayouts } = await adminClient
     .from('instructor_payouts')
     .select('id, session_count, amount_usd, payment_method, paid_at')
     .eq('instructor_id', user.id)
